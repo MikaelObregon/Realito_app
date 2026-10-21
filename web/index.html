@@ -6,9 +6,9 @@
   <title>Realito — Control de Finanzas Personales</title>
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Realito" />
-  <meta name="theme-color" content="#0D7A5F" />
+  <meta name="theme-color" content="#0B1120" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
   <link rel="manifest" href="/manifest.json" />
@@ -80,6 +80,7 @@
       position: fixed;
       inset: 0;
       width: 100%;
+      height: 100%;
       background-color: var(--phone-bg);
       color: var(--text-main);
       overflow: hidden;
@@ -89,6 +90,20 @@
       border: none;
       border-radius: 0;
       box-shadow: none;
+    }
+
+    /* Barra de navegación inferior anclada físicamente a la pantalla en celulares */
+    .bottom-nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      height: calc(56px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background-color: var(--surface-card);
+      border-top: 1px solid var(--border-color);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
     }
 
     /* Solo en monitores de PC anchos (> 768px) mostramos el marco de prueba */
@@ -109,6 +124,9 @@
         border-radius: 36px;
         border: 1px solid var(--border-color);
         box-shadow: 0 25px 65px rgba(0, 0, 0, 0.45);
+      }
+      .bottom-nav-bar {
+        position: absolute;
       }
     }
 
@@ -583,12 +601,26 @@
           <div id="backupActionFeedback" class="text-[11px] font-bold mt-2 text-center is-hidden" style="color:#10B981;"></div>
         </div>
 
+        <!-- 6. Actualizaciones y Caché PWA -->
+        <div class="solid-card p-4 rounded-2xl">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="text-sm font-bold">🔄 Versión y Actualizaciones</h3>
+          </div>
+          <p class="text-xs mb-3" style="color: var(--text-muted);">
+            Si tenés la app agregada a la pantalla de inicio y querés forzar la última versión instalada:
+          </p>
+          <button type="button" onclick="forceAppRefresh()" class="w-full py-2.5 px-3 rounded-xl solid-elevated text-xs font-bold cursor-pointer flex items-center justify-center gap-1.5" style="color:#10B981;">
+            <span>⚡</span>
+            <span>Recargar Última Versión (Limpiar Caché)</span>
+          </button>
+        </div>
+
       </div>
 
     </div>
 
     <!-- Barra de Navegación Inferior Nativa (5 accesos con + Cargar central) -->
-    <div class="solid-card flex justify-around items-center px-1" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 30; height: calc(56px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); border-bottom: none; border-left: none; border-right: none; box-shadow: 0 -4px 20px rgba(0,0,0,0.08);">
+    <div id="bottomNavBar" class="bottom-nav-bar flex justify-around items-center px-1">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-bold cursor-pointer py-1" style="color:#10B981;">
         <span class="text-base leading-none">📊</span>
         <span class="text-[10px]">Inicio</span>
@@ -3516,6 +3548,20 @@
       }, 250);
     }
 
+    async function forceAppRefresh() {
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (let r of regs) await r.unregister();
+        }
+      } catch (e) {}
+      window.location.reload(true);
+    }
+
     loadStateFromLocalStorage();
     loadSupabaseConfig();
     updateThemeColorMeta();
@@ -3524,10 +3570,16 @@
       pullFromSupabaseCloud(false);
     }
 
-    // Registro de Service Worker para soporte Offline 100%
+    // Registro de Service Worker para soporte Offline 100% y Auto-actualización
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.register('./sw.js?v=2').then((reg) => {
+          reg.update().catch(() => {});
+        }).catch(() => {});
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
       });
     }
   </script>
