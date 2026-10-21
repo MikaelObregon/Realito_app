@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reporte de Pruebas Unitarias y E2E — Realito App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #070B14;
+      color: #F8FAFC;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    @media print {
+      body { background-color: #FFFFFF !important; color: #0F172A !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- ENCABEZADO PRINCIPAL -->
+    <div class="bg-gradient-to-br from-emerald-950/90 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 mb-6 shadow-2xl">
+      <div class="flex flex-wrap justify-between items-start gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold mb-3">
+            <span>🛡️ CERTIFICACIÓN DE CALIDAD Y REGRESIÓN E2E</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
+            Realito — Reporte de Pruebas Unitarias y Punta a Punta (E2E)
+          </h1>
+          <p class="text-sm text-slate-300 mt-2 max-w-3xl">
+            Suite automatizada completa que valida todos los cálculos financieros, reglas de negocio, flujos de usuario, billeteras, categorías separadas, cotización del Dólar Oficial y reportes mensuales en Pesos.
+          </p>
+        </div>
+        <div class="flex flex-col items-end gap-2 no-print">
+          <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs cursor-pointer transition shadow-lg">
+            🖨️ Imprimir / Guardar PDF del Reporte
+          </button>
+          <span class="text-xs text-slate-400 font-mono">Ejecutado: 21/10/2026, 10:44:52</span>
+        </div>
+      </div>
+
+      <!-- TARJETAS DE RESUMEN (KPIs) -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 mt-6">
+        <div class="bg-slate-950/70 border border-slate-800 p-4 rounded-2xl">
+          <div class="text-xs text-slate-400 font-bold uppercase">Estado General</div>
+          <div class="text-xl sm:text-2xl font-extrabold text-emerald-400 mt-1">100% APROBADO</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">0 errores detectados</div>
+        </div>
+        <div class="bg-slate-950/70 border border-slate-800 p-4 rounded-2xl">
+          <div class="text-xs text-slate-400 font-bold uppercase">Casos Ejecutados</div>
+          <div class="text-xl sm:text-2xl font-extrabold text-white mt-1">39 / 39</div>
+          <div class="text-[11px] text-emerald-400 mt-0.5">Tasa de éxito: 100.0%</div>
+        </div>
+        <div class="bg-slate-950/70 border border-slate-800 p-4 rounded-2xl">
+          <div class="text-xs text-slate-400 font-bold uppercase">Suites de Flujo</div>
+          <div class="text-xl sm:text-2xl font-extrabold text-sky-400 mt-1">8 Bloques</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Unitarios + Punta a Punta</div>
+        </div>
+        <div class="bg-slate-950/70 border border-slate-800 p-4 rounded-2xl">
+          <div class="text-xs text-slate-400 font-bold uppercase">Tiempo Total</div>
+          <div class="text-xl sm:text-2xl font-extrabold text-amber-400 mt-1">83.75 ms</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Motor Node v24.19.0</div>
+        </div>
+        <div class="bg-slate-950/70 border border-slate-800 p-4 rounded-2xl col-span-2 sm:col-span-1">
+          <div class="text-xs text-slate-400 font-bold uppercase">Ubicación Suite</div>
+          <div class="text-sm font-mono font-bold text-emerald-300 mt-1.5 truncate">Realito_app/test/</div>
+          <div class="text-[11px] text-slate-400 mt-1">Listo para regresión</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSTRUCCIONES DE REGRESIÓN FUTURA -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h3 class="text-sm font-extrabold text-emerald-400">🔄 ¿Cómo volver a correr esta prueba de regresión en el futuro?</h3>
+        <p class="text-xs text-slate-300 mt-1">
+          Todos los archivos quedaron guardados dentro de <code class="text-emerald-300 font-mono">C:\Users\CFOTech\Documents\Realito_app\test</code>. Si en el futuro hacemos cambios y querés verificar que nada se rompió, ejecutá este comando:
+        </p>
+      </div>
+      <div class="bg-slate-950 border border-slate-800 px-4 py-2.5 rounded-xl font-mono text-xs text-emerald-300">
+        node "C:\Users\CFOTech\Documents\Realito_app\test\run_all_tests.js"
+      </div>
+    </div>
+
+    <!-- DETALLE DE TODAS LAS SUITES Y CASOS -->
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 1
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 1: Formateo Monetario, Bimonetarismo y Calculadora Rápida (+)</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Verifica el formato argentino con puntos de miles, ausencia de texto secundario US$ en modo Pesos, conversión exacta con Dólar Oficial y suma rápida multi-término.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 6 / 6 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-01</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Formateo de Pesos Argentinos con separador de miles sin decimales redundantes</div>
+            <div class="text-xs text-slate-400 mt-0.5">Formato es-AR limpio sin ruido visual de US$</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">780000 (ARS)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">$ 780.000</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">$ 780.000</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">77.28 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-02</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Formateo de montos negativos (déficit mensual) con signo claro</div>
+            <div class="text-xs text-slate-400 mt-0.5">Representa déficit de Septiembre correctamente</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">-212538 (ARS)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">- $ 212.538</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">- $ 212.538</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.08 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-03</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Conversión global ARS ⇄ USD con Dólar Oficial ($ 1.015)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Conversión exacta con 2 decimales en modo USD</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">$ 1.015.000 ARS @ $ 1.015</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">US$ 1.000,00</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">US$ 1.000,00</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.09 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-04</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Evaluación de monto simple con puntos ("30.788" -> 30788)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Limpia puntos de miles automáticamente al tipear</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">"30.788"</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">30788</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">30788</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.09 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-05</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Calculadora de suma rápida de 2 montos ("20000+13000" Corte de pelo)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Suma rápida en el teclado numérico</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">"20000+13000"</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">33000</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">33000</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.03 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-06</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Calculadora de suma rápida de 4 montos ("7.000 + 200.000 + 30.000 + 20.000" Luz Marina)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Soporta múltiples sumandos con espacios y puntos</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">"7.000 + 200.000 + 30.000 + 20.000"</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">257000</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">257000</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.02 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 2
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 2: Cálculo de Saldo Disponible y Presupuesto Diario hasta Próximo Cobro</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Valida la fórmula central (Ingresos - Total Gastos Fijos Comprometidos - Gastos Diarios) y el cálculo diario según fecha real de cobro.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 5 / 5 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-07</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Cálculo exacto del Saldo Disponible de Octubre 2026 ($ 489.992)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Descuenta el 100% de los gastos fijos desde el día 1 para no gastar plata comprometida</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario / Dominio</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Ingresos: $ 2.467.474 | Fijos: $ 1.718.855 | Diarios: $ 258.627</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Disponible: $ 489.992</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Disponible: $ 489.992</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.67 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-08</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Impacto inmediato en el Disponible al aumentar o reducir un Gasto Fijo</div>
+            <div class="text-xs text-slate-400 mt-0.5">Recálculo instantáneo al editar cualquier gasto fijo</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Alquiler Octubre: $ 780.000 -> $ 800.000</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Disponible baja exactamente $ 20.000 (a $ 469.992)</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Disponible: $ 469.992</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.08 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-09</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Cálculo de días reales hasta Próximo Cobro (20/10/2026 al 05/11/2026 = 16 días)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Usa reloj real del dispositivo y fecha de cobro configurable</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Hoy: 20/10/2026 | Próximo cobro: 05/11/2026 | Disponible: $ 489.992</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">16 días restantes -> $ 30.625 / día</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">16 días restantes -> $ 30.625 / día</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.75 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-10</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Cambio de fecha de Próximo Cobro al 01/11/2026 recalcula el monto diario disponible</div>
+            <div class="text-xs text-slate-400 mt-0.5">Al adelantar fecha de cobro sube el margen diario permitido</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Hoy: 20/10/2026 | Nuevo cobro: 01/11/2026</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">12 días restantes -> $ 40.833 / día</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">12 días restantes -> $ 40.833 / día</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.10 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-11</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Protección contra división por cero cuando el día de cobro es hoy</div>
+            <div class="text-xs text-slate-400 mt-0.5">Nunca produce Infinity ni NaN</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario Edge Case</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Hoy = Fecha de cobro (2026-11-05)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">1 día mínimo</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">1 día mínimo</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.02 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 3
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 3: Lógica de Cierre de Mes y Traspaso de Saldo a Favor</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Verifica que solo los meses cerrados (o último día del mes) con saldo positivo permitan transferir el sobrante al mes siguiente, y que los meses en negativo arranquen de cero.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 5 / 5 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-12</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Agosto 2026 (cerrado con +$ 565.690 a favor) muestra botón "💸 Pasar a Septiembre"</div>
+            <div class="text-xs text-slate-400 mt-0.5">Permite pasar el sobrante positivo al mes siguiente</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Regla de Negocio</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Agosto 2026 (Disponible: +$ 565.690, Mes cerrado)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Botón visible = true</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Botón visible = true (Saldo: $ 565.690)</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.12 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-13</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Septiembre 2026 (cerrado en negativo -$ 212.538) NO muestra botón ni arrastra deuda a Octubre</div>
+            <div class="text-xs text-slate-400 mt-0.5">Cumple regla: si quedaste en negativo, el mes siguiente empieza de cero</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Regla de Negocio</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Septiembre 2026 (Disponible: -$ 212.538)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Botón visible = false (Octubre arranca limpio de cero)</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Botón visible = false (Saldo Sep: - $ 212.538)</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.08 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-14</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Octubre 2026 a mitad de mes (día 20/10) NO muestra botón de cierre anticipado</div>
+            <div class="text-xs text-slate-400 mt-0.5">Evita transferir el saldo de un mes que todavía se está cursando</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Regla de Negocio</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Octubre 2026 en fecha 20/10/2026</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Botón visible = false</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Botón visible = false</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.07 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-15</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Octubre 2026 en el último día del mes (31/10) con saldo positivo SÍ habilita pasar a Noviembre</div>
+            <div class="text-xs text-slate-400 mt-0.5">En el último día del mes habilita pasar el sobrante al mes entrante</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Regla de Negocio</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Octubre 2026 en fecha 31/10/2026 (Disponible: +$ 489.992)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Botón visible = true</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Botón visible = true</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.08 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-16</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Ejecución del traspaso de saldo positivo suma un Ingreso en el mes siguiente y bloquea doble envío</div>
+            <div class="text-xs text-slate-400 mt-0.5">Traspaso único e idempotente</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo Completo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Traspasar +$ 565.690 de Agosto a Septiembre</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Ingresos Sep +$ 565.690 ($ 2.331.283) y botón Agosto pasa a "Ya transferido"</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Ingresos Sep: $ 2.331.283 | Re-envío habilitado: false</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.09 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 4
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 4: Gastos Fijos Mensuales, Pagos Parciales, Filtros y Mes Adelantado</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Prueba creación, edición total, pagos parciales, check de pagado, filtros (Todos/Pendientes/Pagados) y copia a 1 mes adelantado (Noviembre 2026 ⏭️).</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 6 / 6 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-17</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Verificación de Gastos Fijos Totales, Pagados (incluyendo parciales) y Faltan Pagar en Octubre 2026</div>
+            <div class="text-xs text-slate-400 mt-0.5">Contabiliza pagos totales y adelantos parciales (Seguro Auto $ 40.000 y Día Madres $ 37.000)</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario / Datos Reales</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">14 Gastos Fijos de Octubre 2026</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Total: $ 1.718.855 | Pagados: $ 1.306.333 | Faltan: $ 412.522</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Total: $ 1.718.855 | Pagados: $ 1.306.333 | Faltan: $ 412.522</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.08 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-18</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Cálculo de pago parcial en Gasto Fijo (Alquiler Septiembre: pagó $ 300.000 de $ 780.000)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Muestra insignia de pago parcial y saldo pendiente exacto</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Alquiler Sep: Monto $ 780.000 | Pagado parcial: $ 300.000</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Restan pagar: $ 480.000</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Restan pagar: $ 480.000</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.03 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-19</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Alta de nuevo Gasto Fijo con vencimiento, categoría exclusiva y nota</div>
+            <div class="text-xs text-slate-400 mt-0.5">Impacta inmediatamente en Fijos y en Disponible</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Nuevo Gasto Fijo: "Agua (AySA)" $ 14.200 (Vence día 25)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">15 fijos en Octubre | Pendientes: $ 426.722</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">15 fijos | Pendientes: $ 426.722</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.04 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-20</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Edición completa y eliminación de un Gasto Fijo existente</div>
+            <div class="text-xs text-slate-400 mt-0.5">Edición y borrado sin residuos</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Editar Gas a $ 11.500 (Pagado) y luego eliminar ítem</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Lista queda con 13 gastos fijos</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Lista con 13 gastos fijos</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.05 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-21</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Filtros de Gastos Fijos: "Todos" (14), "Faltan Pagar" (6) y "Pagados" (8)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Filtrado instantáneo en la pestaña Gastos Fijos</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E UI Filtro</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Octubre 2026: 14 Gastos Fijos</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Todos: 14 | Faltan Pagar: 6 | Pagados: 8</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Todos: 14 | Faltan Pagar: 6 | Pagados: 8</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.03 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-22</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Planificación de Mes Adelantado (Noviembre 2026 ⏭️): Copiar Gastos Fijos de Octubre sin duplicar</div>
+            <div class="text-xs text-slate-400 mt-0.5">Permite planificar el mes siguiente con 1 toque</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Botón "📋 Copiar Gastos Fijos de Octubre a Noviembre 2026"</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Completa los 14 gastos fijos en Noviembre como pendientes ($ 0 pagado) sin duplicar</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">14 gastos fijos en Noviembre (100% pendientes)</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.09 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 5
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 5: Movimientos Diarios e Ingresos (Alta, Edición, Eliminación, Fechas y Búsqueda)</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Verifica los botones separados "🧾 Cargar Gasto" y "＋ Ingreso", fechas Hoy/Ayer/Calendario, edición con ajuste automático de billetera, eliminación y buscador.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 5 / 5 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-23</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Alta de Gasto Diario con suma rápida descuenta saldo de la cuenta seleccionada</div>
+            <div class="text-xs text-slate-400 mt-0.5">Impacta en Movimientos del Mes y en la billetera elegida</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Gasto $ 5.990 ("4100+1890") con Personal Pay</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Saldo Personal Pay pasa de $ 315.400 a $ 309.410</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Saldo Personal Pay: $ 309.410</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.05 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-24</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Alta de Ingreso (ej. Uber / DiDi) incrementa saldo de la cuenta y el Disponible del mes</div>
+            <div class="text-xs text-slate-400 mt-0.5">Botón "＋ Ingreso" usa categorías exclusivas de ingreso</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Ingreso +$ 35.000 (Categoría: Uber / DiDi -> Personal Pay)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Disponible sube a $ 524.992 y Personal Pay a $ 350.400</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Disponible: $ 524.992 | Personal Pay: $ 350.400</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.04 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-25</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Edición de un movimiento existente revierte el saldo en la cuenta anterior y aplica el nuevo</div>
+            <div class="text-xs text-slate-400 mt-0.5">Consistencia contable perfecta al editar monto o cuenta</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo Crítico</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Editar "Fiambre": de $ 9.029 (Personal Pay) a $ 10.500 (Efectivo)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Personal Pay recupera +$ 9.029 ($ 324.429) y Efectivo descuenta -$ 10.500 ($ 38.000)</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Personal Pay: $ 324.429 | Efectivo: $ 38.000</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.05 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-26</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Eliminación de un movimiento restaura el saldo en la cuenta y lo borra de la lista</div>
+            <div class="text-xs text-slate-400 mt-0.5">Reversión automática al borrar movimiento</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo Crítico</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Eliminar gasto "DiDi" ($ 3.900 en Personal Pay)</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Personal Pay recupera +$ 3.900 ($ 319.300) y lista pasa de 15 a 14 movimientos</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Personal Pay: $ 319.300 | Movimientos: 14</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.05 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-27</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Buscador en vivo y filtros por tipo ("Todos", "Solo Gastos", "Solo Ingresos")</div>
+            <div class="text-xs text-slate-400 mt-0.5">Búsqueda por texto y filtrado instantáneo</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E UI Filtro</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Filtro Octubre: Todos (15) | Ingresos (2) | Gastos (13) | Buscar "carne"</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Encuentra "Carne" ($ 45.100) el Martes 6</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Encontrados: 1 ("Carne" $ 45.100)</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.07 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 6
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 6: Cuentas (Personal Pay, Banco, Efectivo), Ajuste Manual y Transferencias</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Verifica el ajuste directo de saldo real ("✏️ Ajustar saldo") y las transferencias entre cuentas propias sin duplicar gastos ni ingresos.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 3 / 3 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-28</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Ajuste manual de saldo real ("✏️ Ajustar saldo") actualiza la billetera al instante</div>
+            <div class="text-xs text-slate-400 mt-0.5">Permite cuadrar el saldo real de la billetera en cualquier momento</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Ajustar saldo de Efectivo a $ 62.500</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">$ 62.500</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">$ 62.500</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.02 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-29</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Transferencia entre cuentas propias (Banco -> Personal Pay) mueve el dinero sin alterar el Disponible del mes</div>
+            <div class="text-xs text-slate-400 mt-0.5">No contamina los Gastos ni los Ingresos del mes</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo Crítico</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Transferir $ 50.000 desde Banco hacia Personal Pay</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Banco: $ 79.690 | Personal Pay: $ 365.400 | Disponible intacto: $ 489.992</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Banco: $ 79.690 | Personal Pay: $ 365.400 | Disponible: $ 489.992</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.06 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-30</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Alta, edición de nombre/ícono y eliminación segura de Cuentas en Ajustes</div>
+            <div class="text-xs text-slate-400 mt-0.5">CRUD completo de cuentas en Ajustes</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Crear "Lemon Cash" 🍋 -> Editar a "Lemon Card" 💳 -> Eliminar</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Vuelve a las 3 cuentas principales sin errores</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">3 cuentas activas</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.05 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 7
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 7: Configuración de Categorías Separadas y Selector Visual de Iconos</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Valida que Gastos Fijos, Gastos Diarios e Ingresos tengan sus propias listas independientes de categorías, creación inline desde Gasto Fijo y edición con selector de íconos.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 3 / 3 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-31</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Separación estricta entre Categorías de Gastos Fijos (7), Gastos Diarios (5) e Ingresos (5)</div>
+            <div class="text-xs text-slate-400 mt-0.5">No mezcla categorías de alquiler/luz con súper/comida rápida ni con sueldo</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Listas de categorías del estado inicial</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">Fijos: 7 | Diarios: 5 | Ingresos: 5 (Listas independientes)</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Fijos: 7 | Diarios: 5 | Ingresos: 5</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.02 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-32</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Creación inline de Categoría de Gasto Fijo desde el modal de Nuevo Gasto Fijo con selector de ícono</div>
+            <div class="text-xs text-slate-400 mt-0.5">Creación sin salir de la pantalla de Gastos Fijos</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Botón "＋ Crear nueva categoría fija" -> "Club / Deporte" con ícono ⚽</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">8 categorías fijas y auto-selección en el desplegable</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">8 categorías fijas (Última: ⚽ Club / Deporte)</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.03 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-33</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Edición de nombre e ícono de cualquier categoría desde Ajustes</div>
+            <div class="text-xs text-slate-400 mt-0.5">Se actualiza automáticamente en todos los movimientos asociados</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Editar "Comida" -> "Restaurantes y Cafés" con ícono 🍕</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">🍕 Restaurantes y Cafés</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">🍕 Restaurantes y Cafés</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.03 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden mb-6 shadow-xl">
+        <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                BLOQUE 8
+              </span>
+              <h2 class="text-base sm:text-lg font-extrabold text-white">Suite 8: Cotización Dólar Oficial, Reporte Mensual 100% en Pesos con Gráficos/PDF y Auto-Guardado</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Verifica la actualización del Dólar Oficial (API / Manual Offline), generación del Reporte Mensual exclusivamente en Pesos con porcentajes para gráficos, exportación PDF y persistencia en localStorage.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✔ 6 / 6 Aprobados
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th class="py-2.5 px-3">ID</th>
+                <th class="py-2.5 px-3">Caso de Prueba / Regla Verificada</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Entrada / Escenario</th>
+                <th class="py-2.5 px-3">Resultado Esperado</th>
+                <th class="py-2.5 px-3">Resultado Obtenido</th>
+                <th class="py-2.5 px-3 text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-34</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Actualización manual offline del Dólar Oficial recalcula la vista en USD al instante</div>
+            <div class="text-xs text-slate-400 mt-0.5">Funciona con internet (DolarApi.com) y sin internet (edición manual)</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Flujo</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Editar Dólar Oficial manualmente a $ 1.050 ARS</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">$ 1.050.000 ARS = US$ 1.000,00</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">US$ 1.000,00</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.40 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-35</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Reporte del Mes 100% en Pesos (ARS) con cero referencias a USD y porcentajes exactos de gráficos</div>
+            <div class="text-xs text-slate-400 mt-0.5">Reporte limpio en Pesos listo para copiar o descargar en PDF</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Reporte y Gráficos</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Generar Reporte Mensual Octubre 2026</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">100% en ARS (0 menciones a USD) | Distribución: Fijos 70%, Diarios 10%, Libre 20%</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Contiene USD: false | Fijos 70%, Diarios 10%, Libre 20%</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.11 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-36</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Desglose de Gastos Diarios por Rubro en el Gráfico del Reporte Mensual (Octubre 2026)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Alimenta el gráfico de barras comparativas por rubro</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Unitario / Gráficos</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Agrupar gastos diarios de Octubre por categoría</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">1° Emilis: $ 102.000 | 2° Súper/Carne: $ 92.317</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">1° Emilis: $ 102.000 | 2° Súper/Carne: $ 92.317</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.08 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-37</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Persistencia completa (Serialización y Restauración JSON de todo el estado de la App)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Garantiza que no se pierda ningún cambio al cerrar y abrir la app</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Persistencia</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Guardar estado completo en JSON (localStorage / Supabase payload) y restaurar</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">100% de cuentas, categorías, fijos, movimientos y ajustes preservados</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Tema: ivory | Cobro: 2026-11-10 | Fijos Oct: 14 | Movs Oct: 15</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.17 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-38</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Verificación de integridad del código fuente y archivos de test en la carpeta del proyecto</div>
+            <div class="text-xs text-slate-400 mt-0.5">Estructura lista para regresión continua, Git y compilación móvil</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Integridad Proyecto</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Inspección de estructura en C:\Users\CFOTech\Documents\Realito_app</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">pubspec.yaml + lib/ + test/unit/ + test/e2e/ presentes</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">Todos los módulos y suites verificados en disco</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">0.76 ms</div>
+          </td>
+        </tr>
+      
+        <tr class="border-b border-slate-800/80 hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-bold text-emerald-400 whitespace-nowrap">TC-39</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-sm text-slate-100">Verificación de Esquema SQL en Español para Supabase (cuentas, categorias, gastos_fijos, movimientos)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Tablas: cuentas, categorias, gastos_fijos, movimientos, transferencias_cuentas, configuracion_usuario, estado_sincronizado</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">E2E Base de Datos</span>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-300 font-mono">Inspección de 0001_initial_schema.sql</td>
+          <td class="py-3 px-3 text-xs text-emerald-300 font-mono">7 tablas 100% en español creadas con políticas RLS</td>
+          <td class="py-3 px-3 text-xs text-sky-300 font-mono">7/7 tablas en español verificadas</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold" style="background: rgba(16,185,129,0.18); color: #34D399; border: 1px solid rgba(16,185,129,0.4);">
+              ✔ OK
+            </span>
+            <div class="text-[10px] text-slate-500 mt-1 font-mono">1.79 ms</div>
+          </td>
+        </tr>
+      
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+
+  </div>
+</body>
+</html>

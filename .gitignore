@@ -1,0 +1,13 @@
+# Flutter / Dart / Build artifacts
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Node / OS temporary files
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+

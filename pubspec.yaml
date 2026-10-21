@@ -1,0 +1,49 @@
+name: realito_app
+description: "Realito — Finanzas personales bimonetarias (ARS/USD), simple y offline-first."
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Gestión de Estado e Inyección de Dependencias
+  flutter_riverpod: ^2.6.1
+
+  # Navegación Declarativa
+  go_router: ^14.6.2
+
+  # Internacionalización, Fechas y Formateo Monetario
+  intl: ^0.19.0
+
+  # Base de Datos Local Offline-First & Cifrado (SQLite / SQLCipher)
+  drift: ^2.22.1
+  sqlcipher_flutter_libs: ^0.6.4
+  path_provider: ^2.1.5
+  path: ^1.9.0
+
+  # Backend & Sincronización Remota
+  supabase_flutter: ^2.8.1
+
+  # Seguridad Biométrica y Almacenamiento Seguro (Keychain / Keystore)
+  local_auth: ^2.3.0
+  flutter_secure_storage: ^9.2.2
+
+  # Utilidades de Dominio
+  uuid: ^4.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  drift_dev: ^2.22.1
+  build_runner: ^2.4.13
+
+flutter:
+  uses-material-design: true
+
