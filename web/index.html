@@ -2,8 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Realito — Simulador Interactivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Realito — Control de Finanzas Personales</title>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Realito" />
+  <meta name="theme-color" content="#0D7A5F" />
+  <link rel="manifest" href="manifest.json" />
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
@@ -3509,6 +3515,13 @@
     renderAll();
     if (supabaseUrl && supabaseAnonKey) {
       pullFromSupabaseCloud(false);
+    }
+
+    // Registro de Service Worker para soporte Offline 100%
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
     }
   </script>
 </body>

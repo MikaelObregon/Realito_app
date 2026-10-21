@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "public": true,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/web/index.html" },
+    { "source": "/sw.js", "destination": "/web/sw.js" },
+    { "source": "/manifest.json", "destination": "/web/manifest.json" },
+    { "source": "/(.*)", "destination": "/web/$1" }
+  ]
+}
