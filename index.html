@@ -67,7 +67,7 @@
     body {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       justify-content: flex-start;
     }
 
@@ -75,10 +75,9 @@
       display: none !important;
     }
 
-    /* En celulares (PWA / iPhone / Android): Borde a borde nativo sin carcasa */
+    /* En celulares (PWA / iPhone / Android): 100% Pantalla completa borde a borde */
     .phone-frame {
       width: 100%;
-      max-width: 480px;
       height: 100%;
       height: 100dvh;
       background-color: var(--phone-bg);
@@ -87,21 +86,23 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      margin: 0 auto;
+      margin: 0;
       border: none;
       border-radius: 0;
       box-shadow: none;
     }
 
-    /* En pantallas de escritorio anchas (PC) mostramos un marco elegante */
-    @media (min-width: 641px) {
+    /* Solo en monitores de PC anchos (> 768px) mostramos el marco de prueba */
+    @media (min-width: 769px) {
       body {
         background-color: var(--outer-bg);
+        align-items: center;
         justify-content: center;
         padding: 16px 0;
       }
       .phone-frame {
-        height: 94vh;
+        width: 414px;
+        height: 92vh;
         max-height: 890px;
         border-radius: 36px;
         border: 1px solid var(--border-color);
@@ -190,62 +191,6 @@
       background-color: var(--accent-primary-soft);
     }
 
-    /* Barra flotante de acciones (Gasto primero, Ingreso segundo) */
-    .action-dock {
-      position: absolute;
-      bottom: calc(68px + env(safe-area-inset-bottom, 0px));
-      left: 16px;
-      right: 16px;
-      z-index: 25;
-      background-color: var(--surface-card);
-      border: 1.5px solid var(--border-color);
-      border-radius: 22px;
-      padding: 6px;
-      display: flex;
-      gap: 8px;
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
-    }
-
-    .btn-expense-main {
-      flex: 1.45;
-      background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
-      color: #FFFFFF;
-      border-radius: 16px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
-      transition: transform 0.1s ease;
-    }
-    .btn-expense-main:active {
-      transform: scale(0.97);
-    }
-
-    .btn-income-sec {
-      flex: 1;
-      background: rgba(16, 185, 129, 0.16);
-      border: 1.5px solid rgba(16, 185, 129, 0.45);
-      color: #10B981;
-      border-radius: 16px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-    }
-    .btn-income-sec:active {
-      transform: scale(0.97);
-    }
-
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -282,7 +227,7 @@
     </div>
 
     <!-- Área Principal con Scroll -->
-    <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-48" id="mainScroll">
+    <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-28" id="mainScroll">
 
       <!-- ================= PESTAÑA 1: INICIO (DASHBOARD) ================= -->
       <div id="tab-dashboard" class="space-y-3 pt-1">
@@ -640,49 +585,49 @@
 
     </div>
 
-    <!-- NUEVA BARRA DE ACCIÓN RÁPIDA (DOCK): 1° GASTO (Protagonista), 2° INGRESO -->
-    <div class="action-dock">
-      <button onclick="openQuickModal('expense')" class="btn-expense-main">
-        <span>🧾</span>
-        <span>Cargar Gasto</span>
+    <!-- Barra de Navegación Inferior Nativa (5 accesos con + Cargar central) -->
+    <div class="solid-card flex justify-around items-center px-1" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 30; height: calc(62px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); border-bottom: none; border-left: none; border-right: none;">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-bold cursor-pointer py-1" style="color:#10B981;">
+        <span class="text-base">📊</span>
+        <span class="text-[10px]">Inicio</span>
       </button>
-      <button onclick="openQuickModal('income')" class="btn-income-sec">
-        <span>＋</span>
-        <span>Ingreso</span>
+      <button onclick="switchTab('bills')" id="nav-bills" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
+        <span class="text-base">☑️</span>
+        <span class="text-[10px]">Fijos</span>
       </button>
-    </div>
 
-    <!-- Barra de Navegación Inferior Nativa -->
-    <div class="solid-card flex justify-around items-center px-2" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 20; height: calc(56px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); border-bottom: none; border-left: none; border-right: none;">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-0.5 text-xs font-bold cursor-pointer" style="color:#10B981;">
-        <span>📊</span>
-        <span>Inicio</span>
+      <!-- Botón Central Destacado: Cargar en 1 toque (Estilo Fintech) -->
+      <button onclick="openQuickModal('expense')" class="flex flex-col items-center justify-center -mt-5 cursor-pointer px-1 shrink-0" style="outline: none;">
+        <div class="rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg" style="width: 52px; height: 52px; background: linear-gradient(135deg, #10B981 0%, #0D7A5F 100%); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45); border: 3px solid var(--surface-card);">
+          ＋
+        </div>
+        <span class="text-[10px] font-bold mt-0.5" style="color: #10B981;">Cargar</span>
       </button>
-      <button onclick="switchTab('bills')" id="nav-bills" class="flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">
-        <span>☑️</span>
-        <span>Gastos Fijos</span>
+
+      <button onclick="switchTab('accounts')" id="nav-accounts" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
+        <span class="text-base">🏦</span>
+        <span class="text-[10px]">Cuentas</span>
       </button>
-      <button onclick="switchTab('accounts')" id="nav-accounts" class="flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">
-        <span>🏦</span>
-        <span>Cuentas</span>
-      </button>
-      <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer" style="color: var(--text-muted);">
-        <span>⚙️</span>
-        <span>Ajustes</span>
+      <button onclick="switchTab('settings')" id="nav-settings" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
+        <span class="text-base">⚙️</span>
+        <span class="text-[10px]">Ajustes</span>
       </button>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 1: CARGAR GASTO O INGRESO (SEPARADOS CON SUS PROPIAS CATEGORÍAS)    -->
+    <!-- MODAL 1: CARGAR GASTO O INGRESO (CON SELECTOR RÁPIDO SUPERIOR)            -->
     <!-- ========================================================================= -->
     <div id="quickModal" class="modal-backdrop is-hidden">
       <div class="modal-sheet no-scrollbar">
 
-        <div class="flex justify-between items-center mb-2.5">
-          <div class="flex items-center gap-2">
-            <span id="quickModalBadge" class="px-3 py-1 rounded-xl text-xs font-bold text-white" style="background:#E11D48;">
-              🧾 Nuevo Gasto Diario
-            </span>
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-1.5 p-1 rounded-xl solid-card">
+            <button type="button" onclick="switchQuickModalType('expense')" id="quickTabExpense" class="px-3 py-1 rounded-lg text-xs font-bold text-white cursor-pointer" style="background:#E11D48;">
+              🧾 Gasto
+            </button>
+            <button type="button" onclick="switchQuickModalType('income')" id="quickTabIncome" class="px-3 py-1 rounded-lg text-xs font-semibold solid-card cursor-pointer">
+              ＋ Ingreso
+            </button>
           </div>
           <button onclick="closeQuickModal()" class="w-8 h-8 rounded-full solid-card flex items-center justify-center font-bold text-xs cursor-pointer">✕</button>
         </div>
@@ -2302,38 +2247,55 @@
 
     function openQuickModal(type) {
       quickExpression = '';
-      quickType = type;
       quickSelectedDay = 'Hoy';
       quickSelectedAccount = ACCOUNTS[0].id;
-      quickSelectedCategory = (type === 'income') ? INCOME_CATEGORIES[0].id : EXPENSE_CATEGORIES[0].id;
       document.getElementById('quickNoteInput').value = '';
       const qGrid = document.getElementById('quickMonthDayGrid');
       if (qGrid) qGrid.classList.add('is-hidden');
 
-      const badge = document.getElementById('quickModalBadge');
-      const saveBtn = document.getElementById('quickSaveBtn');
+      switchQuickModalType(type || 'expense');
+      selectQuickDayPreset('Hoy');
+      updateQuickDisplay();
+      document.getElementById('quickModal').classList.remove('is-hidden');
+    }
+
+    function switchQuickModalType(type) {
+      quickType = type;
+      const expenseTab = document.getElementById('quickTabExpense');
+      const incomeTab = document.getElementById('quickTabIncome');
       const catTitle = document.getElementById('quickCategoryTitle');
+      const saveBtn = document.getElementById('quickSaveBtn');
 
       if (type === 'income') {
-        badge.innerText = '＋ Nuevo Ingreso';
-        badge.style.background = '#0D7A5F';
+        if (incomeTab) {
+          incomeTab.className = 'px-3 py-1 rounded-lg text-xs font-bold text-white cursor-pointer';
+          incomeTab.style.background = '#0D7A5F';
+        }
+        if (expenseTab) {
+          expenseTab.className = 'px-3 py-1 rounded-lg text-xs font-semibold solid-card cursor-pointer';
+          expenseTab.style.background = '';
+        }
         catTitle.innerText = '3. Categoría de Ingreso:';
         saveBtn.innerText = '✔ Guardar Ingreso';
         saveBtn.style.background = '#10B981';
         saveBtn.style.color = '#052E16';
+        quickSelectedCategory = INCOME_CATEGORIES[0].id;
       } else {
-        badge.innerText = '🧾 Nuevo Gasto Diario';
-        badge.style.background = '#E11D48';
+        if (expenseTab) {
+          expenseTab.className = 'px-3 py-1 rounded-lg text-xs font-bold text-white cursor-pointer';
+          expenseTab.style.background = '#E11D48';
+        }
+        if (incomeTab) {
+          incomeTab.className = 'px-3 py-1 rounded-lg text-xs font-semibold solid-card cursor-pointer';
+          incomeTab.style.background = '';
+        }
         catTitle.innerText = '3. Categoría de Gasto:';
         saveBtn.innerText = '✔ Guardar Gasto';
         saveBtn.style.background = '#E11D48';
         saveBtn.style.color = '#FFFFFF';
+        quickSelectedCategory = EXPENSE_CATEGORIES[0].id;
       }
-
-      selectQuickDayPreset('Hoy');
       renderQuickSelectors();
-      updateQuickDisplay();
-      document.getElementById('quickModal').classList.remove('is-hidden');
     }
 
     function closeQuickModal() {
