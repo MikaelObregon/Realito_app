@@ -50,33 +50,63 @@
       --input-bg: #FFFDF9;
     }
 
-    body {
+    html, body {
       margin: 0;
-      padding: 16px;
-      background-color: var(--outer-bg);
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--phone-bg);
       color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .is-hidden {
       display: none !important;
     }
 
+    /* En celulares (PWA / iPhone / Android): Borde a borde nativo sin carcasa */
     .phone-frame {
-      width: 402px;
-      height: 860px;
-      border-radius: 40px;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      height: 100dvh;
       background-color: var(--phone-bg);
       color: var(--text-main);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 8px #1E293B;
       overflow: hidden;
       position: relative;
       display: flex;
       flex-direction: column;
+      margin: 0 auto;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    /* En pantallas de escritorio anchas (PC) mostramos un marco elegante */
+    @media (min-width: 641px) {
+      body {
+        background-color: var(--outer-bg);
+        justify-content: center;
+        padding: 16px 0;
+      }
+      .phone-frame {
+        height: 94vh;
+        max-height: 890px;
+        border-radius: 36px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 25px 65px rgba(0, 0, 0, 0.45);
+      }
     }
 
     .solid-card {
@@ -118,6 +148,7 @@
       border-top-left-radius: 28px;
       border-top-right-radius: 28px;
       padding: 14px 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
       max-height: 92%;
       overflow-y: auto;
       overflow-x: hidden;
@@ -162,7 +193,7 @@
     /* Barra flotante de acciones (Gasto primero, Ingreso segundo) */
     .action-dock {
       position: absolute;
-      bottom: 72px;
+      bottom: calc(68px + env(safe-area-inset-bottom, 0px));
       left: 16px;
       right: 16px;
       z-index: 25;
@@ -224,7 +255,7 @@
   <div class="phone-frame" id="phoneContainer">
 
     <!-- AppBar Realito + Cambio Pesos (ARS) / Dólares (USD) -->
-    <div class="px-4 pt-3.5 pb-2 flex justify-between items-center">
+    <div class="px-4 pb-2 flex justify-between items-center shrink-0" style="padding-top: calc(env(safe-area-inset-top, 0px) + 12px);">
       <div class="flex items-center gap-2">
         <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-xs" style="background:#0D7A5F;">R</div>
         <span class="font-bold text-base">Realito</span>
@@ -235,7 +266,7 @@
     </div>
 
     <!-- Selector de Mes (Rueda del Mouse + Arrastrar + Auto-centrado) -->
-    <div id="monthScrollBar" class="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar" style="scroll-behavior: smooth; cursor: grab;">
+    <div id="monthScrollBar" class="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0" style="scroll-behavior: smooth; cursor: grab;">
       <button onclick="selectMonth('2026-11')" id="m-2026-11" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0">
         Noviembre 2026 ⏭️
       </button>
@@ -251,7 +282,7 @@
     </div>
 
     <!-- Área Principal con Scroll -->
-    <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-36" id="mainScroll">
+    <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-48" id="mainScroll">
 
       <!-- ================= PESTAÑA 1: INICIO (DASHBOARD) ================= -->
       <div id="tab-dashboard" class="space-y-3 pt-1">
@@ -621,8 +652,8 @@
       </button>
     </div>
 
-    <!-- Barra de Navegación Inferior -->
-    <div class="h-16 solid-card flex justify-around items-center px-2" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;">
+    <!-- Barra de Navegación Inferior Nativa -->
+    <div class="solid-card flex justify-around items-center px-2" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 20; height: calc(56px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); border-bottom: none; border-left: none; border-right: none;">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-0.5 text-xs font-bold cursor-pointer" style="color:#10B981;">
         <span>📊</span>
         <span>Inicio</span>
