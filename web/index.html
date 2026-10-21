@@ -200,10 +200,10 @@
   <div class="phone-frame" id="phoneContainer">
 
     <!-- AppBar Realito + Cambio Pesos (ARS) / Dólares (USD) -->
-    <div class="px-4 pb-2 flex justify-between items-center shrink-0" style="padding-top: calc(env(safe-area-inset-top, 0px) + 12px);">
+    <div class="px-4 pb-2 flex justify-between items-center shrink-0" style="padding-top: max(env(safe-area-inset-top, 0px), 14px);">
       <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-xs" style="background:#0D7A5F;">R</div>
-        <span class="font-bold text-base">Realito</span>
+        <img src="apple-touch-icon.png" class="w-8 h-8 rounded-xl object-cover shadow-sm border border-emerald-900/20" alt="Realito" />
+        <span class="font-bold text-base tracking-tight">Realito</span>
       </div>
       <button onclick="toggleDisplayCurrency()" class="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 cursor-pointer" style="background: rgba(16,185,129,0.18); color: #10B981; border: 1px solid rgba(16,185,129,0.4);">
         <span>⇄</span> <span id="currencyToggleText">Pesos (ARS)</span>
@@ -226,8 +226,8 @@
       </button>
     </div>
 
-    <!-- Área Principal con Scroll -->
-    <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-28" id="mainScroll">
+    <!-- Área Principal con Scroll (Con espacio libre abajo para que nada se tape) -->
+    <div class="flex-1 overflow-y-auto no-scrollbar px-4" id="mainScroll" style="padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));">
 
       <!-- ================= PESTAÑA 1: INICIO (DASHBOARD) ================= -->
       <div id="tab-dashboard" class="space-y-3 pt-1">
@@ -348,13 +348,13 @@
               <button onclick="clearTxSearch()" id="clearSearchBtn" class="text-xs font-bold is-hidden cursor-pointer" style="color: var(--text-muted);">✕</button>
             </div>
 
-            <div class="flex items-center justify-between">
-              <div class="flex gap-1.5">
-                <button onclick="setTxTypeFilter('all')" id="tf-all" class="px-2.5 py-1 rounded-lg text-xs font-bold text-white cursor-pointer" style="background:#0D7A5F;">Todos</button>
-                <button onclick="setTxTypeFilter('expense')" id="tf-expense" class="px-2.5 py-1 rounded-lg text-xs font-semibold solid-elevated cursor-pointer">Solo Gastos</button>
-                <button onclick="setTxTypeFilter('income')" id="tf-income" class="px-2.5 py-1 rounded-lg text-xs font-semibold solid-elevated cursor-pointer">Solo Ingresos</button>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex gap-1.5 shrink-0">
+                <button onclick="setTxTypeFilter('all')" id="tf-all" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-white whitespace-nowrap cursor-pointer shrink-0" style="background:#0D7A5F;">Todos</button>
+                <button onclick="setTxTypeFilter('expense')" id="tf-expense" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold solid-elevated whitespace-nowrap cursor-pointer shrink-0">Gastos</button>
+                <button onclick="setTxTypeFilter('income')" id="tf-income" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold solid-elevated whitespace-nowrap cursor-pointer shrink-0">Ingresos</button>
               </div>
-              <span class="text-xs font-bold" style="color:#10B981;" id="txSearchSummaryBadge"></span>
+              <span class="text-[11px] font-bold whitespace-nowrap shrink-0 text-right truncate" style="color:#10B981;" id="txSearchSummaryBadge"></span>
             </div>
           </div>
 
@@ -586,30 +586,30 @@
     </div>
 
     <!-- Barra de Navegación Inferior Nativa (5 accesos con + Cargar central) -->
-    <div class="solid-card flex justify-around items-center px-1" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 30; height: calc(62px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); border-bottom: none; border-left: none; border-right: none;">
+    <div class="solid-card flex justify-around items-center px-1" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 30; height: calc(56px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); border-bottom: none; border-left: none; border-right: none; box-shadow: 0 -4px 20px rgba(0,0,0,0.08);">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-bold cursor-pointer py-1" style="color:#10B981;">
-        <span class="text-base">📊</span>
+        <span class="text-base leading-none">📊</span>
         <span class="text-[10px]">Inicio</span>
       </button>
       <button onclick="switchTab('bills')" id="nav-bills" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-base">☑️</span>
+        <span class="text-base leading-none">☑️</span>
         <span class="text-[10px]">Fijos</span>
       </button>
 
       <!-- Botón Central Destacado: Cargar en 1 toque (Estilo Fintech) -->
-      <button onclick="openQuickModal('expense')" class="flex flex-col items-center justify-center -mt-5 cursor-pointer px-1 shrink-0" style="outline: none;">
-        <div class="rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg" style="width: 52px; height: 52px; background: linear-gradient(135deg, #10B981 0%, #0D7A5F 100%); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45); border: 3px solid var(--surface-card);">
+      <button onclick="openQuickModal('expense')" class="flex flex-col items-center justify-center -mt-3.5 cursor-pointer px-1 shrink-0" style="outline: none;">
+        <div class="rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg" style="width: 46px; height: 46px; background: linear-gradient(135deg, #10B981 0%, #0D7A5F 100%); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); border: 2.5px solid var(--surface-card);">
           ＋
         </div>
         <span class="text-[10px] font-bold mt-0.5" style="color: #10B981;">Cargar</span>
       </button>
 
       <button onclick="switchTab('accounts')" id="nav-accounts" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-base">🏦</span>
+        <span class="text-base leading-none">🏦</span>
         <span class="text-[10px]">Cuentas</span>
       </button>
       <button onclick="switchTab('settings')" id="nav-settings" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-base">⚙️</span>
+        <span class="text-base leading-none">⚙️</span>
         <span class="text-[10px]">Ajustes</span>
       </button>
     </div>
@@ -1362,20 +1362,29 @@
       ['all', 'expense', 'income'].forEach(f => {
         const btn = document.getElementById('tf-' + f);
         if (f === filter) {
-          btn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-white cursor-pointer';
+          btn.className = 'px-2.5 py-1 rounded-lg text-[11px] font-bold text-white whitespace-nowrap cursor-pointer shrink-0';
           btn.style.background = '#0D7A5F';
         } else {
-          btn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold solid-elevated cursor-pointer';
+          btn.className = 'px-2.5 py-1 rounded-lg text-[11px] font-semibold solid-elevated whitespace-nowrap cursor-pointer shrink-0';
           btn.style.background = '';
         }
       });
       renderAll();
     }
 
+    function updateThemeColorMeta() {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      const color = isDarkObsidian ? '#0B1120' : '#F2EFE9';
+      if (meta) meta.setAttribute('content', color);
+      document.documentElement.style.backgroundColor = color;
+      document.body.style.backgroundColor = color;
+    }
+
     function toggleTheme() {
       isDarkObsidian = !isDarkObsidian;
       document.body.className = isDarkObsidian ? 'theme-obsidian antialiased' : 'theme-warm antialiased';
       document.getElementById('themeBtn').innerText = isDarkObsidian ? '☀️ Cambiar a Tema Marfil' : '🌙 Cambiar a Tema Obsidiana';
+      updateThemeColorMeta();
     }
 
     function toggleDisplayCurrency() {
@@ -3507,6 +3516,7 @@
 
     loadStateFromLocalStorage();
     loadSupabaseConfig();
+    updateThemeColorMeta();
     renderAll();
     if (supabaseUrl && supabaseAnonKey) {
       pullFromSupabaseCloud(false);
