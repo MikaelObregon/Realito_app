@@ -1,0 +1,12 @@
+{
+  "name": "Realito — Finanzas Personales",
+  "short_name": "Realito",
+  "description": "Control financiero personal en Pesos (ARS) y Dólares (USD) con sincronización en la nube.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#0D7A5F",
+  "orientation": "portrait",
+  "lang": "es-AR"
+}
+
