@@ -1,9 +1,11 @@
-// Service Worker para Realito PWA — Soporte Offline 100% y Auto-actualización Resiliente
-const CACHE_NAME = 'realito-cache-v3';
+// Service Worker para Realito PWA — Soporte Offline 100% y Auto-actualización Silenciosa
+const CACHE_NAME = 'realito-cache-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  'index.html',
   './manifest.json',
+  'manifest.json',
   './apple-touch-icon.png',
   './icon-192.png',
   './icon-512.png',
@@ -15,13 +17,17 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      // Cacheo resiliente elemento a elemento (si un CDN falla, los demás y el HTML quedan asegurados)
       await Promise.allSettled(
-        ASSETS_TO_CACHE.map((url) =>
-          cache.add(url).catch((err) => {
-            console.warn(`[SW] No se pudo cachear ${url}:`, err);
-          })
-        )
+        ASSETS_TO_CACHE.map(async (url) => {
+          try {
+            const res = await fetch(url, { cache: 'no-cache' });
+            if (res && (res.ok || res.type === 'opaque')) {
+              await cache.put(url, res);
+            }
+          } catch (err) {
+            console.warn(`[SW] Pre-cache omitido para ${url}:`, err);
+          }
+        })
       );
     })
   );
@@ -45,47 +51,71 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
 
-  // Las llamadas a Supabase y APIs externas pasan directo a la red (con fallback offline en la app)
+  // Supabase y APIs externas pasan directo a la red (con su propio fallback offline en la app)
   if (url.includes('supabase.co') || url.includes('dolarapi.com')) {
     return;
   }
 
-  // Para navegación (abrir la app o recargar): Caché primero con fallback a index.html si no hay red
+  // 1. Navegación (HTML de la app al abrir en el teléfono o recargar sin internet)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const resClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
-          }
-          return networkResponse;
-        })
-        .catch(async () => {
-          const cached = await caches.match(event.request);
-          if (cached) return cached;
-          const fallback = await caches.match('./index.html');
-          if (fallback) return fallback;
-          return caches.match('./');
-        })
+      (async () => {
+        // Cache-First instantáneo: busca la página en caché para mostrarla en menos de 5ms offline
+        const cached = (await caches.match(event.request, { ignoreSearch: true }))
+          || (await caches.match('./index.html'))
+          || (await caches.match('index.html'))
+          || (await caches.match('./'));
+
+        // En segundo plano actualiza la caché si hay conexión a internet disponible
+        const fetchPromise = fetch(event.request)
+          .then(async (networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const cache = await caches.open(CACHE_NAME);
+              cache.put(event.request, networkResponse.clone());
+              cache.put('./index.html', networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => null);
+
+        if (cached) {
+          return cached;
+        }
+
+        const networkResponse = await fetchPromise;
+        if (networkResponse) return networkResponse;
+
+        return (await caches.match('./index.html')) || (await caches.match('./'));
+      })()
     );
     return;
   }
 
-  // Para assets estáticos: Cache-First con actualización en segundo plano (Stale-While-Revalidate)
+  // 2. Recursos estáticos (scripts, estilos, imágenes): Cache-First con Stale-While-Revalidate
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetchPromise = fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const resClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+    (async () => {
+      const cached = await caches.match(event.request, { ignoreSearch: true });
+      if (cached) {
+        // Actualizar en segundo plano si hay red
+        fetch(event.request).then(async (netRes) => {
+          if (netRes && (netRes.status === 200 || netRes.type === 'opaque')) {
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(event.request, netRes.clone());
           }
-          return networkResponse;
-        })
-        .catch(() => null);
+        }).catch(() => {});
+        return cached;
+      }
 
-      return cached || fetchPromise;
-    })
+      try {
+        const netRes = await fetch(event.request);
+        if (netRes && (netRes.status === 200 || netRes.type === 'opaque')) {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(event.request, netRes.clone());
+        }
+        return netRes;
+      } catch (err) {
+        return cached || null;
+      }
+    })()
   );
 });

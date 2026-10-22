@@ -99,7 +99,7 @@
       left: 0;
       right: 0;
       z-index: 30;
-      height: calc(62px + env(safe-area-inset-bottom, 0px));
+      height: calc(66px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background-color: var(--surface-card);
       border-top: 1px solid var(--border-color);
@@ -522,22 +522,6 @@
           </div>
         </div>
 
-        <!-- 0.B Configuración del Mes Actual de Referencia -->
-        <div class="solid-card p-4 rounded-2xl">
-          <h3 class="text-sm font-bold mb-1">📅 Mes Activo de Referencia</h3>
-          <p class="text-xs mb-3" style="color: var(--text-muted);">
-            Define cuál es el mes actual en curso para los cálculos de días de cobro y presupuestos.
-          </p>
-          <div class="flex items-center justify-between solid-elevated p-3 rounded-xl">
-            <span class="text-xs font-bold">Mes en curso</span>
-            <select id="activeMonthSelect" onchange="changeActiveMonth(this.value)" class="solid-input text-xs font-bold px-3 py-1.5 rounded-xl outline-none cursor-pointer" style="border: 1px solid var(--border-color);">
-              <option value="2026-10">Octubre 2026 (Actual)</option>
-              <option value="2026-11">Noviembre 2026 (Próximo)</option>
-              <option value="2026-09">Septiembre 2026 (Pasado)</option>
-              <option value="2026-08">Agosto 2026 (Pasado)</option>
-            </select>
-          </div>
-        </div>
 
         <!-- 1. Configurar Categorías de GASTOS FIJOS (Separadas de Gastos Diarios) -->
         <div class="solid-card p-4 rounded-2xl">
@@ -640,50 +624,36 @@
           <div id="backupActionFeedback" class="text-[11px] font-bold mt-2 text-center is-hidden" style="color:#10B981;"></div>
         </div>
 
-        <!-- 6. Actualizaciones y Caché PWA -->
-        <div class="solid-card p-4 rounded-2xl">
-          <div class="flex justify-between items-center mb-1">
-            <h3 class="text-sm font-bold">🔄 Versión y Actualizaciones</h3>
-          </div>
-          <p class="text-xs mb-3" style="color: var(--text-muted);">
-            Si tenés la app agregada a la pantalla de inicio y querés forzar la última versión instalada:
-          </p>
-          <button type="button" onclick="forceAppRefresh()" class="w-full py-2.5 px-3 rounded-xl solid-elevated text-xs font-bold cursor-pointer flex items-center justify-center gap-1.5" style="color:#10B981;">
-            <span>⚡</span>
-            <span>Recargar Última Versión (Limpiar Caché)</span>
-          </button>
-        </div>
-
       </div>
 
     </div>
 
     <!-- Barra de Navegación Inferior Nativa (5 accesos con + Cargar central) -->
     <div id="bottomNavBar" class="bottom-nav-bar flex justify-around items-center px-1">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-bold cursor-pointer py-1" style="color:#10B981;">
-        <span class="text-xl leading-none">📊</span>
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 h-full flex flex-col items-center justify-center gap-1 cursor-pointer py-1" style="color:#10B981; outline: none;">
+        <span class="text-2xl leading-none">📊</span>
         <span class="text-[11px] font-bold">Inicio</span>
       </button>
-      <button onclick="switchTab('bills')" id="nav-bills" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-xl leading-none">☑️</span>
-        <span class="text-[11px]">Fijos</span>
+      <button onclick="switchTab('bills')" id="nav-bills" class="flex-1 h-full flex flex-col items-center justify-center gap-1 cursor-pointer py-1" style="color: var(--text-muted); outline: none;">
+        <span class="text-2xl leading-none">☑️</span>
+        <span class="text-[11px] font-semibold">Fijos</span>
       </button>
 
       <!-- Botón Central Destacado: Cargar en 1 toque (Estilo Fintech) -->
-      <button onclick="openQuickModal('expense')" class="flex flex-col items-center justify-center -mt-4 cursor-pointer px-1 shrink-0" style="outline: none;">
-        <div class="rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg" style="width: 48px; height: 48px; background: linear-gradient(135deg, #10B981 0%, #0D7A5F 100%); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); border: 2.5px solid var(--surface-card);">
+      <button onclick="openQuickModal('expense')" class="flex flex-col items-center justify-center -mt-3.5 cursor-pointer px-1 shrink-0" style="outline: none;">
+        <div class="rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg" style="width: 50px; height: 50px; background: linear-gradient(135deg, #10B981 0%, #0D7A5F 100%); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); border: 2.5px solid var(--surface-card);">
           ＋
         </div>
         <span class="text-[11px] font-bold mt-0.5" style="color: #10B981;">Cargar</span>
       </button>
 
-      <button onclick="switchTab('accounts')" id="nav-accounts" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-xl leading-none">🏦</span>
-        <span class="text-[11px]">Cuentas</span>
+      <button onclick="switchTab('accounts')" id="nav-accounts" class="flex-1 h-full flex flex-col items-center justify-center gap-1 cursor-pointer py-1" style="color: var(--text-muted); outline: none;">
+        <span class="text-2xl leading-none">🏦</span>
+        <span class="text-[11px] font-semibold">Cuentas</span>
       </button>
-      <button onclick="switchTab('settings')" id="nav-settings" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-xl leading-none">⚙️</span>
-        <span class="text-[11px]">Ajustes</span>
+      <button onclick="switchTab('settings')" id="nav-settings" class="flex-1 h-full flex flex-col items-center justify-center gap-1 cursor-pointer py-1" style="color: var(--text-muted); outline: none;">
+        <span class="text-2xl leading-none">⚙️</span>
+        <span class="text-[11px] font-semibold">Ajustes</span>
       </button>
     </div>
 
@@ -937,8 +907,8 @@
                 <span class="text-[10px] mt-0.5" style="color: var(--text-muted);" id="dolarFechaActualizacionLabel">Última actualización: --/--/----</span>
               </div>
               <button type="button" onclick="fetchLiveDolarOficial()" class="px-3 py-2 rounded-xl text-xs font-bold text-white cursor-pointer shrink-0 shadow-sm flex items-center gap-1.5" style="background:#0D7A5F;">
-                <span>⚡</span>
-                <span>Sincronizar BNA</span>
+                <span>🔄</span>
+                <span>Actualizar Tasa</span>
               </button>
             </div>
           </div>
@@ -1197,12 +1167,20 @@
 
   <script>
     let OFICIAL_SELL_RATE = 1015;
+    function getSystemCurrentMonthKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const sysKey = `${y}-${m}`;
+      return MONTH_ORDER.includes(sysKey) ? sysKey : '2026-10';
+    }
+
     let dolarRateSource = 'Banco Nación';
     let dolarLastSyncText = 'Banco Nación (Venta): $ 1.015 ARS';
     let dolarFechaActualizacion = '';
     let displayCurrency = 'ARS';
-    let currentActiveMonth = '2026-10'; // Mes activo actual de referencia
-    let selectedMonth = '2026-10';
+    let currentActiveMonth = getSystemCurrentMonthKey(); // Mes activo actual calculado dinámicamente según el teléfono
+    let selectedMonth = currentActiveMonth;
     let currentTab = 'dashboard';
     let billFilter = 'all';
     let txSearchQuery = '';
@@ -1257,6 +1235,9 @@
       { id: 'fcat-auto', name: 'Seguro / Auto Fijo', icon: '🚗', color: '#3B82F6' },
       { id: 'fcat-family', name: 'Mensualidad / Familia', icon: '💜', color: '#EC4899' },
       { id: 'fcat-subs', name: 'Suscripciones', icon: '☁️', color: '#14B8A6' },
+      { id: 'fcat-1792688865834', name: 'Gas (Naturgy)', icon: '⚡', color: '#6366F1' },
+      { id: 'fcat-1792688904948', name: 'Internet', icon: '📱', color: '#6366F1' },
+      { id: 'fcat-1792689146701', name: 'Otros', icon: '💵', color: '#6366F1' },
     ];
 
     // Categorías exclusivas de GASTOS DIARIOS
@@ -1304,6 +1285,7 @@
       { id: 'b-oct-12', monthKey: '2026-10', title: 'Cholas', categoryId: 'fcat-family', amount: 20000, paid: 20000, dueDay: 12, isPaid: true, note: 'Calzado' },
       { id: 'b-oct-13', monthKey: '2026-10', title: 'Gemini y iCloud', categoryId: 'fcat-subs', amount: 13500, paid: 13500, dueDay: 15, isPaid: true, note: '8.500 + 5.000' },
       { id: 'b-oct-14', monthKey: '2026-10', title: 'Gas', categoryId: 'fcat-services', amount: 9923, paid: 0, dueDay: 19, isPaid: false, note: 'Servicio de gas' },
+      { id: 'bill-1792709351759', monthKey: '2026-10', title: 'Algo', categoryId: 'fcat-home', amount: 100, paid: 0, dueDay: 10, isPaid: false, note: '' },
 
       // SEPTIEMBRE 2026
       { id: 'b-sep-1', monthKey: '2026-09', title: 'Alquiler', categoryId: 'fcat-home', amount: 780000, paid: 300000, dueDay: 5, isPaid: false, note: 'Pago parcial 300.000' },
@@ -2153,7 +2135,7 @@
       if (fechaLabel) {
         fechaLabel.innerText = dolarFechaActualizacion
           ? `Última actualización: ${dolarFechaActualizacion} hs`
-          : 'Presioná Sincronizar BNA para consultar en vivo';
+          : 'Presioná Actualizar Tasa para consultar en vivo';
       }
       document.getElementById('dolarRateModal').classList.remove('is-hidden');
     }
@@ -3410,9 +3392,21 @@
         }
         const parsed = rows[0].datos_json;
         if (parsed.ACCOUNTS) ACCOUNTS = parsed.ACCOUNTS;
-        if (parsed.FIXED_BILL_CATEGORIES) FIXED_BILL_CATEGORIES = parsed.FIXED_BILL_CATEGORIES;
-        if (parsed.EXPENSE_CATEGORIES) EXPENSE_CATEGORIES = parsed.EXPENSE_CATEGORIES;
-        if (parsed.INCOME_CATEGORIES) INCOME_CATEGORIES = parsed.INCOME_CATEGORIES;
+        if (parsed.FIXED_BILL_CATEGORIES) {
+          const fixedMap = new Map(FIXED_BILL_CATEGORIES.map(c => [c.id, c]));
+          parsed.FIXED_BILL_CATEGORIES.forEach(c => fixedMap.set(c.id, c));
+          FIXED_BILL_CATEGORIES = Array.from(fixedMap.values());
+        }
+        if (parsed.EXPENSE_CATEGORIES) {
+          const expMap = new Map(EXPENSE_CATEGORIES.map(c => [c.id, c]));
+          parsed.EXPENSE_CATEGORIES.forEach(c => expMap.set(c.id, c));
+          EXPENSE_CATEGORIES = Array.from(expMap.values());
+        }
+        if (parsed.INCOME_CATEGORIES) {
+          const incMap = new Map(INCOME_CATEGORIES.map(c => [c.id, c]));
+          parsed.INCOME_CATEGORIES.forEach(c => incMap.set(c.id, c));
+          INCOME_CATEGORIES = Array.from(incMap.values());
+        }
 
         // Preservar movimientos y gastos fijos cargados localmente en modo offline que no estén aún en la nube
         const cloudTxIds = new Set((parsed.transactions || []).map(t => t.id));
@@ -3429,7 +3423,7 @@
           nextPaydayDateStr = parsed.nextPaydayDateStr;
         }
         if (parsed.paydaysByMonth) paydaysByMonth = parsed.paydaysByMonth;
-        if (parsed.currentActiveMonth) currentActiveMonth = parsed.currentActiveMonth;
+        currentActiveMonth = getSystemCurrentMonthKey();
         if (parsed.dolarFechaActualizacion) dolarFechaActualizacion = parsed.dolarFechaActualizacion;
         if (!paydaysByMonth && nextPaydayDateStr) {
           paydaysByMonth = { [currentActiveMonth || '2026-10']: nextPaydayDateStr };
@@ -3438,6 +3432,59 @@
         if (typeof parsed.isDarkObsidian === 'boolean' && parsed.isDarkObsidian !== isDarkObsidian) {
           toggleTheme();
         }
+
+        // Consulta granular a tablas 'categorias' y 'gastos_fijos' para asegurar que nada falte
+        try {
+          const [catRes, gfRes] = await Promise.all([
+            fetch(`${supabaseUrl}/rest/v1/categorias?select=*`, {
+              headers: { 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
+            }),
+            fetch(`${supabaseUrl}/rest/v1/gastos_fijos?select=*`, {
+              headers: { 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
+            })
+          ]);
+
+          if (catRes.ok) {
+            const dbCats = await catRes.json();
+            if (Array.isArray(dbCats) && dbCats.length > 0) {
+              const fixedMap = new Map(FIXED_BILL_CATEGORIES.map(c => [c.id, c]));
+              const expenseMap = new Map(EXPENSE_CATEGORIES.map(c => [c.id, c]));
+              const incomeMap = new Map(INCOME_CATEGORIES.map(c => [c.id, c]));
+              dbCats.forEach(c => {
+                const item = { id: c.id, name: c.nombre, icon: c.icono, color: c.color };
+                if (c.tipo === 'fijo') fixedMap.set(c.id, item);
+                else if (c.tipo === 'gasto_diario') expenseMap.set(c.id, item);
+                else if (c.tipo === 'ingreso') incomeMap.set(c.id, item);
+              });
+              FIXED_BILL_CATEGORIES = Array.from(fixedMap.values());
+              EXPENSE_CATEGORIES = Array.from(expenseMap.values());
+              INCOME_CATEGORIES = Array.from(incomeMap.values());
+            }
+          }
+
+          if (gfRes.ok) {
+            const dbGf = await gfRes.json();
+            if (Array.isArray(dbGf) && dbGf.length > 0) {
+              const existingBillsMap = new Map(monthlyBills.map(b => [b.id, b]));
+              dbGf.forEach(row => {
+                if (!existingBillsMap.has(row.id)) {
+                  existingBillsMap.set(row.id, {
+                    id: row.id,
+                    monthKey: row.mes_anio || '2026-10',
+                    title: row.titulo,
+                    categoryId: row.categoria_id,
+                    amount: Number(row.monto_total) || 0,
+                    paid: Number(row.monto_pagado) || 0,
+                    dueDay: Number(row.dia_vencimiento) || 10,
+                    isPaid: Boolean(row.esta_pagado),
+                    note: row.nota || ''
+                  });
+                }
+              });
+              monthlyBills = Array.from(existingBillsMap.values());
+            }
+          }
+        } catch (_) {}
 
         // Si teníamos datos nuevos locales que no estaban en la nube, subirlos de inmediato
         if (localNewTx.length > 0 || localNewBills.length > 0) {
@@ -3472,7 +3519,7 @@
           nextPaydayDateStr = parsed.nextPaydayDateStr;
         }
         if (parsed.paydaysByMonth) paydaysByMonth = parsed.paydaysByMonth;
-        if (parsed.currentActiveMonth) currentActiveMonth = parsed.currentActiveMonth;
+        currentActiveMonth = getSystemCurrentMonthKey();
         if (parsed.dolarFechaActualizacion) dolarFechaActualizacion = parsed.dolarFechaActualizacion;
         if (!paydaysByMonth && nextPaydayDateStr) {
           paydaysByMonth = { [currentActiveMonth || '2026-10']: nextPaydayDateStr };
@@ -3996,16 +4043,15 @@
     }
     setupConnectivityListeners();
 
-    // Registro de Service Worker para soporte Offline 100% y Auto-actualización Resiliente
+    // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=3').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=4').then((reg) => {
           reg.update().catch(() => {});
+          setInterval(() => {
+            reg.update().catch(() => {});
+          }, 5 * 60 * 1000);
         }).catch(() => {});
-
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          window.location.reload();
-        });
       });
     }
   </script>
