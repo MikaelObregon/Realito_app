@@ -3413,8 +3413,16 @@
         if (parsed.FIXED_BILL_CATEGORIES) FIXED_BILL_CATEGORIES = parsed.FIXED_BILL_CATEGORIES;
         if (parsed.EXPENSE_CATEGORIES) EXPENSE_CATEGORIES = parsed.EXPENSE_CATEGORIES;
         if (parsed.INCOME_CATEGORIES) INCOME_CATEGORIES = parsed.INCOME_CATEGORIES;
-        if (parsed.monthlyBills) monthlyBills = parsed.monthlyBills;
-        if (parsed.transactions) transactions = parsed.transactions;
+
+        // Preservar movimientos y gastos fijos cargados localmente en modo offline que no estén aún en la nube
+        const cloudTxIds = new Set((parsed.transactions || []).map(t => t.id));
+        const localNewTx = transactions.filter(t => !cloudTxIds.has(t.id));
+        transactions = [...localNewTx, ...(parsed.transactions || [])];
+
+        const cloudBillIds = new Set((parsed.monthlyBills || []).map(b => b.id));
+        const localNewBills = monthlyBills.filter(b => !cloudBillIds.has(b.id));
+        monthlyBills = [...localNewBills, ...(parsed.monthlyBills || [])];
+
         if (parsed.accountTransfers) accountTransfers = parsed.accountTransfers;
         if (parsed.OFICIAL_SELL_RATE) OFICIAL_SELL_RATE = parsed.OFICIAL_SELL_RATE;
         if (parsed.nextPaydayDateStr) {
@@ -3429,6 +3437,11 @@
         if (parsed.transferredPositiveMonths) transferredPositiveMonths = parsed.transferredPositiveMonths;
         if (typeof parsed.isDarkObsidian === 'boolean' && parsed.isDarkObsidian !== isDarkObsidian) {
           toggleTheme();
+        }
+
+        // Si teníamos datos nuevos locales que no estaban en la nube, subirlos de inmediato
+        if (localNewTx.length > 0 || localNewBills.length > 0) {
+          scheduleSupabaseCloudSync();
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
         renderAll();
@@ -3937,6 +3950,10 @@
 
     async function forceAppRefresh() {
       try {
+        // Si hay conexión y Supabase, aseguramos guardar cualquier cambio local antes de recargar
+        if (navigator.onLine && supabaseUrl && supabaseAnonKey) {
+          await pushAllToSupabaseCloud();
+        }
         if ('caches' in window) {
           const keys = await caches.keys();
           await Promise.all(keys.map(k => caches.delete(k)));
