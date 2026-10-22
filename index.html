@@ -9,9 +9,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Realito" />
   <meta name="theme-color" content="#0B1120" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
@@ -99,11 +99,31 @@
       left: 0;
       right: 0;
       z-index: 30;
-      height: calc(56px + env(safe-area-inset-bottom, 0px));
+      height: calc(62px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background-color: var(--surface-card);
       border-top: 1px solid var(--border-color);
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tab-fade {
+      animation: tabFadeIn 0.18s ease-out;
+    }
+
+    @keyframes shakeInput {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+      40%, 60% { transform: translate3d(3px, 0, 0); }
+    }
+
+    .input-error-shake {
+      animation: shakeInput 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     }
 
     /* Solo en monitores de PC anchos (> 768px) mostramos el marco de prueba */
@@ -232,22 +252,24 @@
 
     <!-- Selector de Mes (Rueda del Mouse + Arrastrar + Auto-centrado) -->
     <div id="monthScrollBar" class="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0" style="scroll-behavior: smooth; cursor: grab;">
-      <button onclick="selectMonth('2026-11')" id="m-2026-11" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0">
-        Noviembre 2026 ⏭️
+      <button onclick="selectMonth('2026-11')" id="m-2026-11" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center">
+        <span>Noviembre 2026</span>
+        <span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 bg-sky-500/20 text-sky-300">Próximo</span>
       </button>
-      <button onclick="selectMonth('2026-10')" id="m-2026-10" class="px-3 py-1.5 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0" style="background:#0D7A5F;">
-        Octubre 2026
+      <button onclick="selectMonth('2026-10')" id="m-2026-10" class="px-3 py-1.5 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0 flex items-center shadow-sm" style="background:#0D7A5F;">
+        <span>Octubre 2026</span>
+        <span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 bg-white/20 text-white">Actual</span>
       </button>
-      <button onclick="selectMonth('2026-09')" id="m-2026-09" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0">
-        Septiembre 2026
+      <button onclick="selectMonth('2026-09')" id="m-2026-09" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center">
+        <span>Septiembre 2026</span>
       </button>
-      <button onclick="selectMonth('2026-08')" id="m-2026-08" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0">
-        Agosto 2026
+      <button onclick="selectMonth('2026-08')" id="m-2026-08" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center">
+        <span>Agosto 2026</span>
       </button>
     </div>
 
-    <!-- Área Principal con Scroll (Con espacio libre abajo para que nada se tape) -->
-    <div class="flex-1 overflow-y-auto no-scrollbar px-4" id="mainScroll" style="padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));">
+    <!-- Área Principal con Scroll (Con espacio libre abajo optimizado para teléfono) -->
+    <div class="flex-1 overflow-y-auto no-scrollbar px-4" id="mainScroll" style="padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));">
 
       <!-- ================= PESTAÑA 1: INICIO (DASHBOARD) ================= -->
       <div id="tab-dashboard" class="space-y-3 pt-1">
@@ -277,19 +299,19 @@
             Saldo libre en ARS descontando Gastos Fijos y Diarios
           </p>
 
-          <!-- Recomendación #1: Cuánto puedo gastar por día hasta mi próximo cobro -->
+          <!-- Recomendación #1: Cuánto puedo gastar por día según fecha de cobro -->
           <div id="dailyAllowanceBox" class="rounded-2xl p-2.5 mb-2.5 flex items-center justify-between gap-2" style="background: rgba(0,0,0,0.26); border: 1px solid rgba(255,255,255,0.14);">
             <div>
               <div class="text-xs font-bold" style="color: #6EE7B7;" id="dailyAllowanceAmount">
                 💡 Podés gastar $ 23.425 / día
               </div>
               <div class="text-xs" style="color: rgba(255,255,255,0.8);" id="dailyAllowanceDaysText">
-                Faltan 19 días hasta tu próximo cobro
+                Calculando días según tu fecha de cobro...
               </div>
             </div>
-            <div class="flex flex-col items-end">
-              <span class="text-xs font-semibold" style="color: rgba(255,255,255,0.75);">Próximo cobro:</span>
-              <input type="date" id="nextPaydayInput" value="2026-11-05" onchange="onPaydayChanged(this.value)"
+            <div class="flex flex-col items-end shrink-0">
+              <span class="text-[11px] font-semibold" style="color: rgba(255,255,255,0.85);" id="heroPaydayLabel">Fecha de cobro:</span>
+              <input type="date" id="nextPaydayInput" value="2026-10-05" onchange="onPaydayChanged(this.value)"
                 class="rounded-lg px-2 py-0.5 text-xs font-bold cursor-pointer outline-none mt-0.5"
                 style="background: rgba(255,255,255,0.18); color: #FFFFFF;" />
             </div>
@@ -500,6 +522,23 @@
           </div>
         </div>
 
+        <!-- 0.B Configuración del Mes Actual de Referencia -->
+        <div class="solid-card p-4 rounded-2xl">
+          <h3 class="text-sm font-bold mb-1">📅 Mes Activo de Referencia</h3>
+          <p class="text-xs mb-3" style="color: var(--text-muted);">
+            Define cuál es el mes actual en curso para los cálculos de días de cobro y presupuestos.
+          </p>
+          <div class="flex items-center justify-between solid-elevated p-3 rounded-xl">
+            <span class="text-xs font-bold">Mes en curso</span>
+            <select id="activeMonthSelect" onchange="changeActiveMonth(this.value)" class="solid-input text-xs font-bold px-3 py-1.5 rounded-xl outline-none cursor-pointer" style="border: 1px solid var(--border-color);">
+              <option value="2026-10">Octubre 2026 (Actual)</option>
+              <option value="2026-11">Noviembre 2026 (Próximo)</option>
+              <option value="2026-09">Septiembre 2026 (Pasado)</option>
+              <option value="2026-08">Agosto 2026 (Pasado)</option>
+            </select>
+          </div>
+        </div>
+
         <!-- 1. Configurar Categorías de GASTOS FIJOS (Separadas de Gastos Diarios) -->
         <div class="solid-card p-4 rounded-2xl">
           <h3 class="text-sm font-bold mb-1">☑️ Categorías de Gastos Fijos</h3>
@@ -514,7 +553,7 @@
               <span class="text-[10px]" style="color: var(--text-muted);">▾</span>
             </button>
             <input id="newFixedCatIconInput" type="hidden" value="📌" />
-            <input id="newFixedCatInput" type="text" placeholder="Ej: Nueva categoría de gasto fijo" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
+            <input id="newFixedCatInput" type="text" placeholder="Ej: Nueva categoría fija (Obligatorio)" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
             <button onclick="addCustomCategory('fixed')" class="px-3 py-2 rounded-xl text-xs font-bold text-white cursor-pointer" style="background:#0D7A5F;">+ Agregar</button>
           </div>
           <div id="newFixedIconPickerGrid" class="grid grid-cols-7 gap-1.5 mt-2 p-2 rounded-xl solid-elevated is-hidden"></div>
@@ -534,7 +573,7 @@
               <span class="text-[10px]" style="color: var(--text-muted);">▾</span>
             </button>
             <input id="newExpenseCatIconInput" type="hidden" value="🏷️" />
-            <input id="newExpenseCatInput" type="text" placeholder="Ej: Nueva categoría de gasto diario" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
+            <input id="newExpenseCatInput" type="text" placeholder="Ej: Nueva categoría diaria (Obligatorio)" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
             <button onclick="addCustomCategory('expense')" class="px-3 py-2 rounded-xl text-xs font-bold text-white cursor-pointer" style="background:#0D7A5F;">+ Agregar</button>
           </div>
           <div id="newExpenseIconPickerGrid" class="grid grid-cols-7 gap-1.5 mt-2 p-2 rounded-xl solid-elevated is-hidden"></div>
@@ -554,7 +593,7 @@
               <span class="text-[10px]" style="color: var(--text-muted);">▾</span>
             </button>
             <input id="newIncomeCatIconInput" type="hidden" value="💵" />
-            <input id="newIncomeCatInput" type="text" placeholder="Ej: Nueva categoría de ingreso" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
+            <input id="newIncomeCatInput" type="text" placeholder="Ej: Nueva categoría de ingreso (Obligatorio)" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
             <button onclick="addCustomCategory('income')" class="px-3 py-2 rounded-xl text-xs font-bold text-white cursor-pointer" style="background:#0D7A5F;">+ Agregar</button>
           </div>
           <div id="newIncomeIconPickerGrid" class="grid grid-cols-7 gap-1.5 mt-2 p-2 rounded-xl solid-elevated is-hidden"></div>
@@ -574,7 +613,7 @@
               <span class="text-[10px]" style="color: var(--text-muted);">▾</span>
             </button>
             <input id="newAccountIconInput" type="hidden" value="💳" />
-            <input id="newAccountNameInput" type="text" placeholder="Ej: Nombre de billetera o banco" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
+            <input id="newAccountNameInput" type="text" placeholder="Ej: Nombre de billetera o banco (Obligatorio)" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
             <button onclick="addCustomAccount()" class="px-3 py-2 rounded-xl text-xs font-bold text-white cursor-pointer" style="background:#0D7A5F;">+ Agregar</button>
           </div>
           <div id="newAccountIconPickerGrid" class="grid grid-cols-7 gap-1.5 mt-2 p-2 rounded-xl solid-elevated is-hidden"></div>
@@ -621,30 +660,30 @@
 
     <!-- Barra de Navegación Inferior Nativa (5 accesos con + Cargar central) -->
     <div id="bottomNavBar" class="bottom-nav-bar flex justify-around items-center px-1">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-bold cursor-pointer py-1" style="color:#10B981;">
-        <span class="text-base leading-none">📊</span>
-        <span class="text-[10px]">Inicio</span>
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-bold cursor-pointer py-1" style="color:#10B981;">
+        <span class="text-xl leading-none">📊</span>
+        <span class="text-[11px] font-bold">Inicio</span>
       </button>
-      <button onclick="switchTab('bills')" id="nav-bills" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-base leading-none">☑️</span>
-        <span class="text-[10px]">Fijos</span>
+      <button onclick="switchTab('bills')" id="nav-bills" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
+        <span class="text-xl leading-none">☑️</span>
+        <span class="text-[11px]">Fijos</span>
       </button>
 
       <!-- Botón Central Destacado: Cargar en 1 toque (Estilo Fintech) -->
-      <button onclick="openQuickModal('expense')" class="flex flex-col items-center justify-center -mt-3.5 cursor-pointer px-1 shrink-0" style="outline: none;">
-        <div class="rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg" style="width: 46px; height: 46px; background: linear-gradient(135deg, #10B981 0%, #0D7A5F 100%); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); border: 2.5px solid var(--surface-card);">
+      <button onclick="openQuickModal('expense')" class="flex flex-col items-center justify-center -mt-4 cursor-pointer px-1 shrink-0" style="outline: none;">
+        <div class="rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg" style="width: 48px; height: 48px; background: linear-gradient(135deg, #10B981 0%, #0D7A5F 100%); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); border: 2.5px solid var(--surface-card);">
           ＋
         </div>
-        <span class="text-[10px] font-bold mt-0.5" style="color: #10B981;">Cargar</span>
+        <span class="text-[11px] font-bold mt-0.5" style="color: #10B981;">Cargar</span>
       </button>
 
-      <button onclick="switchTab('accounts')" id="nav-accounts" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-base leading-none">🏦</span>
-        <span class="text-[10px]">Cuentas</span>
+      <button onclick="switchTab('accounts')" id="nav-accounts" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
+        <span class="text-xl leading-none">🏦</span>
+        <span class="text-[11px]">Cuentas</span>
       </button>
-      <button onclick="switchTab('settings')" id="nav-settings" class="flex-1 flex flex-col items-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
-        <span class="text-base leading-none">⚙️</span>
-        <span class="text-[10px]">Ajustes</span>
+      <button onclick="switchTab('settings')" id="nav-settings" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold cursor-pointer py-1" style="color: var(--text-muted);">
+        <span class="text-xl leading-none">⚙️</span>
+        <span class="text-[11px]">Ajustes</span>
       </button>
     </div>
 
@@ -753,14 +792,14 @@
 
         <div class="space-y-3 text-xs">
           <div>
-            <label class="font-bold block mb-1" style="color: var(--text-muted);">Nombre del Gasto Fijo</label>
-            <input id="billTitleInput" type="text" placeholder="Ej: Nombre del servicio o pago mensual"
+            <label class="font-bold block mb-1" style="color: var(--text-muted);">Nombre del Gasto Fijo <span class="text-rose-400 font-bold">*</span></label>
+            <input id="billTitleInput" type="text" placeholder="Ej: Nombre del servicio o pago mensual (Obligatorio)"
               class="w-full px-3 py-2 rounded-xl solid-input font-bold" />
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div class="min-w-0">
-              <label class="font-bold block mb-1" style="color: var(--text-muted);">Monto Total (admite +)</label>
+              <label class="font-bold block mb-1" style="color: var(--text-muted);">Monto Total <span class="text-rose-400 font-bold">*</span> (admite +)</label>
               <input id="billAmountInput" type="text" placeholder="Ej: 50000 o 20000+13000"
                 class="w-full px-3 py-2 rounded-xl solid-input font-bold" />
             </div>
@@ -772,7 +811,7 @@
           </div>
 
           <div>
-            <label class="font-bold block mb-1" style="color: var(--text-muted);">Día de Vencimiento</label>
+            <label class="font-bold block mb-1" style="color: var(--text-muted);">Día de Vencimiento <span class="text-rose-400 font-bold">*</span></label>
             <div class="flex gap-1.5 items-center">
               <input id="billDueDayInput" type="number" min="1" max="31" placeholder="10"
                 class="w-16 px-2 py-2 rounded-xl solid-input font-bold text-center" />
@@ -850,8 +889,8 @@
                 class="w-full px-2 py-2 rounded-xl solid-input text-center text-base font-bold" />
             </div>
             <div class="flex-1">
-              <label class="font-bold block mb-1" style="color: var(--text-muted);">Nombre</label>
-              <input id="editItemNameInput" type="text" placeholder="Nombre..."
+              <label class="font-bold block mb-1" style="color: var(--text-muted);">Nombre <span class="text-rose-400 font-bold">*</span></label>
+              <input id="editItemNameInput" type="text" placeholder="Nombre (Obligatorio)..."
                 class="w-full px-3 py-2.5 rounded-xl solid-input font-bold" />
             </div>
           </div>
@@ -892,10 +931,14 @@
             <p class="text-[11px] mb-2.5" style="color: var(--text-muted);">
               Cotización oficial minorista de referencia para la <b>venta</b> tomada del Banco Nación.
             </p>
-            <div class="flex justify-between items-center">
-              <span class="text-[11px]" style="color: var(--text-muted);" id="dolarLastSyncLabel">Referencia: Banco Nación (Venta)</span>
-              <button type="button" onclick="fetchLiveDolarOficial()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-white cursor-pointer" style="background:#0D7A5F;">
-                🔄 Actualizar del Banco
+            <div class="flex justify-between items-center gap-2">
+              <div class="flex flex-col">
+                <span class="text-xs font-bold" style="color:#10B981;" id="dolarLastSyncLabel">Referencia: Banco Nación (Venta)</span>
+                <span class="text-[10px] mt-0.5" style="color: var(--text-muted);" id="dolarFechaActualizacionLabel">Última actualización: --/--/----</span>
+              </div>
+              <button type="button" onclick="fetchLiveDolarOficial()" class="px-3 py-2 rounded-xl text-xs font-bold text-white cursor-pointer shrink-0 shadow-sm flex items-center gap-1.5" style="background:#0D7A5F;">
+                <span>⚡</span>
+                <span>Sincronizar BNA</span>
               </button>
             </div>
           </div>
@@ -1076,6 +1119,20 @@
           </div>
         </div>
 
+        <!-- GRÁFICO 1.B: Distribución del 100% de Gastos Fijos por Rubro -->
+        <div class="solid-elevated p-3 rounded-2xl mb-3 text-xs">
+          <div class="flex justify-between items-center mb-1.5">
+            <div class="font-bold">📌 ¿En qué se van tus Gastos Fijos? (100% de Fijos)</div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md" style="background: rgba(245,158,11,0.18); color: #F59E0B;" id="repFixedTotalBadge">$ 0</span>
+          </div>
+          <div id="repBarFixedBreakdown" class="w-full h-3.5 rounded-full overflow-hidden flex mb-2" style="background: rgba(0,0,0,0.3);">
+            <div style="width:100%; background:#64748B;"></div>
+          </div>
+          <div id="repFixedCategoriesLegend" class="space-y-1.5 mt-2">
+            <!-- Leyenda con porcentajes y montos ordenados de mayor a menor -->
+          </div>
+        </div>
+
         <!-- GRÁFICO 2: Desglose de Gastos por Categoría -->
         <div class="solid-elevated p-3 rounded-2xl mb-3 text-xs">
           <div class="font-bold mb-2">📈 Gráfico de Gastos Diarios por Rubro</div>
@@ -1141,26 +1198,40 @@
   <script>
     let OFICIAL_SELL_RATE = 1015;
     let dolarRateSource = 'Banco Nación';
-    let dolarLastSyncText = 'Referencia: Banco Nación (Precio de Venta)';
+    let dolarLastSyncText = 'Banco Nación (Venta): $ 1.015 ARS';
+    let dolarFechaActualizacion = '';
     let displayCurrency = 'ARS';
+    let currentActiveMonth = '2026-10'; // Mes activo actual de referencia
     let selectedMonth = '2026-10';
     let currentTab = 'dashboard';
     let billFilter = 'all';
     let txSearchQuery = '';
     let txTypeFilter = 'all'; // 'all' | 'expense' | 'income'
-    let nextPaydayDateStr = '2026-11-05';
+    let nextPaydayDateStr = '2026-10-05';
+    let paydaysByMonth = {
+      '2026-08': '2026-08-05',
+      '2026-09': '2026-09-05',
+      '2026-10': '2026-10-05',
+      '2026-11': '2026-11-05'
+    };
     let transferredPositiveMonths = {}; // Guarda si ya se pasó el sobrante positivo de un mes al siguiente
 
     let isDarkObsidian = true;
-    let isOnline = true;
+    let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
     let outboxQueue = [
       { id: 'ob-1', table: 'monthly_bills', op: 'SYNCED', desc: 'Datos locales sincronizados en SQLite' }
     ];
 
     const MONTH_ORDER = ['2026-08', '2026-09', '2026-10', '2026-11'];
+    const MONTH_BASE_NAMES = {
+      '2026-11': 'Noviembre 2026',
+      '2026-10': 'Octubre 2026',
+      '2026-09': 'Septiembre 2026',
+      '2026-08': 'Agosto 2026',
+    };
     const MONTH_LABELS = {
-      '2026-11': 'Noviembre 2026 (Adelantado)',
+      '2026-11': 'Noviembre 2026 (Próximo)',
       '2026-10': 'Octubre 2026',
       '2026-09': 'Septiembre 2026',
       '2026-08': 'Agosto 2026',
@@ -1322,21 +1393,30 @@
       }
     }
 
-    // Calcula cuántos días faltan desde la fecha REAL de hoy del dispositivo hasta la fecha de próximo cobro elegida
-    function computeDaysUntilNextPayday() {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const parts = nextPaydayDateStr.split('-');
-      if (parts.length !== 3) return 15;
-      const target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-      const diffMs = target.getTime() - today.getTime();
-      const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      return Math.max(1, days);
+    function getPaydayForMonth(mKey) {
+      if (paydaysByMonth && paydaysByMonth[mKey]) return paydaysByMonth[mKey];
+      return `${mKey}-05`;
+    }
+
+    function formatPaydayShort(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) return `${parts[2]}/${parts[1]}`;
+      return dateStr;
     }
 
     function onPaydayChanged(val) {
       if (!val) return;
+      if (!paydaysByMonth) paydaysByMonth = {};
+      paydaysByMonth[selectedMonth] = val;
       nextPaydayDateStr = val;
+      saveStateToLocalStorage();
+      renderAll();
+    }
+
+    function changeActiveMonth(mKey) {
+      currentActiveMonth = mKey;
+      saveStateToLocalStorage();
       renderAll();
     }
 
@@ -1468,31 +1548,69 @@
       });
     })();
 
+    function renderMonthBar() {
+      const bar = document.getElementById('monthScrollBar');
+      if (!bar) return;
+      const displayOrder = [...MONTH_ORDER].reverse();
+      bar.innerHTML = displayOrder.map(k => {
+        const isSelected = (k === selectedMonth);
+        const isCurrent = (k === currentActiveMonth);
+        const idxK = MONTH_ORDER.indexOf(k);
+        const idxActive = MONTH_ORDER.indexOf(currentActiveMonth);
+        const isNext = (idxK === idxActive + 1);
+
+        let badgeHtml = '';
+        if (isCurrent) {
+          badgeHtml = `<span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 ${isSelected ? 'bg-white/25 text-white' : 'bg-emerald-500/20 text-emerald-400'}">Actual</span>`;
+        } else if (isNext) {
+          badgeHtml = `<span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 ${isSelected ? 'bg-white/25 text-white' : 'bg-sky-500/20 text-sky-300'}">Próximo</span>`;
+        }
+
+        const baseName = MONTH_BASE_NAMES[k] || k;
+        const styleBg = isSelected ? 'background:#0D7A5F;' : '';
+        const cls = isSelected
+          ? 'px-3 py-1.5 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0 flex items-center shadow-sm'
+          : 'px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center';
+
+        return `<button onclick="selectMonth('${k}')" id="m-${k}" class="${cls}" style="${styleBg}">
+          <span>${baseName}</span>
+          ${badgeHtml}
+        </button>`;
+      }).join('');
+    }
+
     function selectMonth(monthKey) {
       selectedMonth = monthKey;
-      MONTH_ORDER.forEach(k => {
-        const btn = document.getElementById('m-' + k);
-        if (!btn) return;
-        if (k === monthKey) {
-          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0';
-          btn.style.background = '#0D7A5F';
-          try {
-            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-          } catch (_) {}
-        } else {
-          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0';
-          btn.style.background = '';
-        }
-      });
+      renderMonthBar();
+      try {
+        const btn = document.getElementById('m-' + monthKey);
+        if (btn) btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } catch (_) {}
+      try { navigator.vibrate?.(10); } catch (_) {}
       renderAll();
     }
 
     function switchTab(tab) {
+      const main = document.getElementById('mainScroll');
+      if (currentTab === tab) {
+        // Punto 7: Si ya estamos en esta sección y se vuelve a presionar, enviar a la parte superior
+        if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+        try { navigator.vibrate?.(10); } catch (_) {}
+        return;
+      }
+
       currentTab = tab;
+      try { navigator.vibrate?.(10); } catch (_) {}
+
+      // Punto 8: Al cambiar a una nueva sección, empezar siempre arriba de todo
+      if (main) main.scrollTop = 0;
+
       ['dashboard', 'bills', 'accounts', 'settings'].forEach(t => {
         const panel = document.getElementById('tab-' + t);
         if (t === tab) {
           panel.classList.remove('is-hidden');
+          panel.classList.add('tab-fade');
+          setTimeout(() => panel.classList.remove('tab-fade'), 250);
         } else {
           panel.classList.add('is-hidden');
         }
@@ -1576,9 +1694,113 @@
       }
     }
 
+    function computeHeroPaydayAllowance(available) {
+      const dailyAmountEl = document.getElementById('dailyAllowanceAmount');
+      const dailyDaysEl = document.getElementById('dailyAllowanceDaysText');
+      const heroPaydayLabel = document.getElementById('heroPaydayLabel');
+      const paydayInput = document.getElementById('nextPaydayInput');
+
+      const currentPaydayStr = getPaydayForMonth(selectedMonth);
+      if (paydayInput) paydayInput.value = currentPaydayStr;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const idxSelected = MONTH_ORDER.indexOf(selectedMonth);
+      const idxActive = MONTH_ORDER.indexOf(currentActiveMonth);
+
+      // CASO 1: Mes Pasado (cerrado)
+      if (idxSelected < idxActive) {
+        if (heroPaydayLabel) heroPaydayLabel.innerText = 'Cobrado en fecha:';
+        if (available > 0) {
+          dailyAmountEl.innerText = `✅ Mes cerrado: Saldo a favor`;
+          dailyAmountEl.style.color = '#6EE7B7';
+          dailyDaysEl.innerText = `Cobrado el ${formatPaydayShort(currentPaydayStr)} · Saldo final: ${formatMoney(available)}`;
+        } else {
+          dailyAmountEl.innerText = `✅ Mes cerrado`;
+          dailyAmountEl.style.color = '#94A3B8';
+          dailyDaysEl.innerText = `Cobrado el ${formatPaydayShort(currentPaydayStr)} · Cierre sin remanente`;
+        }
+        return;
+      }
+
+      // CASO 2: Mes Próximo / Futuro (Planificación adelantada)
+      if (idxSelected > idxActive) {
+        if (heroPaydayLabel) heroPaydayLabel.innerText = 'Cobro previsto:';
+        const parts = selectedMonth.split('-');
+        const daysInFutureMonth = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10), 0).getDate() || 30;
+        const monthName = MONTH_BASE_NAMES[selectedMonth] || 'el mes';
+        if (available > 0) {
+          const perDay = Math.floor(available / daysInFutureMonth);
+          dailyAmountEl.innerText = `💡 Proyección: ${formatMoney(perDay)} / día`;
+          dailyAmountEl.style.color = '#6EE7B7';
+          dailyDaysEl.innerText = `Planificado a ${daysInFutureMonth} días de ${monthName}`;
+        } else {
+          dailyAmountEl.innerText = `⚠️ Sin margen proyectado`;
+          dailyAmountEl.style.color = '#FDA4AF';
+          dailyDaysEl.innerText = `Cargá tus ingresos para proyectar tu mes`;
+        }
+        return;
+      }
+
+      // CASO 3: Mes Actual
+      if (heroPaydayLabel) heroPaydayLabel.innerText = 'Fecha de cobro:';
+      const parts = currentPaydayStr.split('-');
+      const paydayDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+
+      if (today.getTime() > paydayDate.getTime()) {
+        // La fecha de cobro de este mes YA PASÓ (el sueldo ya se cobró)
+        const nextMonthKey = (idxSelected + 1 < MONTH_ORDER.length) ? MONTH_ORDER[idxSelected + 1] : null;
+        const nextPaydayStr = nextMonthKey ? getPaydayForMonth(nextMonthKey) : null;
+
+        let daysRemaining = 15;
+        let targetLabel = '';
+        if (nextPaydayStr) {
+          const nParts = nextPaydayStr.split('-');
+          const nextTarget = new Date(parseInt(nParts[0], 10), parseInt(nParts[1], 10) - 1, parseInt(nParts[2], 10));
+          const diffMs = nextTarget.getTime() - today.getTime();
+          daysRemaining = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+          targetLabel = `próximo cobro (${formatPaydayShort(nextPaydayStr)})`;
+        } else {
+          const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+          daysRemaining = Math.max(1, lastDay - today.getDate() + 1);
+          targetLabel = 'fin de mes';
+        }
+
+        if (available > 0) {
+          const perDay = Math.floor(available / daysRemaining);
+          dailyAmountEl.innerText = `💡 Podés gastar ${formatMoney(perDay)} / día`;
+          dailyAmountEl.style.color = '#6EE7B7';
+          dailyDaysEl.innerText = `Cobrado el ${formatPaydayShort(currentPaydayStr)} · Quedan ${daysRemaining} días hasta tu ${targetLabel}`;
+        } else {
+          dailyAmountEl.innerText = `⚠️ Sin margen diario disponible`;
+          dailyAmountEl.style.color = '#FDA4AF';
+          dailyDaysEl.innerText = `Quedan ${daysRemaining} días hasta tu ${targetLabel}`;
+        }
+      } else {
+        // La fecha de cobro de este mes AÚN NO LLEGÓ
+        const diffMs = paydayDate.getTime() - today.getTime();
+        const daysToPayday = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+        if (available > 0) {
+          const perDay = Math.floor(available / daysToPayday);
+          dailyAmountEl.innerText = `💡 Podés gastar ${formatMoney(perDay)} / día`;
+          dailyAmountEl.style.color = '#6EE7B7';
+          dailyDaysEl.innerText = `Faltan ${daysToPayday} días para cobrar tu sueldo de este mes (${formatPaydayShort(currentPaydayStr)})`;
+        } else {
+          dailyAmountEl.innerText = `⚠️ Sin margen diario disponible`;
+          dailyAmountEl.style.color = '#FDA4AF';
+          dailyDaysEl.innerText = `Faltan ${daysToPayday} días para cobrar (${formatPaydayShort(currentPaydayStr)})`;
+        }
+      }
+    }
+
     function renderAll() {
       updateLiveSystemClock();
-      const monthLabel = MONTH_LABELS[selectedMonth];
+      renderMonthBar();
+      const selActive = document.getElementById('activeMonthSelect');
+      if (selActive) selActive.value = currentActiveMonth;
+
+      const monthLabel = MONTH_LABELS[selectedMonth] || selectedMonth;
       const mTx = transactions.filter(t => t.monthKey === selectedMonth);
       const mBills = monthlyBills.filter(b => b.monthKey === selectedMonth);
 
@@ -1598,20 +1820,8 @@
       document.getElementById('heroFixed').innerText = formatMoney(totalFixed);
       document.getElementById('heroDaily').innerText = formatMoney(totalDaily);
 
-      // Calculadora por día según fecha de próximo cobro
-      const daysToPayday = computeDaysUntilNextPayday();
-      const dailyAmountEl = document.getElementById('dailyAllowanceAmount');
-      const dailyDaysEl = document.getElementById('dailyAllowanceDaysText');
-      if (available > 0) {
-        const perDay = Math.floor(available / daysToPayday);
-        dailyAmountEl.innerText = `💡 Podés gastar ${formatMoney(perDay)} / día`;
-        dailyAmountEl.style.color = '#6EE7B7';
-        dailyDaysEl.innerText = `Calculado a ${daysToPayday} días hasta tu próximo cobro`;
-      } else {
-        dailyAmountEl.innerText = `⚠️ Sin margen diario disponible`;
-        dailyAmountEl.style.color = '#FDA4AF';
-        dailyDaysEl.innerText = `Faltan ${daysToPayday} días para el próximo cobro`;
-      }
+      // Calculadora de cobro por mes independiente
+      computeHeroPaydayAllowance(available);
 
       const heroCard = document.getElementById('heroCard');
       const heroStatusText = document.getElementById('heroStatusText');
@@ -1624,14 +1834,10 @@
       }
 
       // 2. Botón de Pasar Saldo a Favor al Mes Siguiente:
-      // SOLO aparece si:
-      //  a) Quedó saldo a favor (available > 0), Y
-      //  b) Es un mes anterior ya finalizado (selectedMonth < CURRENT_ACTIVE_MONTH) O hoy es el último día del mes en curso.
-      const CURRENT_ACTIVE_MONTH = '2026-10';
       const todayDate = new Date();
       const lastDayOfCurrentMonth = new Date(todayDate.getFullYear(), todayDate.getMonth() + 1, 0).getDate();
       const isLastDayOfMonth = (todayDate.getDate() === lastDayOfCurrentMonth);
-      const isClosedPastMonth = (MONTH_ORDER.indexOf(selectedMonth) < MONTH_ORDER.indexOf(CURRENT_ACTIVE_MONTH));
+      const isClosedPastMonth = (MONTH_ORDER.indexOf(selectedMonth) < MONTH_ORDER.indexOf(currentActiveMonth));
 
       const surplusCard = document.getElementById('positiveSurplusTransferCard');
       const idx = MONTH_ORDER.indexOf(selectedMonth);
@@ -1941,7 +2147,14 @@
 
     function openDolarRateModal() {
       document.getElementById('manualDolarRateInput').value = OFICIAL_SELL_RATE;
-      document.getElementById('dolarLastSyncLabel').innerText = dolarLastSyncText;
+      const statusLabel = document.getElementById('dolarLastSyncLabel');
+      const fechaLabel = document.getElementById('dolarFechaActualizacionLabel');
+      if (statusLabel) statusLabel.innerText = dolarLastSyncText;
+      if (fechaLabel) {
+        fechaLabel.innerText = dolarFechaActualizacion
+          ? `Última actualización: ${dolarFechaActualizacion} hs`
+          : 'Presioná Sincronizar BNA para consultar en vivo';
+      }
       document.getElementById('dolarRateModal').classList.remove('is-hidden');
     }
 
@@ -1951,7 +2164,8 @@
 
     async function fetchLiveDolarOficial() {
       const statusLabel = document.getElementById('dolarLastSyncLabel');
-      statusLabel.innerText = 'Consultando cotización Banco Nación (Venta)...';
+      const fechaLabel = document.getElementById('dolarFechaActualizacionLabel');
+      if (statusLabel) statusLabel.innerText = 'Consultando cotización Banco Nación...';
       try {
         const res = await fetch('https://dolarapi.com/v1/dolares/oficial');
         if (res.ok) {
@@ -1960,16 +2174,31 @@
             OFICIAL_SELL_RATE = Number(data.venta);
             dolarRateSource = 'Banco Nación';
             dolarLastSyncText = `Banco Nación (Venta): $ ${OFICIAL_SELL_RATE.toLocaleString('es-AR')} ARS`;
+
+            if (data.fechaActualizacion) {
+              const d = new Date(data.fechaActualizacion);
+              dolarFechaActualizacion = isNaN(d.getTime())
+                ? new Date().toLocaleDateString('es-AR') + ' ' + new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+                : d.toLocaleDateString('es-AR') + ' ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+            } else {
+              const now = new Date();
+              dolarFechaActualizacion = now.toLocaleDateString('es-AR') + ' ' + now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+            }
+
             document.getElementById('manualDolarRateInput').value = OFICIAL_SELL_RATE;
-            statusLabel.innerText = dolarLastSyncText;
+            if (statusLabel) statusLabel.innerText = dolarLastSyncText;
+            if (fechaLabel) fechaLabel.innerText = `Última actualización: ${dolarFechaActualizacion} hs`;
+            saveStateToLocalStorage();
             renderAll();
+            try { navigator.vibrate?.(15); } catch (_) {}
             return;
           }
         }
       } catch (_) {}
       dolarRateSource = 'Banco Nación';
       dolarLastSyncText = `Banco Nación (Venta): $ ${OFICIAL_SELL_RATE.toLocaleString('es-AR')} ARS`;
-      statusLabel.innerText = dolarLastSyncText;
+      if (statusLabel) statusLabel.innerText = dolarLastSyncText;
+      if (fechaLabel && dolarFechaActualizacion) fechaLabel.innerText = `Última actualización: ${dolarFechaActualizacion} hs`;
       renderAll();
     }
 
@@ -2087,10 +2316,46 @@
       document.getElementById('editItemModal').classList.add('is-hidden');
     }
 
+    function highlightRequiredInput(inputEl, message = 'Este campo es obligatorio') {
+      if (!inputEl) return;
+      inputEl.classList.add('input-error-shake');
+      inputEl.style.borderColor = '#FB7185';
+      inputEl.style.boxShadow = '0 0 0 2px rgba(251, 113, 133, 0.35)';
+      try { inputEl.focus(); } catch (_) {}
+      try { navigator.vibrate?.([30, 50, 30]); } catch (_) {}
+
+      setTimeout(() => {
+        inputEl.classList.remove('input-error-shake');
+      }, 350);
+
+      let errEl = inputEl.parentNode ? inputEl.parentNode.querySelector('.input-error-msg') : null;
+      if (!errEl && inputEl.parentNode) {
+        errEl = document.createElement('div');
+        errEl.className = 'input-error-msg text-[11px] font-bold mt-1 text-rose-400 flex items-center gap-1';
+        inputEl.parentNode.appendChild(errEl);
+      }
+      if (errEl) {
+        errEl.innerText = `⚠️ ${message}`;
+        errEl.classList.remove('is-hidden');
+      }
+
+      const removeHandler = () => {
+        inputEl.style.borderColor = '';
+        inputEl.style.boxShadow = '';
+        if (errEl) errEl.classList.add('is-hidden');
+        inputEl.removeEventListener('input', removeHandler);
+      };
+      inputEl.addEventListener('input', removeHandler);
+    }
+
     function saveEditItemModal() {
       const newIcon = document.getElementById('editItemIconInput').value.trim() || '🏷️';
-      const newName = document.getElementById('editItemNameInput').value.trim();
-      if (!newName) return;
+      const nameInput = document.getElementById('editItemNameInput');
+      const newName = nameInput ? nameInput.value.trim() : '';
+      if (!newName) {
+        highlightRequiredInput(nameInput, 'Ingresá un nombre');
+        return;
+      }
 
       let target = null;
       if (editingSettingKind === 'fixed') {
@@ -2191,8 +2456,12 @@
       const iconInputId = kind === 'income'
         ? 'newIncomeCatIconInput'
         : (kind === 'fixed' ? 'newFixedCatIconInput' : 'newExpenseCatIconInput');
-      const name = document.getElementById(inputId).value.trim();
-      if (!name) return;
+      const inputEl = document.getElementById(inputId);
+      const name = inputEl ? inputEl.value.trim() : '';
+      if (!name) {
+        highlightRequiredInput(inputEl, 'Ingresá el nombre de la categoría');
+        return;
+      }
       const customIconEl = document.getElementById(iconInputId);
       const customIcon = customIconEl && customIconEl.value.trim() ? customIconEl.value.trim() : null;
 
@@ -2225,8 +2494,12 @@
     }
 
     function addCustomAccount() {
-      const name = document.getElementById('newAccountNameInput').value.trim();
-      if (!name) return;
+      const inputEl = document.getElementById('newAccountNameInput');
+      const name = inputEl ? inputEl.value.trim() : '';
+      if (!name) {
+        highlightRequiredInput(inputEl, 'Ingresá el nombre de la billetera o cuenta');
+        return;
+      }
       const iconEl = document.getElementById('newAccountIconInput');
       const icon = iconEl && iconEl.value.trim() ? iconEl.value.trim() : '💳';
       ACCOUNTS.push({ id: 'acc-' + Date.now(), name, icon, balance: 0 });
@@ -2468,7 +2741,10 @@
 
     function saveQuickTransaction() {
       const total = evaluateQuickExpression(quickExpression);
-      if (total <= 0) return;
+      if (total <= 0) {
+        highlightRequiredInput(document.getElementById('quickDisplayCard'), 'Ingresá un monto mayor a $ 0 con el teclado');
+        return;
+      }
 
       const noteInput = document.getElementById('quickNoteInput').value.trim();
       const cat = findCategory(quickSelectedCategory);
@@ -2560,7 +2836,10 @@
       const input = document.getElementById('inlineFixedCatInput');
       if (!input) return;
       const name = input.value.trim();
-      if (!name) return;
+      if (!name) {
+        highlightRequiredInput(input, 'Ingresá el nombre de la categoría fija');
+        return;
+      }
       const iconInput = document.getElementById('inlineFixedCatIconInput');
       const iconDisplay = document.getElementById('inlineFixedCatIconDisplay');
       const icon = iconInput && iconInput.value.trim() ? iconInput.value.trim() : '📌';
@@ -2593,15 +2872,24 @@
     }
 
     function saveBillModal() {
-      const title = document.getElementById('billTitleInput').value.trim();
-      const rawAmount = document.getElementById('billAmountInput').value.replace(/\./g, '').trim();
+      const titleInput = document.getElementById('billTitleInput');
+      const title = titleInput ? titleInput.value.trim() : '';
+      const amountInput = document.getElementById('billAmountInput');
+      const rawAmount = amountInput ? amountInput.value.replace(/\./g, '').trim() : '';
       const rawPaid = document.getElementById('billPaidInput').value.replace(/\./g, '').trim();
       const amount = evaluateQuickExpression(rawAmount);
       const paid = evaluateQuickExpression(rawPaid);
       const dueDay = Math.min(31, Math.max(1, parseInt(document.getElementById('billDueDayInput').value, 10) || 10));
       const note = document.getElementById('billNoteInput').value.trim();
 
-      if (!title || amount <= 0) return;
+      if (!title) {
+        highlightRequiredInput(titleInput, 'Ingresá el nombre del gasto fijo');
+        return;
+      }
+      if (amount <= 0) {
+        highlightRequiredInput(amountInput, 'Ingresá un monto mayor a $ 0');
+        return;
+      }
 
       if (editingBillId) {
         const bill = monthlyBills.find(b => b.id === editingBillId);
@@ -2865,6 +3153,9 @@
           accountTransfers,
           OFICIAL_SELL_RATE,
           nextPaydayDateStr,
+          paydaysByMonth,
+          currentActiveMonth,
+          dolarFechaActualizacion,
           transferredPositiveMonths,
           isDarkObsidian,
         };
@@ -3002,6 +3293,9 @@
           accountTransfers,
           OFICIAL_SELL_RATE,
           nextPaydayDateStr,
+          paydaysByMonth,
+          currentActiveMonth,
+          dolarFechaActualizacion,
           transferredPositiveMonths,
           isDarkObsidian
         };
@@ -3125,8 +3419,12 @@
         if (parsed.OFICIAL_SELL_RATE) OFICIAL_SELL_RATE = parsed.OFICIAL_SELL_RATE;
         if (parsed.nextPaydayDateStr) {
           nextPaydayDateStr = parsed.nextPaydayDateStr;
-          const paydayEl = document.getElementById('nextPaydayInput');
-          if (paydayEl) paydayEl.value = nextPaydayDateStr;
+        }
+        if (parsed.paydaysByMonth) paydaysByMonth = parsed.paydaysByMonth;
+        if (parsed.currentActiveMonth) currentActiveMonth = parsed.currentActiveMonth;
+        if (parsed.dolarFechaActualizacion) dolarFechaActualizacion = parsed.dolarFechaActualizacion;
+        if (!paydaysByMonth && nextPaydayDateStr) {
+          paydaysByMonth = { [currentActiveMonth || '2026-10']: nextPaydayDateStr };
         }
         if (parsed.transferredPositiveMonths) transferredPositiveMonths = parsed.transferredPositiveMonths;
         if (typeof parsed.isDarkObsidian === 'boolean' && parsed.isDarkObsidian !== isDarkObsidian) {
@@ -3159,8 +3457,12 @@
         if (parsed.OFICIAL_SELL_RATE) OFICIAL_SELL_RATE = parsed.OFICIAL_SELL_RATE;
         if (parsed.nextPaydayDateStr) {
           nextPaydayDateStr = parsed.nextPaydayDateStr;
-          const paydayEl = document.getElementById('nextPaydayInput');
-          if (paydayEl) paydayEl.value = nextPaydayDateStr;
+        }
+        if (parsed.paydaysByMonth) paydaysByMonth = parsed.paydaysByMonth;
+        if (parsed.currentActiveMonth) currentActiveMonth = parsed.currentActiveMonth;
+        if (parsed.dolarFechaActualizacion) dolarFechaActualizacion = parsed.dolarFechaActualizacion;
+        if (!paydaysByMonth && nextPaydayDateStr) {
+          paydaysByMonth = { [currentActiveMonth || '2026-10']: nextPaydayDateStr };
         }
         if (parsed.transferredPositiveMonths) transferredPositiveMonths = parsed.transferredPositiveMonths;
         if (typeof parsed.isDarkObsidian === 'boolean' && parsed.isDarkObsidian !== isDarkObsidian) {
@@ -3219,6 +3521,26 @@
           return { cat, amount: amt, pct };
         });
 
+      // Desglose del 100% de Gastos Fijos por categoría/rubro
+      const fixedCatMap = {};
+      mBills.forEach(b => {
+        const cId = b.categoryId || 'sin-cat';
+        fixedCatMap[cId] = (fixedCatMap[cId] || 0) + b.amount;
+      });
+      const fixedColors = ['#6366F1', '#EC4899', '#14B8A6', '#F59E0B', '#8B5CF6', '#3B82F6', '#10B981', '#F43F5E'];
+      const fixedBreakdown = Object.entries(fixedCatMap)
+        .sort((a, b) => b[1] - a[1])
+        .map(([catId, amt], idx) => {
+          const cat = FIXED_BILL_CATEGORIES.find(c => c.id === catId) || { name: 'Otros Fijos', icon: '📌' };
+          const pct = totalFixed > 0 ? Math.round((amt / totalFixed) * 100) : 0;
+          return {
+            cat,
+            amount: amt,
+            pct,
+            color: fixedColors[idx % fixedColors.length]
+          };
+        });
+
       const lines = [];
       lines.push(`📊 REPORTE MENSUAL — ${monthLabel.toUpperCase()}`);
       lines.push(`----------------------------------------`);
@@ -3227,6 +3549,16 @@
       lines.push(`• Gastos Fijos: $ ${totalFixed.toLocaleString('es-AR')} (Pagado: $ ${totalFixedPaid.toLocaleString('es-AR')} | Falta: $ ${totalFixedPending.toLocaleString('es-AR')})`);
       lines.push(`• Gastos Diarios: $ ${totalDaily.toLocaleString('es-AR')}`);
       lines.push(`• Saldo Disponible: ${formatArsOnly(available)}`);
+      lines.push(``);
+
+      lines.push(`📌 DISTRIBUCIÓN DE GASTOS FIJOS (100%):`);
+      if (fixedBreakdown.length === 0) {
+        lines.push(`  (Sin gastos fijos)`);
+      } else {
+        fixedBreakdown.forEach(item => {
+          lines.push(`• ${item.cat.icon} ${item.cat.name}: $ ${item.amount.toLocaleString('es-AR')} (${item.pct}%)`);
+        });
+      }
       lines.push(``);
 
       lines.push(`☑️ PAGOS / GASTOS FIJOS (${mBills.length}):`);
@@ -3284,6 +3616,7 @@
         pctDaily,
         pctAvail,
         categoryBreakdown,
+        fixedBreakdown,
         dayGroups,
         dayMap,
         incomes,
@@ -3310,6 +3643,37 @@
       document.getElementById('repPctFixedLabel').innerText = `Fijos: ${rep.pctFixed}%`;
       document.getElementById('repPctDailyLabel').innerText = `Diarios: ${rep.pctDaily}%`;
       document.getElementById('repPctAvailLabel').innerText = `Libre: ${rep.pctAvail}%`;
+
+      // Actualizar Gráfico 1.B: Distribución del 100% de Gastos Fijos
+      const fixedBadgeEl = document.getElementById('repFixedTotalBadge');
+      if (fixedBadgeEl) fixedBadgeEl.innerText = `$ ${rep.totalFixed.toLocaleString('es-AR')}`;
+      const barFixedEl = document.getElementById('repBarFixedBreakdown');
+      const legendFixedEl = document.getElementById('repFixedCategoriesLegend');
+      if (rep.totalFixed <= 0 || !rep.fixedBreakdown || rep.fixedBreakdown.length === 0) {
+        if (barFixedEl) barFixedEl.innerHTML = `<div style="width:100%; background:rgba(255,255,255,0.15);"></div>`;
+        if (legendFixedEl) legendFixedEl.innerHTML = `<div class="text-[11px] py-1" style="color: var(--text-muted);">Sin gastos fijos en este mes.</div>`;
+      } else {
+        if (barFixedEl) {
+          barFixedEl.innerHTML = rep.fixedBreakdown.map(item => `
+            <div style="width:${item.pct}%; background:${item.color};" title="${item.cat.name}: ${item.pct}%"></div>
+          `).join('');
+        }
+        if (legendFixedEl) {
+          legendFixedEl.innerHTML = rep.fixedBreakdown.map((item, idx) => `
+            <div class="flex justify-between items-center text-xs py-0.5">
+              <div class="flex items-center gap-1.5 truncate">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${item.color};"></span>
+                <span class="truncate font-semibold">${item.cat.icon} ${item.cat.name}</span>
+                ${idx === 0 ? '<span class="text-[9px] px-1 rounded bg-amber-500/20 text-amber-400 font-bold shrink-0">Mayor gasto</span>' : ''}
+              </div>
+              <div class="font-bold shrink-0 ml-2">
+                <span>$ ${item.amount.toLocaleString('es-AR')}</span>
+                <span class="text-[10px] ml-1 px-1.5 py-0.5 rounded" style="background: rgba(255,255,255,0.08);">${item.pct}%</span>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
 
       // Actualizar Gráfico 2: Barras de Gastos Diarios por Rubro
       const chartBox = document.getElementById('repCategoryChartContainer');
@@ -3419,6 +3783,16 @@
     function exportMonthlyPdfReport() {
       const rep = buildMonthlyReportData();
 
+      const fixedSegmentsHtml = (rep.fixedBreakdown || []).map(item => `
+        <div style="width:${item.pct}%; background:${item.color};"></div>
+      `).join('');
+
+      const fixedLegendHtml = (rep.fixedBreakdown || []).map(item => `
+        <span style="color:#0F172A; margin-right:12px; display:inline-block; margin-bottom:3px;">
+          <span style="color:${item.color}; font-weight:800;">■</span> ${item.cat.name}: <b>${item.pct}%</b> ($ ${item.amount.toLocaleString('es-AR')})
+        </span>
+      `).join('');
+
       const catBarsHtml = rep.categoryBreakdown.map(item => `
         <div style="margin-bottom:7px;">
           <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:2px; color:#0F172A;">
@@ -3509,6 +3883,19 @@
           </div>
 
           <div style="border:1px solid #CBD5E1; border-radius:10px; padding:10px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="font-weight:800; font-size:12px; color:#0F172A;">📌 Gráfico 1.B: Distribución de tus Gastos Fijos (100% de Fijos)</div>
+              <div style="font-size:11px; font-weight:800; color:#D97706;">Total: $ ${rep.totalFixed.toLocaleString('es-AR')}</div>
+            </div>
+            <div style="width:100%; height:12px; background:#E2E8F0; border-radius:99px; overflow:hidden; display:flex; margin-bottom:6px;">
+              ${fixedSegmentsHtml || '<div style="width:100%; background:#CBD5E1;"></div>'}
+            </div>
+            <div style="font-size:10px; font-weight:600; line-height: 1.5;">
+              ${fixedLegendHtml || '<span style="color:#64748B;">Sin gastos fijos cargados este mes.</span>'}
+            </div>
+          </div>
+
+          <div style="border:1px solid #CBD5E1; border-radius:10px; padding:10px; margin-bottom:12px;">
             <div style="font-weight:800; font-size:12px; margin-bottom:8px; color:#0F172A;">📈 Gráfico 2: Gastos Diarios por Rubro</div>
             ${catBarsHtml || '<div style="font-size:11px; color:#64748B;">Sin gastos diarios registrados.</div>'}
           </div>
@@ -3570,10 +3957,32 @@
       pullFromSupabaseCloud(false);
     }
 
-    // Registro de Service Worker para soporte Offline 100% y Auto-actualización
+    // Detección automática de conectividad Offline / Online en el teléfono
+    function setupConnectivityListeners() {
+      isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+      updateSyncBadge();
+
+      window.addEventListener('online', () => {
+        isOnline = true;
+        updateSyncBadge();
+        showSupabaseFeedback('✔ Conexión recuperada: sincronizando con la nube...', false);
+        if (supabaseUrl && supabaseAnonKey) {
+          pushAllToSupabaseCloud();
+        }
+      });
+
+      window.addEventListener('offline', () => {
+        isOnline = false;
+        updateSyncBadge();
+        showSupabaseFeedback('☁️ Modo Offline: tus datos quedan guardados seguros en el teléfono', false);
+      });
+    }
+    setupConnectivityListeners();
+
+    // Registro de Service Worker para soporte Offline 100% y Auto-actualización Resiliente
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=3').then((reg) => {
           reg.update().catch(() => {});
         }).catch(() => {});
 
