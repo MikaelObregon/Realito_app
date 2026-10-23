@@ -434,67 +434,94 @@
         <div id="billsChecklistContainer" class="space-y-2.5"></div>
       </div>
 
-      <!-- ================= PESTAÑA 3: CUENTAS (PERSONAL PAY, BANCO, EFECTIVO) ================= -->
-      <div id="tab-accounts" class="space-y-3.5 pt-1 is-hidden">
+      <!-- ================= PESTAÑA 3: 📊 REPORTES & ESTADÍSTICAS DEL MES ================= -->
+      <div id="tab-reports" class="space-y-3 pt-1 is-hidden">
         <div class="solid-card p-4 rounded-2xl">
           <div class="flex justify-between items-center mb-1">
-            <h3 class="text-sm font-bold" id="accountsMonthHeader">Mis Cuentas y Billeteras</h3>
-            <span id="accountsMonthTotal" class="text-xs font-bold" style="color:#10B981;">Total: $ 0</span>
-          </div>
-          <p class="text-xs mb-3" style="color: var(--text-muted);" id="accountsMonthSubtitle">
-            Saldos configurados para el mes seleccionado.
-          </p>
-          <div id="accountsListContainer" class="space-y-2.5"></div>
-        </div>
-
-        <!-- NUEVA SECCIÓN: TRANSFERIR ENTRE MIS PROPIAS CUENTAS (No afecta Gastos ni Ingresos del mes) -->
-        <div class="solid-card p-4 rounded-2xl">
-          <div class="flex justify-between items-center mb-1">
-            <h3 class="text-sm font-bold">🔄 Transferir entre mis Cuentas</h3>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: rgba(16,185,129,0.16); color:#10B981;">No suma gasto</span>
+            <h3 class="text-sm font-bold" id="reportsTabHeader">📊 Reportes & Estadísticas</h3>
+            <span class="text-xs font-bold" style="color:#10B981;" id="reportsTabMonthBadge">Octubre 2026</span>
           </div>
           <p class="text-xs mb-3" style="color: var(--text-muted);">
-            Mové plata entre Banco, Personal Pay o Efectivo sin alterar tu Disponible del mes.
+            Balance completo de ingresos, gastos fijos, gastos diarios y disponible libre.
           </p>
 
-          <div class="space-y-2.5 text-xs">
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="font-bold block mb-1" style="color: var(--text-muted);">Desde (Origen)</label>
-                <select id="transferFromSelect" class="w-full px-2.5 py-2 rounded-xl solid-input font-bold text-xs outline-none"></select>
-              </div>
-              <div>
-                <label class="font-bold block mb-1" style="color: var(--text-muted);">Hacia (Destino)</label>
-                <select id="transferToSelect" class="w-full px-2.5 py-2 rounded-xl solid-input font-bold text-xs outline-none"></select>
-              </div>
+          <!-- 4 Tarjetas de Resumen en Cuadrícula -->
+          <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
+            <div class="solid-elevated p-2.5 rounded-xl">
+              <div style="color: var(--text-muted);">Ingresos Totales</div>
+              <div class="font-bold text-sm mt-0.5" style="color:#10B981;" id="repTabIncomeVal">$ 0</div>
             </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="font-bold block mb-1" style="color: var(--text-muted);">Monto a pasar (ARS)</label>
-                <input id="transferAmountInput" type="number" placeholder="0"
-                  class="w-full px-3 py-2 rounded-xl solid-input font-bold text-xs" />
-              </div>
-              <div>
-                <label class="font-bold block mb-1" style="color: var(--text-muted);">Nota (opcional)</label>
-                <input id="transferNoteInput" type="text" placeholder="Ej: Fondeo billetera"
-                  class="w-full px-3 py-2 rounded-xl solid-input font-semibold text-xs" />
-              </div>
+            <div class="solid-elevated p-2.5 rounded-xl">
+              <div style="color: var(--text-muted);">Saldo Disponible Libre</div>
+              <div class="font-bold text-sm mt-0.5" id="repTabAvailableVal">$ 0</div>
             </div>
-
-            <button type="button" onclick="submitAccountTransfer()"
-              class="w-full py-2.5 rounded-xl font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5"
-              style="background:#10B981; color:#052E16;">
-              <span>⇄</span>
-              <span>Transferir entre mis Cuentas</span>
-            </button>
+            <div class="solid-elevated p-2.5 rounded-xl">
+              <div style="color: var(--text-muted);">Gastos Fijos</div>
+              <div class="font-bold text-sm mt-0.5" style="color:#FBBF24;" id="repTabFixedVal">$ 0</div>
+            </div>
+            <div class="solid-elevated p-2.5 rounded-xl">
+              <div style="color: var(--text-muted);">Gastos Diarios</div>
+              <div class="font-bold text-sm mt-0.5" style="color:#FB7185;" id="repTabDailyVal">$ 0</div>
+            </div>
           </div>
 
-          <div class="mt-3 pt-2.5" style="border-top: 1px solid var(--border-color);">
-            <div class="text-xs font-bold mb-1.5" style="color: var(--text-muted);" id="transfersMonthHeader">Últimos pases entre cuentas:</div>
-            <div id="accountTransfersHistoryList" class="space-y-1.5 text-xs"></div>
+          <!-- GRÁFICO 1: Distribución del Ingreso -->
+          <div class="solid-elevated p-3 rounded-2xl mb-3 text-xs">
+            <div class="font-bold mb-1.5">📊 ¿A dónde fue tu ingreso este mes?</div>
+            <div class="w-full h-3.5 rounded-full overflow-hidden flex mb-2" style="background: rgba(0,0,0,0.3);">
+              <div id="repTabBarFixed" style="width: 50%; background: #F59E0B;" title="Gastos Fijos"></div>
+              <div id="repTabBarDaily" style="width: 25%; background: #E11D48;" title="Gastos Diarios"></div>
+              <div id="repTabBarAvail" style="width: 25%; background: #10B981;" title="Disponible"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-1 text-[11px] font-semibold">
+              <div class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#F59E0B;"></span>
+                <span id="repTabPctFixedLabel">Fijos: 0%</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#E11D48;"></span>
+                <span id="repTabPctDailyLabel">Diarios: 0%</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#10B981;"></span>
+                <span id="repTabPctAvailLabel">Libre: 0%</span>
+              </div>
+            </div>
           </div>
+
+          <!-- GRÁFICO 1.B: Desglose 100% de Gastos Fijos por Rubro -->
+          <div class="solid-elevated p-3 rounded-2xl mb-3 text-xs">
+            <div class="flex justify-between items-center mb-1.5">
+              <div class="font-bold">📌 ¿En qué se van tus Gastos Fijos? (100% de Fijos)</div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md" style="background: rgba(245,158,11,0.18); color: #F59E0B;" id="repTabFixedTotalBadge">$ 0</span>
+            </div>
+            <div id="repTabBarFixedBreakdown" class="w-full h-3.5 rounded-full overflow-hidden flex mb-2" style="background: rgba(0,0,0,0.3);">
+              <div style="width:100%; background:#64748B;"></div>
+            </div>
+            <div id="repTabFixedCategoriesLegend" class="space-y-1.5 mt-2"></div>
+          </div>
+
+          <!-- GRÁFICO 2: Gastos Diarios por Rubro -->
+          <div class="solid-elevated p-3 rounded-2xl mb-3 text-xs">
+            <div class="font-bold mb-2">📈 Gastos Diarios por Rubro</div>
+            <div id="repTabCategoryChartContainer" class="space-y-2"></div>
+          </div>
+
+          <!-- Botón de Exportar Hoja PDF -->
+          <button type="button" onclick="exportMonthlyPdfReport()"
+            class="w-full py-2.5 rounded-xl font-bold text-xs cursor-pointer flex items-center justify-center gap-2"
+            style="background:#10B981; color:#052E16;">
+            <span>📄</span>
+            <span>Descargar Reporte del Mes en PDF</span>
+          </button>
         </div>
+      </div>
+
+      <!-- Contenedor Cuentas para retrocompatibilidad DOM silenciosa -->
+      <div id="tab-accounts" class="is-hidden" style="display:none !important;">
+        <div id="accountsMonthHeader"></div><div id="accountsMonthTotal"></div><div id="accountsMonthSubtitle"></div>
+        <div id="accountsListContainer"></div><select id="transferFromSelect"></select><select id="transferToSelect"></select>
+        <input id="transferAmountInput" /><input id="transferNoteInput" /><div id="accountTransfersHistoryList"></div><div id="transfersMonthHeader"></div>
       </div>
 
       <!-- ================= PESTAÑA 4: ⚙️ AJUSTES (TEMA, CATEGORÍAS Y CUENTAS) ================= -->
@@ -639,9 +666,9 @@
         <span class="text-[11px] font-bold mt-0.5" style="color: #10B981;">Cargar</span>
       </button>
 
-      <button onclick="switchTab('accounts')" id="nav-accounts" class="flex-1 h-full flex flex-col items-center justify-center gap-1 cursor-pointer py-1" style="color: var(--text-muted); outline: none;">
-        <span class="text-2xl leading-none">🏦</span>
-        <span class="text-[11px] font-semibold">Cuentas</span>
+      <button onclick="switchTab('reports')" id="nav-reports" class="flex-1 h-full flex flex-col items-center justify-center gap-1 cursor-pointer py-1" style="color: var(--text-muted); outline: none;">
+        <span class="text-2xl leading-none">📊</span>
+        <span class="text-[11px] font-semibold">Reportes</span>
       </button>
       <button onclick="switchTab('settings')" id="nav-settings" class="flex-1 h-full flex flex-col items-center justify-center gap-1 cursor-pointer py-1" style="color: var(--text-muted); outline: none;">
         <span class="text-2xl leading-none">⚙️</span>
@@ -697,15 +724,15 @@
           <div id="quickMonthDayGrid" class="grid grid-cols-7 gap-1 mt-1.5 p-2 rounded-xl solid-elevated is-hidden"></div>
         </div>
 
-        <!-- SELECTOR DE CUENTA (Personal Pay, Banco, Efectivo) -->
-        <div class="mb-2.5">
+        <!-- SELECTOR DE CUENTA (Oculto en Modelo B para carga ultra rápida sin fricción) -->
+        <div class="mb-2.5 is-hidden" style="display:none !important;">
           <div class="text-xs font-bold mb-1" style="color: var(--text-muted);">2. Cuenta / Billetera:</div>
           <div id="quickAccountPills" class="grid grid-cols-3 gap-1.5"></div>
         </div>
 
         <!-- SELECTOR DE CATEGORÍA (Propias de Gasto Diario o Propias de Ingreso) -->
         <div class="mb-2.5">
-          <div class="text-xs font-bold mb-1" style="color: var(--text-muted);" id="quickCategoryTitle">3. Categoría:</div>
+          <div class="text-xs font-bold mb-1" style="color: var(--text-muted);" id="quickCategoryTitle">2. Categoría:</div>
           <div id="quickCategoryPills" class="grid grid-cols-3 gap-1.5"></div>
         </div>
 
@@ -968,8 +995,8 @@
             <div id="editTxMonthDayGrid" class="grid grid-cols-7 gap-1 mt-1.5 p-2 rounded-xl solid-elevated is-hidden"></div>
           </div>
 
-          <!-- Fila 3: Cuenta / Billetera compacta -->
-          <div>
+          <!-- Fila 3: Cuenta / Billetera compacta (Oculto en Modelo B) -->
+          <div class="is-hidden" style="display:none !important;">
             <label class="font-bold block mb-1" style="color: var(--text-muted);">Cuenta / Billetera:</label>
             <div id="editTxAccountPills" class="grid grid-cols-3 gap-1.5"></div>
           </div>
@@ -1635,18 +1662,36 @@
 
       ensureMonthBalances(toMonth);
       const summaryParts = [];
+      let totalPassed = 0;
       ACCOUNTS.forEach(a => {
         const balInOrigin = getAccountBalance(a.id, fromMonth);
         balancesByMonth[toMonth][a.id] = balInOrigin;
+        totalPassed += balInOrigin;
         summaryParts.push(`${a.name}: ${formatMoney(balInOrigin)}`);
       });
+
+      const existingSurplusTx = transactions.find(t => t.monthKey === toMonth && t.note && t.note.includes(`a favor de ${fromName}`));
+      if (!existingSurplusTx && totalPassed > 0) {
+        const dayLabel = '1 ' + (MONTH_BASE_NAMES[toMonth] ? MONTH_BASE_NAMES[toMonth].slice(0, 3) : 'Día 1');
+        transactions.unshift({
+          id: 'tx_surplus_' + Date.now(),
+          monthKey: toMonth,
+          dayLabel,
+          type: 'income',
+          categoryId: 'inc-extra',
+          accountId: 'acc-bank',
+          amount: totalPassed,
+          note: `Remanente / Saldo a favor de ${fromName}`
+        });
+        enqueueOutbox('transactions', 'INSERT', `Ingreso transferido de ${fromName} a ${toName}: $ ${totalPassed.toLocaleString('es-AR')}`);
+      }
 
       transferredPositiveMonths[fromMonth] = true;
       enqueueOutbox('account_transfers', 'INSERT', `Plata de ${fromName} pasada a ${toName} para cada banco de origen (${summaryParts.join(' • ')})`);
       saveStateToLocalStorage();
       closeSurplusModal();
       renderAll();
-      showBackupFeedback(`✔ Plata de ${fromName} pasada a cada banco de origen en ${toName}`);
+      showBackupFeedback(`✔ Plata de ${fromName} pasada a ${toName}`);
     }
 
     function transferPositiveSurplusToNextMonth() {
@@ -1818,14 +1863,16 @@
       // Punto 8: Al cambiar a una nueva sección, empezar siempre arriba de todo
       if (main) main.scrollTop = 0;
 
-      ['dashboard', 'bills', 'accounts', 'settings'].forEach(t => {
+      ['dashboard', 'bills', 'reports', 'settings', 'accounts'].forEach(t => {
         const panel = document.getElementById('tab-' + t);
-        if (t === tab) {
-          panel.classList.remove('is-hidden');
-          panel.classList.add('tab-fade');
-          setTimeout(() => panel.classList.remove('tab-fade'), 250);
-        } else {
-          panel.classList.add('is-hidden');
+        if (panel) {
+          if (t === tab) {
+            panel.classList.remove('is-hidden');
+            panel.classList.add('tab-fade');
+            setTimeout(() => panel.classList.remove('tab-fade'), 250);
+          } else {
+            panel.classList.add('is-hidden');
+          }
         }
         const nav = document.getElementById('nav-' + t);
         if (nav) {
@@ -2050,29 +2097,25 @@
       const realAvailableAfterPendingBills = Math.max(0, totalMonthBal - totalFixedPending);
       const available = totalIncome - totalFixed - totalDaily;
 
-      // 1. Hero Card: Consistencia 1:1 total con la sección de Cuentas
+      // 1. Hero Card: Presupuesto Ágil y Disponible Libre del Mes
       document.getElementById('heroSubtitle').innerText =
-        `SALDO EN CUENTAS — ${monthLabel.toUpperCase()}`;
-      document.getElementById('heroBalance').innerText = formatMoney(totalMonthBal);
+        `DISPONIBLE EN ${displayCurrency} — ${monthLabel.toUpperCase()}`;
+      document.getElementById('heroBalance').innerText = formatMoney(available);
       document.getElementById('heroIncome').innerText = formatMoney(totalIncome);
       document.getElementById('heroFixed').innerText = formatMoney(totalFixed);
       document.getElementById('heroDaily').innerText = formatMoney(totalDaily);
 
-      // Calculadora de cobro por mes independiente
-      computeHeroPaydayAllowance(realAvailableAfterPendingBills > 0 ? realAvailableAfterPendingBills : available);
+      // Calculadora de cobro por mes independiente sobre el disponible libre
+      computeHeroPaydayAllowance(available);
 
       const heroCard = document.getElementById('heroCard');
       const heroStatusText = document.getElementById('heroStatusText');
-      if (totalMonthBal <= 0 && available < 0) {
+      if (available < 0) {
         heroCard.style.background = 'linear-gradient(135deg, #9F1239 0%, #4C0519 100%)';
-        heroStatusText.innerText = '⚠️ No tenés saldo registrado en tus cuentas para este mes';
+        heroStatusText.innerText = `⚠️ Presupuesto excedido por ${formatMoney(Math.abs(available))} este mes`;
       } else {
         heroCard.style.background = 'linear-gradient(135deg, #0D7A5F 0%, #064E3B 100%)';
-        if (totalFixedPending > 0) {
-          heroStatusText.innerText = `Total en cuentas: ${formatMoney(totalMonthBal)} • Faltan pagar ${formatMoney(totalFixedPending)} en fijos • Te quedan ${formatMoney(realAvailableAfterPendingBills)} libres`;
-        } else {
-          heroStatusText.innerText = `Todos los gastos fijos del mes están al día • ${formatMoney(totalMonthBal)} 100% disponible`;
-        }
+        heroStatusText.innerText = 'Saldo libre en ARS descontando Gastos Fijos y Diarios';
       }
 
       // 2. Botón de Pasar Saldo / Cuentas al Mes Siguiente (Día 1 o mes cerrado):
@@ -2088,14 +2131,23 @@
       let surplusSourceMonth = selectedMonth;
       let surplusTargetMonth = (idx < MONTH_ORDER.length - 1) ? MONTH_ORDER[idx + 1] : null;
 
-      if (idx >= 0 && idx < MONTH_ORDER.length - 1 && totalMonthBal > 0 && (isClosedPastMonth || isLastDayOfMonth || isFirstDayOfMonth)) {
+      const surplusAmount = (available > 0) ? available : totalMonthBal;
+
+      if (idx >= 0 && idx < MONTH_ORDER.length - 1 && surplusAmount > 0 && (isClosedPastMonth || isLastDayOfMonth || isFirstDayOfMonth)) {
         shouldShowSurplus = true;
         surplusSourceMonth = selectedMonth;
         surplusTargetMonth = MONTH_ORDER[idx + 1];
       } else if (idx > 0) {
         const prevMonthKey = MONTH_ORDER[idx - 1];
+        const prevTx = transactions.filter(t => t.monthKey === prevMonthKey);
+        const prevBills = monthlyBills.filter(b => b.monthKey === prevMonthKey);
+        const prevInc = prevTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+        const prevDaily = prevTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+        const prevFixed = prevBills.reduce((s, b) => s + b.amount, 0);
+        const prevAvail = prevInc - prevFixed - prevDaily;
         const prevBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, prevMonthKey), 0);
-        if (prevBal > 0 && (isFirstDayOfMonth || selectedMonth === currentActiveMonth || idx > MONTH_ORDER.indexOf(currentActiveMonth))) {
+        const prevSurplus = (prevAvail > 0) ? prevAvail : prevBal;
+        if (prevSurplus > 0 && (isFirstDayOfMonth || selectedMonth === currentActiveMonth || idx > MONTH_ORDER.indexOf(currentActiveMonth))) {
           shouldShowSurplus = true;
           surplusSourceMonth = prevMonthKey;
           surplusTargetMonth = selectedMonth;
@@ -2105,19 +2157,21 @@
       if (shouldShowSurplus && surplusCard && surplusTargetMonth) {
         const srcName = MONTH_BASE_NAMES[surplusSourceMonth] || surplusSourceMonth;
         const tgtName = MONTH_BASE_NAMES[surplusTargetMonth] || surplusTargetMonth;
-        const srcBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, surplusSourceMonth), 0);
+        const srcBal = (surplusSourceMonth === selectedMonth)
+          ? surplusAmount
+          : ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, surplusSourceMonth), 0);
 
         surplusCard.classList.remove('is-hidden');
         document.getElementById('surplusTitle').innerText = `🎉 Pasar plata de ${srcName} a ${tgtName}: ${formatMoney(srcBal)}`;
         const btn = document.getElementById('surplusBtn');
         if (transferredPositiveMonths[surplusSourceMonth]) {
-          document.getElementById('surplusSubtitle').innerText = `Ya pasaste los saldos de ${srcName} a cada banco de origen en ${tgtName}.`;
+          document.getElementById('surplusSubtitle').innerText = `Ya pasaste el saldo a favor de ${srcName} a ${tgtName}.`;
           btn.innerText = '✔ Ya transferido';
           btn.style.opacity = '0.6';
           btn.onclick = () => openSurplusTransferModal(surplusSourceMonth, surplusTargetMonth);
         } else {
-          document.getElementById('surplusSubtitle').innerText = `Pasar la plata para cada banco que estaba en el origen a ${tgtName}.`;
-          btn.innerText = `💸 Pasar a cada banco`;
+          document.getElementById('surplusSubtitle').innerText = `Pasar saldo disponible de ${srcName} para iniciar ${tgtName}.`;
+          btn.innerText = `💸 Pasar al mes sig.`;
           btn.style.opacity = '1';
           btn.onclick = () => openSurplusTransferModal(surplusSourceMonth, surplusTargetMonth);
         }
@@ -2405,6 +2459,7 @@
       }
 
       renderSettingsTab();
+      renderReportsTab();
       saveStateToLocalStorage();
     }
 
@@ -2521,6 +2576,88 @@
     ];
     let editingSettingKind = null; // 'fixed' | 'expense' | 'income' | 'account'
     let editingSettingId = null;
+
+    function renderReportsTab() {
+      const rep = buildMonthlyReportData();
+      const monthBadge = document.getElementById('reportsTabMonthBadge');
+      if (monthBadge) monthBadge.innerText = rep.monthLabel;
+
+      const incVal = document.getElementById('repTabIncomeVal');
+      if (incVal) incVal.innerText = formatMoney(rep.totalIncome);
+
+      const availVal = document.getElementById('repTabAvailableVal');
+      if (availVal) {
+        availVal.innerText = formatMoney(rep.available);
+        availVal.style.color = rep.available >= 0 ? '#10B981' : '#FB7185';
+      }
+
+      const fixVal = document.getElementById('repTabFixedVal');
+      if (fixVal) fixVal.innerText = formatMoney(rep.totalFixed);
+
+      const dayVal = document.getElementById('repTabDailyVal');
+      if (dayVal) dayVal.innerText = formatMoney(rep.totalDaily);
+
+      // Gráfico 1: Barras de distribución del ingreso
+      const barFixed = document.getElementById('repTabBarFixed');
+      if (barFixed) barFixed.style.width = `${rep.pctFixed}%`;
+      const barDaily = document.getElementById('repTabBarDaily');
+      if (barDaily) barDaily.style.width = `${rep.pctDaily}%`;
+      const barAvail = document.getElementById('repTabBarAvail');
+      if (barAvail) barAvail.style.width = `${rep.pctAvail}%`;
+
+      const lblFixed = document.getElementById('repTabPctFixedLabel');
+      if (lblFixed) lblFixed.innerText = `Fijos: ${rep.pctFixed}%`;
+      const lblDaily = document.getElementById('repTabPctDailyLabel');
+      if (lblDaily) lblDaily.innerText = `Diarios: ${rep.pctDaily}%`;
+      const lblAvail = document.getElementById('repTabPctAvailLabel');
+      if (lblAvail) lblAvail.innerText = `Libre: ${rep.pctAvail}%`;
+
+      // Gráfico 1.B: Desglose 100% de Gastos Fijos
+      const fixBadge = document.getElementById('repTabFixedTotalBadge');
+      if (fixBadge) fixBadge.innerText = formatMoney(rep.totalFixed);
+
+      const fixBarCont = document.getElementById('repTabBarFixedBreakdown');
+      const fixLegend = document.getElementById('repTabFixedCategoriesLegend');
+      if (fixBarCont && fixLegend) {
+        if (!rep.fixedBreakdown || rep.fixedBreakdown.length === 0) {
+          fixBarCont.innerHTML = `<div style="width:100%; background:rgba(255,255,255,0.1);"></div>`;
+          fixLegend.innerHTML = `<div class="text-[11px]" style="color:var(--text-muted);">Sin gastos fijos registrados.</div>`;
+        } else {
+          fixBarCont.innerHTML = rep.fixedBreakdown.map(item => `
+            <div style="width:${item.pct}%; background:${item.color};" title="${item.cat.name}: ${item.pct}%"></div>
+          `).join('');
+          fixLegend.innerHTML = rep.fixedBreakdown.map(item => `
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:${item.color};"></span>
+                <span class="font-semibold">${item.cat.icon || '📌'} ${item.cat.name}</span>
+              </span>
+              <span class="font-bold">${formatMoney(item.amount)} <span style="color:var(--text-muted);">(${item.pct}%)</span></span>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Gráfico 2: Gastos Diarios por Rubro
+      const catChart = document.getElementById('repTabCategoryChartContainer');
+      if (catChart) {
+        if (!rep.categoryBreakdown || rep.categoryBreakdown.length === 0) {
+          catChart.innerHTML = `<div class="text-xs py-1" style="color:var(--text-muted);">Aún no hay gastos diarios en este mes.</div>`;
+        } else {
+          catChart.innerHTML = rep.categoryBreakdown.map(item => `
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-1">
+                <span class="flex items-center gap-1">${item.cat.icon} ${item.cat.name}</span>
+                <span>${formatMoney(item.amount)} <span style="color:var(--text-muted); font-size:11px;">(${item.pct}%)</span></span>
+              </div>
+              <div class="w-full h-2 rounded-full overflow-hidden" style="background: rgba(0,0,0,0.25);">
+                <div class="h-full rounded-full" style="width:${item.pct}%; background:${item.cat.color};"></div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
 
     function renderSettingsTab() {
       const fixedListEl = document.getElementById('settingsFixedCatsList');
@@ -2891,7 +3028,7 @@
           expenseTab.className = 'px-3 py-1 rounded-lg text-xs font-semibold solid-card cursor-pointer';
           expenseTab.style.background = '';
         }
-        catTitle.innerText = '3. Categoría de Ingreso:';
+        catTitle.innerText = '2. Categoría de Ingreso:';
         saveBtn.innerText = '✔ Guardar Ingreso';
         saveBtn.style.background = '#10B981';
         saveBtn.style.color = '#052E16';
@@ -2905,7 +3042,7 @@
           incomeTab.className = 'px-3 py-1 rounded-lg text-xs font-semibold solid-card cursor-pointer';
           incomeTab.style.background = '';
         }
-        catTitle.innerText = '3. Categoría de Gasto:';
+        catTitle.innerText = '2. Categoría de Gasto:';
         saveBtn.innerText = '✔ Guardar Gasto';
         saveBtn.style.background = '#E11D48';
         saveBtn.style.color = '#FFFFFF';
@@ -3156,6 +3293,7 @@
       enqueueOutbox('categories', 'INSERT', `Nueva categoría gasto fijo: ${icon} ${name}`);
       renderBillCategoryPills();
       renderSettingsTab();
+      renderReportsTab();
       saveStateToLocalStorage();
     }
 
