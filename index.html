@@ -1523,6 +1523,16 @@
     let editingBillId = null;
     let editingBillCategoryId = 'cat-home';
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function formatMoney(arsAmount) {
       if (displayCurrency === 'USD') {
         const usd = arsAmount / OFICIAL_SELL_RATE;
@@ -2285,7 +2295,7 @@
                   </div>
                   <div>
                     <div class="flex items-center gap-1.5">
-                      <span class="text-xs font-bold">${tx.note || cat.name}</span>
+                      <span class="text-xs font-bold">${escapeHtml(tx.note || cat.name)}</span>
                       ${isInc
                         ? `<span class="px-1.5 py-0.5 rounded text-xs font-bold" style="background:rgba(16,185,129,0.2); color:#10B981;">INGRESO</span>`
                         : ''}
@@ -2363,10 +2373,10 @@
                 </button>
                 <div class="flex-1">
                   <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="text-xs font-bold" style="${bill.isPaid ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${cat.icon} ${bill.title}</span>
+                    <span class="text-xs font-bold" style="${bill.isPaid ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${cat.icon} ${escapeHtml(bill.title)}</span>
                     <span class="text-xs px-2 py-0.5 rounded-md font-semibold" style="background: rgba(245,158,11,0.18); color: #FBBF24;">Vence día ${bill.dueDay}</span>
                   </div>
-                  ${bill.note ? `<div class="text-xs mt-1" style="color: var(--text-muted);">📝 ${bill.note}</div>` : ''}
+                  ${bill.note ? `<div class="text-xs mt-1" style="color: var(--text-muted);">📝 ${escapeHtml(bill.note)}</div>` : ''}
                   ${(!bill.isPaid && bill.paid > 0) ? `<div class="text-xs font-bold mt-1" style="color:#10B981;">Pagado parcial: ${formatMoney(bill.paid)} • Falta: ${formatMoney(pending)}</div>` : ''}
                 </div>
               </div>
@@ -2675,7 +2685,7 @@
       if (fixedListEl) {
         fixedListEl.innerHTML = FIXED_BILL_CATEGORIES.map(c => `
           <div class="solid-elevated px-3 py-2 rounded-xl flex justify-between items-center text-xs">
-            <span class="font-bold">${c.icon} ${c.name}</span>
+            <span class="font-bold">${c.icon} ${escapeHtml(c.name)}</span>
             <div class="flex items-center gap-3">
               <button onclick="openEditItemModal('fixed', '${c.id}')" class="text-xs font-bold cursor-pointer" style="color:#10B981;">Editar</button>
               <button onclick="removeCategory('fixed', '${c.id}')" class="text-xs font-bold cursor-pointer" style="color:#FB7185;">Eliminar</button>
@@ -2686,7 +2696,7 @@
 
       document.getElementById('settingsIncomeCatsList').innerHTML = INCOME_CATEGORIES.map(c => `
         <div class="solid-elevated px-3 py-2 rounded-xl flex justify-between items-center text-xs">
-          <span class="font-bold">${c.icon} ${c.name}</span>
+          <span class="font-bold">${c.icon} ${escapeHtml(c.name)}</span>
           <div class="flex items-center gap-3">
             <button onclick="openEditItemModal('income', '${c.id}')" class="text-xs font-bold cursor-pointer" style="color:#10B981;">Editar</button>
             <button onclick="removeCategory('income', '${c.id}')" class="text-xs font-bold cursor-pointer" style="color:#FB7185;">Eliminar</button>
@@ -2696,7 +2706,7 @@
 
       document.getElementById('settingsExpenseCatsList').innerHTML = EXPENSE_CATEGORIES.map(c => `
         <div class="solid-elevated px-3 py-2 rounded-xl flex justify-between items-center text-xs">
-          <span class="font-bold">${c.icon} ${c.name}</span>
+          <span class="font-bold">${c.icon} ${escapeHtml(c.name)}</span>
           <div class="flex items-center gap-3">
             <button onclick="openEditItemModal('expense', '${c.id}')" class="text-xs font-bold cursor-pointer" style="color:#10B981;">Editar</button>
             <button onclick="removeCategory('expense', '${c.id}')" class="text-xs font-bold cursor-pointer" style="color:#FB7185;">Eliminar</button>
@@ -2706,7 +2716,7 @@
 
       document.getElementById('settingsAccountsList').innerHTML = ACCOUNTS.map(a => `
         <div class="solid-elevated px-3 py-2 rounded-xl flex justify-between items-center text-xs">
-          <span class="font-bold">${a.icon} ${a.name}</span>
+          <span class="font-bold">${a.icon} ${escapeHtml(a.name)}</span>
           <div class="flex items-center gap-3">
             <button onclick="openEditItemModal('account', '${a.id}')" class="text-xs font-bold cursor-pointer" style="color:#10B981;">Editar</button>
             <button onclick="removeAccount('${a.id}')" class="text-xs font-bold cursor-pointer" style="color:#FB7185;">Eliminar</button>

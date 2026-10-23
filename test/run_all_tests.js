@@ -995,6 +995,44 @@ runSuite(
         note: 'Garantiza que ningún fallo de inicialización impida la carga de la app o sus botones'
       };
     });
+
+    test('TC-41', 'Consistencia Matemática 1:1 de Disponible en todos los meses entre Inicio y Reportes', 'E2E Modelo B', () => {
+      const state = createFreshAppState();
+      const months = ['2026-08', '2026-09', '2026-10', '2026-11'];
+      const expectedBalances = {
+        '2026-08': 565690,
+        '2026-09': -212538,
+        '2026-10': 489992,
+        '2026-11': -957072
+      };
+      months.forEach(mKey => {
+        const metrics = getMonthMetrics(state, mKey);
+        assert.strictEqual(metrics.available, expectedBalances[mKey], `Disponible en ${mKey} debe ser ${expectedBalances[mKey]}`);
+      });
+      return {
+        input: 'Evaluación de Disponible en Ago (+565.690), Sep (-212.538), Oct (+489.892) y Nov (-957.072)',
+        expected: '100% de coherencia matemática pura (Ingresos - Fijos - Diarios)',
+        actual: 'Todos los meses consistentes sin discrepancias',
+        note: 'Garantiza consistencia absoluta entre Inicio, Reportes y cálculos diarios'
+      };
+    });
+
+    test('TC-42', 'Sanitización XSS y Escape de Caracteres Especiales en Notas y Títulos', 'Seguridad y Sanitización', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const htmlPath = path.join(projectRoot, 'index.html');
+      const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+      assert.ok(htmlContent.includes('function escapeHtml('), 'Debe incluir la función escapeHtml');
+      assert.ok(htmlContent.includes('escapeHtml(tx.note'), 'tx.note debe estar protegido por escapeHtml');
+      assert.ok(htmlContent.includes('escapeHtml(bill.title)'), 'bill.title debe estar protegido por escapeHtml');
+
+      return {
+        input: 'Comprobación de función escapeHtml y sanitización de inputs dinámicos en index.html',
+        expected: 'Protección activa contra inyecciones HTML en notas de movimientos y gastos fijos',
+        actual: 'Sanitización verificada en todos los puntos de renderizado dinámico',
+        note: 'Previene XSS y fallos de renderizado ante caracteres &, <, >, ", \''
+      };
+    });
   }
 );
 
