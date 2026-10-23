@@ -955,6 +955,46 @@ runSuite(
         note: 'Tablas: cuentas, categorias, gastos_fijos, movimientos, transferencias_cuentas, configuracion_usuario, estado_sincronizado'
       };
     });
+
+    test('TC-40', 'Verificación de Ejecución de Runtime del Script real de index.html sin ReferenceError ni Dead Zone', 'E2E Runtime Browser', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const htmlPath = path.join(projectRoot, 'index.html');
+      const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+      const mockWindow = { location: { reload: () => {} }, addEventListener: () => {}, scrollTo: () => {} };
+      const mockDoc = {
+        getElementById: (id) => ({
+          classList: { add: () => {}, remove: () => {}, contains: () => false },
+          style: {}, innerHTML: '', innerText: '', value: '',
+          addEventListener: () => {}, scrollTo: () => {}, scrollIntoView: () => {},
+          querySelector: () => ({ innerHTML: '' })
+        }),
+        querySelectorAll: () => [],
+        querySelector: () => ({ setAttribute: () => {} }),
+        body: { style: {}, className: '' },
+        documentElement: { style: {}, setAttribute: () => {} }
+      };
+      const mockNav = {
+        onLine: true,
+        serviceWorker: { register: () => Promise.resolve({ update: () => Promise.resolve() }), addEventListener: () => {} },
+        vibrate: () => {}
+      };
+      const mockStorage = { getItem: () => null, setItem: () => {} };
+
+      const scriptMatch = htmlContent.match(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/i);
+      assert.ok(scriptMatch && scriptMatch[1], 'El tag script de index.html debe existir y tener código');
+
+      const scriptCode = scriptMatch[1];
+      const runner = new Function('window', 'document', 'navigator', 'localStorage', scriptCode);
+      runner(mockWindow, mockDoc, mockNav, mockStorage);
+
+      return {
+        input: 'Ejecución del script en entorno DOM mockeado',
+        expected: 'Cero excepciones de sintaxis, temporal dead zone o ReferenceError',
+        actual: 'Script inicializado y ejecutado con éxito sin errores',
+        note: 'Garantiza que ningún fallo de inicialización impida la carga de la app o sus botones'
+      };
+    });
   }
 );
 

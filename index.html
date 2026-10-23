@@ -251,20 +251,10 @@
     </div>
 
     <!-- Selector de Mes (Rueda del Mouse + Arrastrar + Auto-centrado) -->
-    <div id="monthScrollBar" class="px-4 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0" style="scroll-behavior: smooth; cursor: grab;">
-      <button onclick="selectMonth('2026-11')" id="m-2026-11" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center">
-        <span>Noviembre 2026</span>
-        <span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 bg-sky-500/20 text-sky-300">Próximo</span>
-      </button>
-      <button onclick="selectMonth('2026-10')" id="m-2026-10" class="px-3 py-1.5 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0 flex items-center shadow-sm" style="background:#0D7A5F;">
+    <div id="monthScrollBar" class="pb-2 flex gap-2 overflow-x-auto no-scrollbar shrink-0" style="scroll-behavior: smooth; cursor: grab; padding-left: max(16px, calc(50% - 75px)); padding-right: max(16px, calc(50% - 75px));">
+      <button onclick="selectMonth('2026-10')" id="m-2026-10" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0 flex items-center shadow-md" style="background:#0D7A5F;">
         <span>Octubre 2026</span>
-        <span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 bg-white/20 text-white">Actual</span>
-      </button>
-      <button onclick="selectMonth('2026-09')" id="m-2026-09" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center">
-        <span>Septiembre 2026</span>
-      </button>
-      <button onclick="selectMonth('2026-08')" id="m-2026-08" class="px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center">
-        <span>Agosto 2026</span>
+        <span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 bg-white/25 text-white">Actual</span>
       </button>
     </div>
 
@@ -1166,15 +1156,97 @@
   </div>
 
   <script>
-    let OFICIAL_SELL_RATE = 1015;
+    // Catálogo dinámico de meses en español y cálculo de orden temporal
+    const SPANISH_MONTH_NAMES = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+
+    function formatMonthBaseName(mKey) {
+      if (!mKey || typeof mKey !== 'string') return mKey;
+      const parts = mKey.split('-');
+      if (parts.length !== 2) return mKey;
+      const y = parts[0];
+      const mIndex = parseInt(parts[1], 10) - 1;
+      const name = SPANISH_MONTH_NAMES[mIndex] || parts[1];
+      return `${name} ${y}`;
+    }
+
+    function getNextMonthKey(mKey) {
+      const parts = (mKey || '').split('-');
+      let y = parseInt(parts[0], 10) || new Date().getFullYear();
+      let m = parseInt(parts[1], 10) || (new Date().getMonth() + 1);
+      m += 1;
+      if (m > 12) {
+        m = 1;
+        y += 1;
+      }
+      return `${y}-${String(m).padStart(2, '0')}`;
+    }
+
+    function getPrevMonthKey(mKey) {
+      const parts = (mKey || '').split('-');
+      let y = parseInt(parts[0], 10) || new Date().getFullYear();
+      let m = parseInt(parts[1], 10) || (new Date().getMonth() + 1);
+      m -= 1;
+      if (m < 1) {
+        m = 12;
+        y -= 1;
+      }
+      return `${y}-${String(m).padStart(2, '0')}`;
+    }
+
     function getSystemCurrentMonthKey() {
       const d = new Date();
       const y = d.getFullYear();
       const m = String(d.getMonth() + 1).padStart(2, '0');
-      const sysKey = `${y}-${m}`;
-      return MONTH_ORDER.includes(sysKey) ? sysKey : '2026-10';
+      return `${y}-${m}`;
     }
 
+    let MONTH_ORDER = ['2026-08', '2026-09', '2026-10', '2026-11'];
+    let MONTH_BASE_NAMES = {
+      '2026-11': 'Noviembre 2026',
+      '2026-10': 'Octubre 2026',
+      '2026-09': 'Septiembre 2026',
+      '2026-08': 'Agosto 2026'
+    };
+    let MONTH_LABELS = {
+      '2026-11': 'Noviembre 2026 (Próximo)',
+      '2026-10': 'Octubre 2026 (Actual)',
+      '2026-09': 'Septiembre 2026',
+      '2026-08': 'Agosto 2026'
+    };
+
+    function refreshMonthsCatalog() {
+      const sysCurrent = getSystemCurrentMonthKey();
+      const nextMonth = getNextMonthKey(sysCurrent);
+
+      const monthSet = new Set(['2026-08', '2026-09', '2026-10', '2026-11', sysCurrent, nextMonth]);
+      if (typeof monthlyBills !== 'undefined' && Array.isArray(monthlyBills)) {
+        monthlyBills.forEach(b => { if (b.monthKey) monthSet.add(b.monthKey); });
+      }
+      if (typeof transactions !== 'undefined' && Array.isArray(transactions)) {
+        transactions.forEach(t => { if (t.monthKey) monthSet.add(t.monthKey); });
+      }
+
+      MONTH_ORDER = Array.from(monthSet).sort();
+
+      MONTH_BASE_NAMES = {};
+      MONTH_LABELS = {};
+      MONTH_ORDER.forEach(k => {
+        const base = formatMonthBaseName(k);
+        MONTH_BASE_NAMES[k] = base;
+        if (k === sysCurrent) {
+          MONTH_LABELS[k] = `${base} (Actual)`;
+        } else if (k === nextMonth) {
+          MONTH_LABELS[k] = `${base} (Próximo)`;
+        } else {
+          MONTH_LABELS[k] = base;
+        }
+      });
+    }
+
+    let OFICIAL_SELL_RATE = 1015;
     let dolarRateSource = 'Banco Nación';
     let dolarLastSyncText = 'Banco Nación (Venta): $ 1.015 ARS';
     let dolarFechaActualizacion = '';
@@ -1200,20 +1272,6 @@
     let outboxQueue = [
       { id: 'ob-1', table: 'monthly_bills', op: 'SYNCED', desc: 'Datos locales sincronizados en SQLite' }
     ];
-
-    const MONTH_ORDER = ['2026-08', '2026-09', '2026-10', '2026-11'];
-    const MONTH_BASE_NAMES = {
-      '2026-11': 'Noviembre 2026',
-      '2026-10': 'Octubre 2026',
-      '2026-09': 'Septiembre 2026',
-      '2026-08': 'Agosto 2026',
-    };
-    const MONTH_LABELS = {
-      '2026-11': 'Noviembre 2026 (Próximo)',
-      '2026-10': 'Octubre 2026',
-      '2026-09': 'Septiembre 2026',
-      '2026-08': 'Agosto 2026',
-    };
 
     let ACCOUNTS = [
       { id: 'acc-pp', name: 'Personal Pay', icon: '📱', balance: 315400 },
@@ -1328,6 +1386,8 @@
       { id: 't-aug-inc1', monthKey: '2026-08', dayLabel: '1 Ago', type: 'income', categoryId: 'inc-sueldo', accountId: 'acc-bank', amount: 2569000, note: 'Sueldo Agosto' },
       { id: 't-aug-1', monthKey: '2026-08', dayLabel: 'Jueves 13', type: 'expense', categoryId: 'cat-auto', accountId: 'acc-bank', amount: 250000, note: 'Mecánico adicional' },
     ];
+
+    refreshMonthsCatalog();
 
     let quickExpression = '';
     let quickType = 'expense';
@@ -1533,8 +1593,8 @@
     function renderMonthBar() {
       const bar = document.getElementById('monthScrollBar');
       if (!bar) return;
-      const displayOrder = [...MONTH_ORDER].reverse();
-      bar.innerHTML = displayOrder.map(k => {
+      refreshMonthsCatalog();
+      bar.innerHTML = MONTH_ORDER.map(k => {
         const isSelected = (k === selectedMonth);
         const isCurrent = (k === currentActiveMonth);
         const idxK = MONTH_ORDER.indexOf(k);
@@ -1548,11 +1608,11 @@
           badgeHtml = `<span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 ${isSelected ? 'bg-white/25 text-white' : 'bg-sky-500/20 text-sky-300'}">Próximo</span>`;
         }
 
-        const baseName = MONTH_BASE_NAMES[k] || k;
+        const baseName = MONTH_BASE_NAMES[k] || formatMonthBaseName(k);
         const styleBg = isSelected ? 'background:#0D7A5F;' : '';
         const cls = isSelected
-          ? 'px-3 py-1.5 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0 flex items-center shadow-sm'
-          : 'px-3 py-1.5 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center';
+          ? 'px-3.5 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0 flex items-center shadow-md'
+          : 'px-3.5 py-2 rounded-xl text-xs font-semibold solid-card whitespace-nowrap cursor-pointer shrink-0 flex items-center opacity-85 hover:opacity-100';
 
         return `<button onclick="selectMonth('${k}')" id="m-${k}" class="${cls}" style="${styleBg}">
           <span>${baseName}</span>
@@ -1561,13 +1621,25 @@
       }).join('');
     }
 
+    function centerMonthButton(monthKey, smooth = true) {
+      const bar = document.getElementById('monthScrollBar');
+      const targetKey = monthKey || selectedMonth || currentActiveMonth;
+      const btn = document.getElementById('m-' + targetKey);
+      if (!bar || !btn) return;
+      const barWidth = bar.clientWidth;
+      const btnLeft = btn.offsetLeft;
+      const btnWidth = btn.offsetWidth;
+      const targetScrollLeft = btnLeft - (barWidth / 2) + (btnWidth / 2);
+      bar.scrollTo({
+        left: Math.max(0, targetScrollLeft),
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
+
     function selectMonth(monthKey) {
       selectedMonth = monthKey;
       renderMonthBar();
-      try {
-        const btn = document.getElementById('m-' + monthKey);
-        if (btn) btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      } catch (_) {}
+      centerMonthButton(monthKey, true);
       try { navigator.vibrate?.(10); } catch (_) {}
       renderAll();
     }
@@ -1605,27 +1677,46 @@
       renderAll();
     }
 
-    function copyBillsFromOctToNov() {
-      const octBills = monthlyBills.filter(b => b.monthKey === '2026-10');
-      const existingNovTitles = new Set(monthlyBills.filter(b => b.monthKey === '2026-11').map(b => b.title.toLowerCase()));
+    function copyBillsFromPreviousMonth() {
+      const currentKey = selectedMonth;
+      const idx = MONTH_ORDER.indexOf(currentKey);
+      if (idx <= 0) {
+        showBackupFeedback('No hay un mes anterior registrado para copiar gastos.');
+        return;
+      }
+      const prevKey = MONTH_ORDER[idx - 1];
+      const prevBills = monthlyBills.filter(b => b.monthKey === prevKey);
+      if (prevBills.length === 0) {
+        showBackupFeedback(`No hay gastos fijos en ${MONTH_BASE_NAMES[prevKey] || prevKey} para copiar.`);
+        return;
+      }
+
+      const existingTitles = new Set(monthlyBills.filter(b => b.monthKey === currentKey).map(b => b.title.trim().toLowerCase()));
       let copied = 0;
-      octBills.forEach(b => {
-        if (!existingNovTitles.has(b.title.toLowerCase())) {
+      prevBills.forEach(b => {
+        if (!existingTitles.has(b.title.trim().toLowerCase())) {
           monthlyBills.push({
-            id: 'b-nov-copy-' + Date.now() + '-' + (copied++),
-            monthKey: '2026-11',
+            id: 'b-copy-' + Date.now() + '-' + (copied++),
+            monthKey: currentKey,
             title: b.title,
             categoryId: b.categoryId,
             amount: b.amount,
             paid: 0,
-            dueDay: b.dueDay,
+            dueDay: b.dueDay || 10,
             isPaid: false,
-            note: ''
+            note: b.note || ''
           });
         }
       });
-      enqueueOutbox('monthly_bills', 'INSERT', `Copiados ${copied} gastos fijos a Noviembre 2026`);
+
+      saveStateToLocalStorage();
+      enqueueOutbox('monthly_bills', 'INSERT', `Copiados ${copied} gastos fijos a ${MONTH_BASE_NAMES[currentKey] || currentKey}`);
       renderAll();
+      showBackupFeedback(`✔ Se copiaron ${copied} gastos fijos a ${MONTH_BASE_NAMES[currentKey] || currentKey}`);
+    }
+
+    function copyBillsFromOctToNov() {
+      copyBillsFromPreviousMonth();
     }
 
     function enqueueOutbox(table, op, desc) {
@@ -1779,6 +1870,9 @@
     function renderAll() {
       updateLiveSystemClock();
       renderMonthBar();
+      setTimeout(() => {
+        centerMonthButton(selectedMonth, false);
+      }, 50);
       const selActive = document.getElementById('activeMonthSelect');
       if (selActive) selActive.value = currentActiveMonth;
 
@@ -1979,9 +2073,23 @@
       document.getElementById('billsProgressBar').style.width = `${progressPct}%`;
 
       const copyBox = document.getElementById('copyPreviousMonthBox');
-      if (selectedMonth === '2026-11') {
-        copyBox.classList.remove('is-hidden');
-      } else {
+      const idxSel = MONTH_ORDER.indexOf(selectedMonth);
+      if (idxSel > 0 && copyBox) {
+        const prevMonthKey = MONTH_ORDER[idxSel - 1];
+        const prevCount = monthlyBills.filter(b => b.monthKey === prevMonthKey).length;
+        const curCount = mBills.length;
+        const idxActive = MONTH_ORDER.indexOf(currentActiveMonth);
+        const shouldShow = prevCount > 0 && (idxSel >= idxActive) && (curCount < prevCount);
+        if (shouldShow) {
+          copyBox.classList.remove('is-hidden');
+          const btn = copyBox.querySelector('button');
+          if (btn) {
+            btn.innerHTML = `<span>📋</span><span>Copiar gastos fijos de ${MONTH_BASE_NAMES[prevMonthKey] || prevMonthKey} a ${MONTH_BASE_NAMES[selectedMonth] || selectedMonth} para actualizar montos</span>`;
+          }
+        } else {
+          copyBox.classList.add('is-hidden');
+        }
+      } else if (copyBox) {
         copyBox.classList.add('is-hidden');
       }
 
@@ -4046,7 +4154,7 @@
     // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=4').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=5').then((reg) => {
           reg.update().catch(() => {});
           setInterval(() => {
             reg.update().catch(() => {});
