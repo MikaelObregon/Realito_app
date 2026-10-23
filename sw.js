@@ -1,13 +1,19 @@
 // Service Worker para Realito PWA — Soporte Offline 100% y Auto-actualización Silenciosa
-const CACHE_NAME = 'realito-cache-v5';
+const CACHE_NAME = 'realito-cache-v6';
 const ASSETS_TO_CACHE = [
+  '/',
+  '/index.html',
   './',
   './index.html',
   'index.html',
+  '/manifest.json',
   './manifest.json',
   'manifest.json',
+  '/apple-touch-icon.png',
   './apple-touch-icon.png',
+  '/icon-192.png',
   './icon-192.png',
+  '/icon-512.png',
   './icon-512.png',
   'https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
@@ -60,19 +66,21 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(
       (async () => {
-        // Cache-First instantáneo: busca la página en caché para mostrarla en menos de 5ms offline
-        const cached = (await caches.match(event.request, { ignoreSearch: true }))
-          || (await caches.match('./index.html'))
-          || (await caches.match('index.html'))
-          || (await caches.match('./'));
+        const cache = await caches.open(CACHE_NAME);
+        const cached = (await cache.match(event.request, { ignoreSearch: true }))
+          || (await cache.match('/index.html'))
+          || (await cache.match('./index.html'))
+          || (await cache.match('index.html'))
+          || (await cache.match('/'))
+          || (await cache.match('./'));
 
         // En segundo plano actualiza la caché si hay conexión a internet disponible
         const fetchPromise = fetch(event.request)
           .then(async (networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
-              const cache = await caches.open(CACHE_NAME);
-              cache.put(event.request, networkResponse.clone());
-              cache.put('./index.html', networkResponse.clone());
+              await cache.put(event.request, networkResponse.clone());
+              await cache.put('/index.html', networkResponse.clone());
+              await cache.put('./index.html', networkResponse.clone());
             }
             return networkResponse;
           })
@@ -85,7 +93,10 @@ self.addEventListener('fetch', (event) => {
         const networkResponse = await fetchPromise;
         if (networkResponse) return networkResponse;
 
-        return (await caches.match('./index.html')) || (await caches.match('./'));
+        return (await cache.match('/index.html'))
+          || (await cache.match('./index.html'))
+          || (await cache.match('./'))
+          || (await cache.match('/'));
       })()
     );
     return;
@@ -94,13 +105,13 @@ self.addEventListener('fetch', (event) => {
   // 2. Recursos estáticos (scripts, estilos, imágenes): Cache-First con Stale-While-Revalidate
   event.respondWith(
     (async () => {
-      const cached = await caches.match(event.request, { ignoreSearch: true });
+      const cache = await caches.open(CACHE_NAME);
+      const cached = await cache.match(event.request, { ignoreSearch: true });
       if (cached) {
         // Actualizar en segundo plano si hay red
         fetch(event.request).then(async (netRes) => {
           if (netRes && (netRes.status === 200 || netRes.type === 'opaque')) {
-            const cache = await caches.open(CACHE_NAME);
-            cache.put(event.request, netRes.clone());
+            await cache.put(event.request, netRes.clone());
           }
         }).catch(() => {});
         return cached;
@@ -109,8 +120,7 @@ self.addEventListener('fetch', (event) => {
       try {
         const netRes = await fetch(event.request);
         if (netRes && (netRes.status === 200 || netRes.type === 'opaque')) {
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(event.request, netRes.clone());
+          await cache.put(event.request, netRes.clone());
         }
         return netRes;
       } catch (err) {

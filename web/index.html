@@ -438,10 +438,12 @@
       <div id="tab-accounts" class="space-y-3.5 pt-1 is-hidden">
         <div class="solid-card p-4 rounded-2xl">
           <div class="flex justify-between items-center mb-1">
-            <h3 class="text-sm font-bold">Mis Cuentas y Billeteras</h3>
-            <button onclick="switchTab('settings')" class="text-xs font-bold cursor-pointer" style="color:#10B981;">⚙️ Configurar</button>
+            <h3 class="text-sm font-bold" id="accountsMonthHeader">Mis Cuentas y Billeteras</h3>
+            <span id="accountsMonthTotal" class="text-xs font-bold" style="color:#10B981;">Total: $ 0</span>
           </div>
-          <p class="text-xs mb-3" style="color: var(--text-muted);">Personal Pay, Banco y Efectivo actualizados al instante.</p>
+          <p class="text-xs mb-3" style="color: var(--text-muted);" id="accountsMonthSubtitle">
+            Saldos configurados para el mes seleccionado.
+          </p>
           <div id="accountsListContainer" class="space-y-2.5"></div>
         </div>
 
@@ -489,7 +491,7 @@
           </div>
 
           <div class="mt-3 pt-2.5" style="border-top: 1px solid var(--border-color);">
-            <div class="text-xs font-bold mb-1.5" style="color: var(--text-muted);">Últimos pases entre cuentas:</div>
+            <div class="text-xs font-bold mb-1.5" style="color: var(--text-muted);" id="transfersMonthHeader">Últimos pases entre cuentas:</div>
             <div id="accountTransfersHistoryList" class="space-y-1.5 text-xs"></div>
           </div>
         </div>
@@ -1266,6 +1268,19 @@
     };
     let transferredPositiveMonths = {}; // Guarda si ya se pasó el sobrante positivo de un mes al siguiente
 
+    // Registro de IDs eliminados localmente para evitar que la nube los resucite al sincronizar
+    let deletedBillIds = new Set();
+    try {
+      const rawDelB = localStorage.getItem('realito_deleted_bills_v1');
+      if (rawDelB) deletedBillIds = new Set(JSON.parse(rawDelB));
+    } catch (_) {}
+
+    let deletedTxIds = new Set();
+    try {
+      const rawDelT = localStorage.getItem('realito_deleted_tx_v1');
+      if (rawDelT) deletedTxIds = new Set(JSON.parse(rawDelT));
+    } catch (_) {}
+
     let isDarkObsidian = true;
     let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
@@ -1279,9 +1294,37 @@
       { id: 'acc-cash', name: 'Efectivo', icon: '💵', balance: 48500 },
     ];
 
+    // Saldos configurados independientemente por mes
+    let balancesByMonth = {
+      '2026-10': { 'acc-pp': 315400, 'acc-bank': 129690, 'acc-cash': 48500 },
+      '2026-09': { 'acc-pp': 200000, 'acc-bank': 150000, 'acc-cash': 30000 },
+      '2026-08': { 'acc-pp': 100000, 'acc-bank': 250000, 'acc-cash': 20000 }
+    };
+
+    function getAccountBalance(accId, monthKey = selectedMonth) {
+      if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
+      if (balancesByMonth && balancesByMonth[monthKey] && typeof balancesByMonth[monthKey][accId] === 'number') {
+        return balancesByMonth[monthKey][accId];
+      }
+      const acc = ACCOUNTS.find(a => a.id === accId);
+      return acc ? (Number(acc.balance) || 0) : 0;
+    }
+
+    function setAccountBalance(accId, newBalance, monthKey = selectedMonth) {
+      if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
+      if (!balancesByMonth) balancesByMonth = {};
+      if (!balancesByMonth[monthKey]) balancesByMonth[monthKey] = {};
+      balancesByMonth[monthKey][accId] = Number(newBalance) || 0;
+      if (monthKey === currentActiveMonth) {
+        const acc = ACCOUNTS.find(a => a.id === accId);
+        if (acc) acc.balance = balancesByMonth[monthKey][accId];
+      }
+      saveStateToLocalStorage();
+    }
+
     let accountTransfers = [
-      { id: 'tr-1', fromId: 'acc-bank', toId: 'acc-pp', amount: 150000, note: 'Fondeo billetera diaria', dateLabel: 'Martes 13' },
-      { id: 'tr-2', fromId: 'acc-bank', toId: 'acc-cash', amount: 40000, note: 'Retiro efectivo cajero', dateLabel: 'Jueves 8' },
+      { id: 'tr-1', monthKey: '2026-10', fromId: 'acc-bank', toId: 'acc-pp', amount: 150000, note: 'Fondeo billetera diaria', dateLabel: 'Martes 13' },
+      { id: 'tr-2', monthKey: '2026-10', fromId: 'acc-bank', toId: 'acc-cash', amount: 40000, note: 'Retiro efectivo cajero', dateLabel: 'Jueves 8' },
     ];
 
     // Categorías exclusivas de GASTOS FIJOS MENSUALES (separadas de Gastos Diarios)
@@ -1329,9 +1372,9 @@
       { id: 'b-nov-2', monthKey: '2026-11', title: 'Colegio', categoryId: 'fcat-edu', amount: 177072, paid: 0, dueDay: 15, isPaid: false, note: '' },
 
       // OCTUBRE 2026
-      { id: 'b-oct-1', monthKey: '2026-10', title: 'Alquiler', categoryId: 'fcat-home', amount: 780000, paid: 780000, dueDay: 5, isPaid: true, note: 'Pagado mes completo' },
+      { id: 'bill-1792757559042', monthKey: '2026-10', title: 'Alquiler', categoryId: 'fcat-home', amount: 780000, paid: 780000, dueDay: 5, isPaid: true, note: 'Pagado mes completo' },
       { id: 'b-oct-2', monthKey: '2026-10', title: 'Luz Marina', categoryId: 'fcat-family', amount: 257000, paid: 257000, dueDay: 10, isPaid: true, note: '7.000 + 200.000 + 30.000 + 20.000' },
-      { id: 'b-oct-3', monthKey: '2026-10', title: 'Colegio', categoryId: 'fcat-edu', amount: 177072, paid: 0, dueDay: 15, isPaid: false, note: 'Cuota mensual colegio' },
+      { id: 'bill-1792757739542', monthKey: '2026-10', title: 'Colegio', categoryId: 'fcat-edu', amount: 177072, paid: 177072, dueDay: 15, isPaid: true, note: 'Cuota mensual colegio' },
       { id: 'b-oct-4', monthKey: '2026-10', title: 'Seguro Auto', categoryId: 'fcat-auto', amount: 150000, paid: 40000, dueDay: 18, isPaid: false, note: '15gasolina+10limpiador+15gasolina' },
       { id: 'b-oct-5', monthKey: '2026-10', title: 'Día de las Madres', categoryId: 'fcat-family', amount: 60000, paid: 37000, dueDay: 18, isPaid: false, note: '8 cartera + 29 aros' },
       { id: 'b-oct-6', monthKey: '2026-10', title: 'Go Cuotas', categoryId: 'fcat-cards', amount: 52892, paid: 52892, dueDay: 12, isPaid: true, note: 'Cuotas del mes' },
@@ -1638,6 +1681,7 @@
 
     function selectMonth(monthKey) {
       selectedMonth = monthKey;
+      try { localStorage.setItem('realito_selected_month_v1', monthKey); } catch (_) {}
       renderMonthBar();
       centerMonthButton(monthKey, true);
       try { navigator.vibrate?.(10); } catch (_) {}
@@ -2136,31 +2180,46 @@
       const sourceBadgeEl = document.getElementById('dolarSourceBadge');
       if (sourceBadgeEl) sourceBadgeEl.innerText = dolarRateSource;
 
-      // 7. Cuentas, Transferencias entre Cuentas & Sync
-      document.getElementById('accountsListContainer').innerHTML = ACCOUNTS.map(a => `
+      // 7. Cuentas, Transferencias entre Cuentas & Sync configuradas según el mes seleccionado
+      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
+      const accountsHeaderEl = document.getElementById('accountsMonthHeader');
+      if (accountsHeaderEl) accountsHeaderEl.innerText = `Mis Cuentas — ${monthName}`;
+      const accountsSubtitleEl = document.getElementById('accountsMonthSubtitle');
+      if (accountsSubtitleEl) accountsSubtitleEl.innerText = `Saldos configurados para ${monthName}.`;
+      const accountsTotalEl = document.getElementById('accountsMonthTotal');
+      const totalMonthBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, selectedMonth), 0);
+      if (accountsTotalEl) accountsTotalEl.innerText = `Total: ${formatMoney(totalMonthBal)}`;
+
+      document.getElementById('accountsListContainer').innerHTML = ACCOUNTS.map(a => {
+        const bal = getAccountBalance(a.id, selectedMonth);
+        return `
         <div class="solid-elevated p-3 rounded-2xl flex justify-between items-center">
           <div class="flex items-center gap-2.5">
             <span class="text-lg">${a.icon}</span>
             <div>
               <div class="text-xs font-bold">${a.name}</div>
-              <div class="text-xs" style="color: var(--text-muted);">Billetera activa</div>
+              <div class="text-xs" style="color: var(--text-muted);">${monthName}</div>
             </div>
           </div>
           <div class="text-right flex flex-col items-end gap-1">
-            <div class="text-sm font-bold" style="color:#10B981;">${formatMoney(a.balance)}</div>
+            <div class="text-sm font-bold" style="color:#10B981;">${formatMoney(bal)}</div>
             <button type="button" onclick="openAdjustBalanceModal('${a.id}')" class="px-2.5 py-0.5 rounded-lg solid-card text-[11px] font-bold cursor-pointer" style="color:#10B981;">
               Ajustar saldo
             </button>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       const fromSelect = document.getElementById('transferFromSelect');
       const toSelect = document.getElementById('transferToSelect');
       if (fromSelect && toSelect && ACCOUNTS.length > 0) {
         const prevFrom = fromSelect.value || (ACCOUNTS[1] ? ACCOUNTS[1].id : ACCOUNTS[0].id);
         const prevTo = toSelect.value || ACCOUNTS[0].id;
-        const optionsHtml = ACCOUNTS.map(a => `<option value="${a.id}">${a.icon} ${a.name} (${formatMoney(a.balance)})</option>`).join('');
+        const optionsHtml = ACCOUNTS.map(a => {
+          const bal = getAccountBalance(a.id, selectedMonth);
+          return `<option value="${a.id}">${a.icon} ${a.name} (${formatMoney(bal)})</option>`;
+        }).join('');
         fromSelect.innerHTML = optionsHtml;
         toSelect.innerHTML = optionsHtml;
         fromSelect.value = ACCOUNTS.some(a => a.id === prevFrom) ? prevFrom : ACCOUNTS[0].id;
@@ -2168,11 +2227,15 @@
       }
 
       const trListEl = document.getElementById('accountTransfersHistoryList');
+      const transfersHeaderEl = document.getElementById('transfersMonthHeader');
+      if (transfersHeaderEl) transfersHeaderEl.innerText = `Pases registrados en ${monthName}:`;
+
       if (trListEl) {
-        if (accountTransfers.length === 0) {
-          trListEl.innerHTML = `<div class="text-xs py-1" style="color: var(--text-muted);">Sin pases registrados todavía.</div>`;
+        const monthTransfers = accountTransfers.filter(tr => (tr.monthKey || '2026-10') === selectedMonth);
+        if (monthTransfers.length === 0) {
+          trListEl.innerHTML = `<div class="text-xs py-1" style="color: var(--text-muted);">Sin pases registrados en ${monthName}.</div>`;
         } else {
-          trListEl.innerHTML = accountTransfers.map(tr => {
+          trListEl.innerHTML = monthTransfers.map(tr => {
             const fromAcc = ACCOUNTS.find(a => a.id === tr.fromId) || { icon: '🏦', name: 'Cuenta' };
             const toAcc = ACCOUNTS.find(a => a.id === tr.toId) || { icon: '📱', name: 'Cuenta' };
             return `
@@ -2216,22 +2279,27 @@
       const toAcc = ACCOUNTS.find(a => a.id === toId);
       if (!fromAcc || !toAcc) return;
 
-      fromAcc.balance -= amount;
-      toAcc.balance += amount;
+      const curFromBal = getAccountBalance(fromId, selectedMonth);
+      const curToBal = getAccountBalance(toId, selectedMonth);
+
+      setAccountBalance(fromId, curFromBal - amount, selectedMonth);
+      setAccountBalance(toId, curToBal + amount, selectedMonth);
 
       accountTransfers.unshift({
         id: 'tr-' + Date.now(),
+        monthKey: selectedMonth,
         fromId,
         toId,
         amount,
         note: note || 'Transferencia entre mis cuentas',
-        dateLabel: 'Hoy',
+        dateLabel: formatDayLabelFromDate(new Date()),
       });
 
       document.getElementById('transferAmountInput').value = '';
       document.getElementById('transferNoteInput').value = '';
 
-      enqueueOutbox('account_transfers', 'INSERT', `Pase ${fromAcc.name} ➔ ${toAcc.name}: $ ${amount.toLocaleString('es-AR')}`);
+      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
+      enqueueOutbox('account_transfers', 'INSERT', `Pase en ${monthName}: ${fromAcc.name} ➔ ${toAcc.name} $ ${amount.toLocaleString('es-AR')}`);
       renderAll();
     }
 
@@ -2627,6 +2695,7 @@
       b.isPaid = !b.isPaid;
       b.paid = b.isPaid ? b.amount : 0;
       enqueueOutbox('monthly_bills', 'UPDATE', `${b.title}: ${b.isPaid ? 'Pagado' : 'Pendiente'}`);
+      saveStateToLocalStorage();
       renderAll();
     }
 
@@ -2857,11 +2926,14 @@
 
       const acc = ACCOUNTS.find(a => a.id === quickSelectedAccount);
       if (acc) {
-        acc.balance += (quickType === 'income' ? total : -total);
+        const delta = (quickType === 'income' ? total : -total);
+        const curBal = getAccountBalance(acc.id, selectedMonth);
+        setAccountBalance(acc.id, curBal + delta, selectedMonth);
       }
 
       enqueueOutbox('transactions', 'INSERT', `${finalNote}: $ ${total.toLocaleString('es-AR')}`);
       closeQuickModal();
+      saveStateToLocalStorage();
       renderAll();
     }
 
@@ -3009,6 +3081,7 @@
       }
 
       closeEditBillModal();
+      saveStateToLocalStorage();
       renderAll();
     }
 
@@ -3016,10 +3089,13 @@
       if (!editingBillId) return;
       const bill = monthlyBills.find(b => b.id === editingBillId);
       monthlyBills = monthlyBills.filter(b => b.id !== editingBillId);
+      deletedBillIds.add(editingBillId);
+      try { localStorage.setItem('realito_deleted_bills_v1', JSON.stringify([...deletedBillIds])); } catch (_) {}
       if (bill) {
         enqueueOutbox('monthly_bills', 'DELETE', `Eliminado: ${bill.title}`);
       }
       closeEditBillModal();
+      saveStateToLocalStorage();
       renderAll();
     }
 
@@ -3149,13 +3225,17 @@
       // Revertir efecto anterior en la billetera original
       const oldAcc = ACCOUNTS.find(a => a.id === tx.accountId);
       if (oldAcc) {
-        oldAcc.balance += (tx.type === 'income' ? -tx.amount : tx.amount);
+        const delta = (tx.type === 'income' ? -tx.amount : tx.amount);
+        const cur = getAccountBalance(oldAcc.id, tx.monthKey);
+        setAccountBalance(oldAcc.id, cur + delta, tx.monthKey);
       }
 
       // Aplicar nuevo efecto en la billetera seleccionada
       const newAcc = ACCOUNTS.find(a => a.id === editingTxAccountId);
       if (newAcc) {
-        newAcc.balance += (tx.type === 'income' ? newAmount : -newAmount);
+        const delta = (tx.type === 'income' ? newAmount : -newAmount);
+        const cur = getAccountBalance(newAcc.id, tx.monthKey);
+        setAccountBalance(newAcc.id, cur + delta, tx.monthKey);
       }
 
       tx.amount = newAmount;
@@ -3166,6 +3246,7 @@
 
       enqueueOutbox('transactions', 'UPDATE', `Editado: ${newNote} ($ ${newAmount.toLocaleString('es-AR')})`);
       closeEditTxModal();
+      saveStateToLocalStorage();
       renderAll();
     }
 
@@ -3176,12 +3257,17 @@
 
       const oldAcc = ACCOUNTS.find(a => a.id === tx.accountId);
       if (oldAcc) {
-        oldAcc.balance += (tx.type === 'income' ? -tx.amount : tx.amount);
+        const delta = (tx.type === 'income' ? -tx.amount : tx.amount);
+        const cur = getAccountBalance(oldAcc.id, tx.monthKey);
+        setAccountBalance(oldAcc.id, cur + delta, tx.monthKey);
       }
 
       transactions = transactions.filter(t => t.id !== editingTxId);
+      deletedTxIds.add(editingTxId);
+      try { localStorage.setItem('realito_deleted_tx_v1', JSON.stringify([...deletedTxIds])); } catch (_) {}
       enqueueOutbox('transactions', 'DELETE', `Eliminado: ${tx.note}`);
       closeEditTxModal();
+      saveStateToLocalStorage();
       renderAll();
     }
 
@@ -3194,8 +3280,9 @@
       const acc = ACCOUNTS.find(a => a.id === accId);
       if (!acc) return;
       adjustingAccountId = acc.id;
-      document.getElementById('adjustBalanceModalTitle').innerText = `${acc.icon} Ajustar saldo de ${acc.name}`;
-      document.getElementById('adjustBalanceInput').value = acc.balance;
+      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
+      document.getElementById('adjustBalanceModalTitle').innerText = `${acc.icon} Ajustar saldo de ${acc.name} — ${monthName}`;
+      document.getElementById('adjustBalanceInput').value = getAccountBalance(acc.id, selectedMonth);
       document.getElementById('adjustBalanceModal').classList.remove('is-hidden');
     }
 
@@ -3208,8 +3295,9 @@
       const acc = ACCOUNTS.find(a => a.id === adjustingAccountId);
       if (!acc) return;
       const newBal = parseInt(document.getElementById('adjustBalanceInput').value, 10) || 0;
-      acc.balance = newBal;
-      enqueueOutbox('accounts', 'UPDATE', `Saldo ${acc.name} ajustado a $ ${newBal.toLocaleString('es-AR')}`);
+      setAccountBalance(acc.id, newBal, selectedMonth);
+      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
+      enqueueOutbox('accounts', 'UPDATE', `Saldo ${acc.name} (${monthName}) ajustado a $ ${newBal.toLocaleString('es-AR')}`);
       closeAdjustBalanceModal();
       renderAll();
     }
@@ -3235,6 +3323,7 @@
       try {
         const payload = {
           ACCOUNTS,
+          balancesByMonth: balancesByMonth || {},
           FIXED_BILL_CATEGORIES,
           EXPENSE_CATEGORIES,
           INCOME_CATEGORIES,
@@ -3245,11 +3334,15 @@
           nextPaydayDateStr,
           paydaysByMonth,
           currentActiveMonth,
+          selectedMonth,
           dolarFechaActualizacion,
           transferredPositiveMonths,
           isDarkObsidian,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        if (selectedMonth) {
+          localStorage.setItem('realito_selected_month_v1', selectedMonth);
+        }
         scheduleSupabaseCloudSync();
       } catch (_) {}
     }
@@ -3375,6 +3468,7 @@
         // 1. Tabla: estado_sincronizado (Respaldo instantáneo multi-dispositivo)
         const fullSnapshot = {
           ACCOUNTS,
+          balancesByMonth: balancesByMonth || {},
           FIXED_BILL_CATEGORIES,
           EXPENSE_CATEGORIES,
           INCOME_CATEGORIES,
@@ -3385,6 +3479,7 @@
           nextPaydayDateStr,
           paydaysByMonth,
           currentActiveMonth,
+          selectedMonth,
           dolarFechaActualizacion,
           transferredPositiveMonths,
           isDarkObsidian
@@ -3499,7 +3594,27 @@
           return true;
         }
         const parsed = rows[0].datos_json;
-        if (parsed.ACCOUNTS) ACCOUNTS = parsed.ACCOUNTS;
+        if (parsed.balancesByMonth) {
+          balancesByMonth = balancesByMonth || {};
+          for (const mKey of Object.keys(parsed.balancesByMonth)) {
+            balancesByMonth[mKey] = {
+              ...(parsed.balancesByMonth[mKey] || {}),
+              ...(balancesByMonth[mKey] || {})
+            };
+          }
+        }
+        if (parsed.ACCOUNTS) {
+          const curAccMap = new Map(ACCOUNTS.map(a => [a.id, a]));
+          ACCOUNTS = parsed.ACCOUNTS.map(a => {
+            const existing = curAccMap.get(a.id);
+            return {
+              ...a,
+              balance: getAccountBalance(a.id, currentActiveMonth)
+            };
+          });
+          parsed.ACCOUNTS.forEach(a => curAccMap.delete(a.id));
+          curAccMap.forEach(a => ACCOUNTS.push(a));
+        }
         if (parsed.FIXED_BILL_CATEGORIES) {
           const fixedMap = new Map(FIXED_BILL_CATEGORIES.map(c => [c.id, c]));
           parsed.FIXED_BILL_CATEGORIES.forEach(c => fixedMap.set(c.id, c));
@@ -3516,16 +3631,50 @@
           INCOME_CATEGORIES = Array.from(incMap.values());
         }
 
-        // Preservar movimientos y gastos fijos cargados localmente en modo offline que no estén aún en la nube
-        const cloudTxIds = new Set((parsed.transactions || []).map(t => t.id));
-        const localNewTx = transactions.filter(t => !cloudTxIds.has(t.id));
-        transactions = [...localNewTx, ...(parsed.transactions || [])];
+        // Fusión inteligente: preservar movimientos y gastos fijos cargados localmente sin pisarlos
+        const cloudBills = (parsed.monthlyBills || []).filter(b => !deletedBillIds.has(b.id));
+        const localBillsMap = new Map(monthlyBills.map(b => [b.id, b]));
+        const mergedBills = [];
+        for (const lb of monthlyBills) {
+          if (deletedBillIds.has(lb.id)) continue;
+          const cb = cloudBills.find(b => b.id === lb.id);
+          if (cb) {
+            mergedBills.push({
+              ...cb,
+              ...lb,
+              isPaid: Boolean(lb.isPaid || cb.isPaid),
+              paid: Math.max(Number(lb.paid) || 0, Number(cb.paid) || 0)
+            });
+          } else {
+            mergedBills.push(lb);
+          }
+        }
+        for (const cb of cloudBills) {
+          if (!localBillsMap.has(cb.id) && !deletedBillIds.has(cb.id)) {
+            mergedBills.push(cb);
+          }
+        }
+        monthlyBills = mergedBills;
 
-        const cloudBillIds = new Set((parsed.monthlyBills || []).map(b => b.id));
-        const localNewBills = monthlyBills.filter(b => !cloudBillIds.has(b.id));
-        monthlyBills = [...localNewBills, ...(parsed.monthlyBills || [])];
+        const cloudTx = (parsed.transactions || []).filter(t => !deletedTxIds.has(t.id));
+        const localTxMap = new Map(transactions.map(t => [t.id, t]));
+        const mergedTx = [...transactions.filter(t => !deletedTxIds.has(t.id))];
+        for (const ct of cloudTx) {
+          if (!localTxMap.has(ct.id) && !deletedTxIds.has(ct.id)) {
+            mergedTx.push(ct);
+          }
+        }
+        transactions = mergedTx;
 
-        if (parsed.accountTransfers) accountTransfers = parsed.accountTransfers;
+        if (parsed.accountTransfers) {
+          const cloudTr = parsed.accountTransfers || [];
+          const localTrMap = new Map(accountTransfers.map(tr => [tr.id, tr]));
+          for (const tr of cloudTr) {
+            if (!localTrMap.has(tr.id)) {
+              accountTransfers.push(tr);
+            }
+          }
+        }
         if (parsed.OFICIAL_SELL_RATE) OFICIAL_SELL_RATE = parsed.OFICIAL_SELL_RATE;
         if (parsed.nextPaydayDateStr) {
           nextPaydayDateStr = parsed.nextPaydayDateStr;
@@ -3575,7 +3724,7 @@
             if (Array.isArray(dbGf) && dbGf.length > 0) {
               const existingBillsMap = new Map(monthlyBills.map(b => [b.id, b]));
               dbGf.forEach(row => {
-                if (!existingBillsMap.has(row.id)) {
+                if (!deletedBillIds.has(row.id) && !existingBillsMap.has(row.id)) {
                   existingBillsMap.set(row.id, {
                     id: row.id,
                     monthKey: row.mes_anio || '2026-10',
@@ -3594,11 +3743,8 @@
           }
         } catch (_) {}
 
-        // Si teníamos datos nuevos locales que no estaban en la nube, subirlos de inmediato
-        if (localNewTx.length > 0 || localNewBills.length > 0) {
-          scheduleSupabaseCloudSync();
-        }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        saveStateToLocalStorage();
+        scheduleSupabaseCloudSync();
         renderAll();
         updateSupabaseStatusBadge('☁️ Sincronizado', true);
         if (showToast) showSupabaseFeedback('✔ ¡Datos descargados y actualizados desde Supabase!');
@@ -3616,6 +3762,7 @@
         if (!raw) return;
         const parsed = JSON.parse(raw);
         if (parsed.ACCOUNTS) ACCOUNTS = parsed.ACCOUNTS;
+        if (parsed.balancesByMonth) balancesByMonth = parsed.balancesByMonth;
         if (parsed.FIXED_BILL_CATEGORIES) FIXED_BILL_CATEGORIES = parsed.FIXED_BILL_CATEGORIES;
         if (parsed.EXPENSE_CATEGORIES) EXPENSE_CATEGORIES = parsed.EXPENSE_CATEGORIES;
         if (parsed.INCOME_CATEGORIES) INCOME_CATEGORIES = parsed.INCOME_CATEGORIES;
@@ -3635,6 +3782,10 @@
         if (parsed.transferredPositiveMonths) transferredPositiveMonths = parsed.transferredPositiveMonths;
         if (typeof parsed.isDarkObsidian === 'boolean' && parsed.isDarkObsidian !== isDarkObsidian) {
           toggleTheme();
+        }
+        const savedSelMonth = localStorage.getItem('realito_selected_month_v1') || parsed.selectedMonth;
+        if (savedSelMonth && MONTH_ORDER.includes(savedSelMonth)) {
+          selectedMonth = savedSelMonth;
         }
       } catch (_) {}
     }
@@ -4154,7 +4305,7 @@
     // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=5').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=6').then((reg) => {
           reg.update().catch(() => {});
           setInterval(() => {
             reg.update().catch(() => {});
