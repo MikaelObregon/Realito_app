@@ -2104,28 +2104,32 @@
       const realAvailableAfterPendingBills = Math.max(0, totalMonthBal - totalFixedPending);
       const available = totalIncome - totalFixed - totalDaily;
 
-      // 1. Hero Card: Consistencia y Claridad Total en Cuentas y Gastos Fijos
+      // 1. Hero Card: Presupuesto Ágil y Disponible Libre del Mes
       document.getElementById('heroSubtitle').innerText =
-        `SALDO EN CUENTAS — ${monthLabel.toUpperCase()}`;
-      document.getElementById('heroBalance').innerText = formatMoney(totalMonthBal);
+        `DISPONIBLE EN ${displayCurrency} — ${monthLabel.toUpperCase()}`;
+      document.getElementById('heroBalance').innerText = formatMoney(available);
       document.getElementById('heroIncome').innerText = formatMoney(totalIncome);
       document.getElementById('heroFixed').innerText = formatMoney(totalFixed);
       document.getElementById('heroDaily').innerText = formatMoney(totalDaily);
 
-      // Calculadora de cobro por mes independiente
-      computeHeroPaydayAllowance(realAvailableAfterPendingBills > 0 ? realAvailableAfterPendingBills : available);
+      // Calculadora de cobro por mes independiente sobre el disponible libre
+      computeHeroPaydayAllowance(available);
 
       const heroCard = document.getElementById('heroCard');
       const heroStatusText = document.getElementById('heroStatusText');
-      if (totalMonthBal <= 0 && available < 0) {
+      if (available < 0) {
         heroCard.style.background = 'linear-gradient(135deg, #9F1239 0%, #4C0519 100%)';
-        heroStatusText.innerText = '⚠️ No tenés saldo registrado en tus cuentas para este mes';
+        if (totalIncome === 0 && totalFixed > 0) {
+          heroStatusText.innerText = `⚠️ Tenés ${formatMoney(totalFixed)} en gastos fijos previstos para este mes`;
+        } else {
+          heroStatusText.innerText = `⚠️ Presupuesto excedido por ${formatMoney(Math.abs(available))} este mes`;
+        }
       } else {
         heroCard.style.background = 'linear-gradient(135deg, #0D7A5F 0%, #064E3B 100%)';
         if (totalFixedPending > 0) {
-          heroStatusText.innerText = `Total en cuentas: ${formatMoney(totalMonthBal)} • Faltan pagar ${formatMoney(totalFixedPending)} en fijos • Te quedan ${formatMoney(realAvailableAfterPendingBills)} libres`;
+          heroStatusText.innerText = `Faltan pagar ${formatMoney(totalFixedPending)} en fijos • Te quedan ${formatMoney(available)} libres en el mes`;
         } else {
-          heroStatusText.innerText = `Todos los gastos fijos del mes están al día • ${formatMoney(totalMonthBal)} 100% disponible`;
+          heroStatusText.innerText = `Todos los gastos fijos del mes están al día • ${formatMoney(available)} 100% disponible`;
         }
       }
 
