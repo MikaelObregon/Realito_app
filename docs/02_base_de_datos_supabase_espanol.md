@@ -11,18 +11,10 @@ La aplicación **Realito** se sincroniza automáticamente en segundo plano con u
 
 ```mermaid
 erDiagram
-    CUENTAS ||--o{ MOVIMIENTOS : "cuenta_id"
-    CUENTAS ||--o{ TRANSFERENCIAS_CUENTAS : "cuenta_origen_id / cuenta_destino_id"
     CATEGORIAS ||--o{ MOVIMIENTOS : "categoria_id"
     CATEGORIAS ||--o{ GASTOS_FIJOS : "categoria_id"
-
-    CUENTAS {
-        text id PK "Ej: acc-pp, acc-bank, acc-cash"
-        text nombre "Ej: Personal Pay, Banco, Efectivo"
-        text icono "Ej: 📱, 🏦, 💵"
-        bigint saldo "Saldo actual en Pesos (ARS)"
-        timestamptz actualizado_en
-    }
+    CUENTAS ||--o{ MOVIMIENTOS : "cuenta_id"
+    CUENTAS ||--o{ TRANSFERENCIAS_CUENTAS : "cuenta_origen_id / cuenta_destino_id"
 
     CATEGORIAS {
         text id PK "Ej: fcat-home, cat-super, inc-sueldo"
@@ -49,12 +41,20 @@ erDiagram
     MOVIMIENTOS {
         text id PK "Identificador del movimiento"
         text mes_anio "Formato YYYY-MM (ej: 2026-10)"
-        text etiqueta_dia "Ej: Jueves 15, Martes 13"
-        text tipo "gasto | ingreso"
+        text etiqueta_dia "Ej: Hoy, Ayer, 1 Nov, Jueves 15"
+        text tipo "expense | income"
         text categoria_id FK "Referencia a categorias.id"
         text cuenta_id FK "Referencia a cuentas.id"
         bigint monto "Monto en ARS"
         text nota "Descripción o desglose de suma"
+        timestamptz actualizado_en
+    }
+
+    CUENTAS {
+        text id PK "Ej: acc-pp, acc-bank, acc-cash"
+        text nombre "Ej: Personal Pay, Banco, Efectivo"
+        text icono "Ej: 📱, 🏦, 💵"
+        bigint saldo "Saldo de respaldo en ARS"
         timestamptz actualizado_en
     }
 
@@ -92,22 +92,22 @@ erDiagram
 
 | # | Nombre de la Tabla | Propósito en la App |
 | :--- | :--- | :--- |
-| **1** | `cuentas` | Guarda tus billeteras y cuentas activas (`Personal Pay`, `Banco`, `Efectivo` y cualquier otra que agregues), su ícono y su saldo actual en Pesos (`ARS`). |
-| **2** | `categorias` | Almacena las 3 familias de rubros separadas por la columna `tipo`: **`fijo`** (Gastos Fijos), **`gasto_diario`** (Gastos Diarios) e **`ingreso`** (Ingresos). |
-| **3** | `gastos_fijos` | Checklist mensual de pagos fijos por cada mes (`mes_anio`), con su día de vencimiento (`1` al `31`), monto total, monto pagado parcial o total y estado (`esta_pagado`). |
-| **4** | `movimientos` | Todos los gastos diarios e ingresos cargados mes a mes, vinculados a la cuenta utilizada (`cuenta_id`), su categoría (`categoria_id`) y su día (`etiqueta_dia`). |
-| **5** | `transferencias_cuentas` | Historial de pases de dinero entre tus propias cuentas (ej. de `Banco` a `Personal Pay`). Ajusta los saldos de ambas cuentas sin distorsionar los gastos ni ingresos del mes. |
-| **6** | `configuracion_usuario` | Guarda tus preferencias globales: cotización vigente del Dólar Oficial (Venta — Banco Nación), fecha de tu próximo cobro, moneda activa (`ARS`/`USD`) y tema visual (`obsidiana`/`marfil`). |
-| **7** | `estado_sincronizado` | Guarda una fotografía instantánea (`datos_json`) de todo el estado de la app bajo la clave `'principal'` para que al abrir la app en otro teléfono se hidrate toda la información en una sola lectura rápida. |
+| **1** | `movimientos` | Registra todos los gastos diarios e ingresos cargados mes a mes, con su categoría (`categoria_id`), día (`etiqueta_dia`), monto y nota sanitizada. En el **Modelo B**, la carga se realiza en 2 segundos sin exigir al usuario seleccionar cuentas manualmente. |
+| **2** | `gastos_fijos` | Checklist mensual de compromisos fijos por mes (`mes_anio`), con día de vencimiento (`1` al `31`), monto presupuestado, pagos parciales o totales y estado (`esta_pagado`). |
+| **3** | `categorias` | Almacena los rubros clasificados en 3 familias mediante la columna `tipo`: **`fijo`** (Gastos Fijos), **`gasto_diario`** (Gastos Diarios) e **`ingreso`** (Ingresos). |
+| **4** | `configuracion_usuario` | Preferencias del usuario: cotización vigente del Dólar Oficial (Venta — Banco Nación), fecha del próximo cobro de sueldo, moneda activa (`ARS`/`USD`), tema (`obsidiana`/`marfil`) y mapa de meses transferidos. |
+| **5** | `estado_sincronizado` | Almacena una instantánea completa (`datos_json`) bajo la clave `'principal'` para hidratación ultra rápida en nuevos dispositivos o navegadores. |
+| **6** | `cuentas` | Mantiene registradas las billeteras y cuentas de respaldo (`Personal Pay`, `Banco`, `Efectivo`), garantizando compatibilidad retroactiva total. |
+| **7** | `transferencias_cuentas` | Registro histórico de movimientos de fondos entre billeteras. |
 
 ---
 
-## 3. Cómo Funciona la Sincronización Automática (Sin Configuración Manual)
+## 3. Arquitectura de Sincronización Automática
 
-La conexión a la base de datos trabaja **100% por detrás de forma transparente**, sin mostrar paneles técnicos en la pantalla de Ajustes:
+La persistencia funciona mediante una estrategia híbrida **Local-First + Sincronización en la Nube**:
 
-1. **Al abrir la aplicación (`pullFromSupabaseCloud`):**
-   - La app consulta automáticamente Supabase en segundo plano y descarga la última versión sincronizada para que cualquier teléfono o computadora muestre exactamente los mismos saldos y movimientos.
-2. **Al realizar cualquier cambio (`scheduleSupabaseCloudSync` → `pushAllToSupabaseCloud`):**
-   - Cada vez que cargás un gasto/ingreso, editás un movimiento, marcás un gasto fijo como pagado, transferís entre cuentas o cambiás el tema visual, la app guarda primero en memoria local (`localStorage` en `< 5 ms`) y a los `600 ms` sincroniza automáticamente las **7 tablas en español** mediante `UPSERT` (`Prefer: resolution=merge-duplicates`).
-
+1. **Escritura Inmediata en Memoria Local (`localStorage`):**
+   - Cualquier acción (cargar un gasto, tildar un servicio, cambiar de mes o exportar un PDF) se aplica en **menos de 5 milisegundos**, garantizando respuesta instantánea sin bloqueos de red.
+2. **Cola Outbox y Sincronización Asíncrona:**
+   - La app despacha cambios hacia Supabase en segundo plano (`debounce` de 600 ms) mediante sentencias `UPSERT` (`Prefer: resolution=merge-duplicates`).
+   - Si el teléfono pierde conexión, las operaciones se acumulan en la cola (`outboxQueue`) con estado `PENDING` y se sincronizan automáticamente en cuanto se restablece el acceso a internet (`isOnline = true`).
