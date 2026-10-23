@@ -1025,6 +1025,39 @@
     </div>
 
     <!-- ========================================================================= -->
+    <!-- MODAL 6B: TRASPASO DE SALDOS AL MES SIGUIENTE                             -->
+    <!-- ========================================================================= -->
+    <div id="surplusTransferModal" class="modal-backdrop is-hidden">
+      <div class="modal-sheet no-scrollbar">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <span class="text-[10px] font-bold uppercase" style="color:#10B981;">TRASPASO DE SALDOS</span>
+            <h3 class="text-sm font-bold" id="surplusModalTitle">🎉 Pasar plata al mes siguiente</h3>
+          </div>
+          <button onclick="closeSurplusModal()" class="w-8 h-8 rounded-full solid-card flex items-center justify-center font-bold text-xs cursor-pointer">✕</button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <p style="color: var(--text-muted);" id="surplusModalSubtitle">
+            Se pasará la plata disponible de cada cuenta hacia el mes nuevo respetando cada banco de origen:
+          </p>
+          <div id="surplusModalAccountsList" class="space-y-2"></div>
+          <div class="p-3 rounded-xl solid-card flex justify-between items-center font-bold">
+            <span>Total a transferir:</span>
+            <span style="color:#10B981;" id="surplusModalTotalText">$ 0</span>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button type="button" onclick="closeSurplusModal()" class="px-4 py-2.5 rounded-xl solid-card font-bold text-xs cursor-pointer">
+            Cancelar
+          </button>
+          <button type="button" onclick="confirmSurplusTransfer()" class="flex-1 py-2.5 rounded-xl font-bold text-xs cursor-pointer" style="background:#10B981; color:#052E16;">
+            ✔ Confirmar para cada banco
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
     <!-- MODAL 7: REPORTE COMPLETO DEL MES (100% EN PESOS + GRÁFICOS + PDF)        -->
     <!-- ========================================================================= -->
     <div id="monthlyReportModal" class="modal-backdrop is-hidden">
@@ -1301,10 +1334,33 @@
       '2026-08': { 'acc-pp': 100000, 'acc-bank': 250000, 'acc-cash': 20000 }
     };
 
+    function ensureMonthBalances(monthKey = selectedMonth) {
+      if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
+      if (!balancesByMonth) balancesByMonth = {};
+      if (!balancesByMonth[monthKey]) {
+        balancesByMonth[monthKey] = {};
+        ACCOUNTS.forEach(a => {
+          balancesByMonth[monthKey][a.id] = getAccountBalance(a.id, monthKey);
+        });
+      }
+      return balancesByMonth[monthKey];
+    }
+
     function getAccountBalance(accId, monthKey = selectedMonth) {
       if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
       if (balancesByMonth && balancesByMonth[monthKey] && typeof balancesByMonth[monthKey][accId] === 'number') {
         return balancesByMonth[monthKey][accId];
+      }
+      // Herencia inteligente para cada banco que estaba en el origen:
+      // Si el mes no tiene saldo explícito todavía, busca en el mes cronológicamente anterior
+      const idx = MONTH_ORDER.indexOf(monthKey);
+      if (idx > 0) {
+        for (let i = idx - 1; i >= 0; i--) {
+          const prevKey = MONTH_ORDER[i];
+          if (balancesByMonth && balancesByMonth[prevKey] && typeof balancesByMonth[prevKey][accId] === 'number') {
+            return balancesByMonth[prevKey][accId];
+          }
+        }
       }
       const acc = ACCOUNTS.find(a => a.id === accId);
       return acc ? (Number(acc.balance) || 0) : 0;
@@ -1312,8 +1368,7 @@
 
     function setAccountBalance(accId, newBalance, monthKey = selectedMonth) {
       if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
-      if (!balancesByMonth) balancesByMonth = {};
-      if (!balancesByMonth[monthKey]) balancesByMonth[monthKey] = {};
+      ensureMonthBalances(monthKey);
       balancesByMonth[monthKey][accId] = Number(newBalance) || 0;
       if (monthKey === currentActiveMonth) {
         const acc = ACCOUNTS.find(a => a.id === accId);
@@ -1505,37 +1560,97 @@
       renderAll();
     }
 
-    // Pasar saldo positivo de fin de mes al mes siguiente manualmente con un botón
-    function transferPositiveSurplusToNextMonth() {
+    let pendingSurplusFromMonth = null;
+    let pendingSurplusToMonth = null;
+
+    function openSurplusTransferModal(overrideFrom = null, overrideTo = null) {
       const idx = MONTH_ORDER.indexOf(selectedMonth);
-      if (idx < 0 || idx >= MONTH_ORDER.length - 1) return;
-      if (transferredPositiveMonths[selectedMonth]) return;
+      if (idx < 0) return;
 
-      const mTx = transactions.filter(t => t.monthKey === selectedMonth);
-      const mBills = monthlyBills.filter(b => b.monthKey === selectedMonth);
-      const totalIncome = mTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-      const totalDaily = mTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-      const totalFixed = mBills.reduce((s, b) => s + b.amount, 0);
-      const available = totalIncome - totalFixed - totalDaily;
+      let fromMonth = overrideFrom;
+      let toMonth = overrideTo;
 
-      if (available <= 0) return;
+      if (!fromMonth || !toMonth) {
+        const idxActive = MONTH_ORDER.indexOf(currentActiveMonth);
+        if (idx > idxActive) {
+          // Viendo un mes futuro (ej. Noviembre): origen es el mes anterior (Octubre)
+          fromMonth = MONTH_ORDER[idx - 1];
+          toMonth = selectedMonth;
+        } else if (idx < MONTH_ORDER.length - 1) {
+          // Viendo el mes actual o pasado: origen es el mes seleccionado y destino el siguiente
+          fromMonth = selectedMonth;
+          toMonth = MONTH_ORDER[idx + 1];
+        }
+      }
 
-      const nextMonthKey = MONTH_ORDER[idx + 1];
-      transferredPositiveMonths[selectedMonth] = true;
+      if (!fromMonth || !toMonth) return;
 
-      transactions.unshift({
-        id: 'tx-surplus-' + Date.now(),
-        monthKey: nextMonthKey,
-        dayLabel: 'Inicio de mes',
-        type: 'income',
-        categoryId: 'inc-extra',
-        accountId: 'acc-bank',
-        amount: available,
-        note: `Saldo a favor de ${MONTH_LABELS[selectedMonth]}`,
+      pendingSurplusFromMonth = fromMonth;
+      pendingSurplusToMonth = toMonth;
+
+      const fromName = MONTH_BASE_NAMES[fromMonth] || fromMonth;
+      const toName = MONTH_BASE_NAMES[toMonth] || toMonth;
+
+      const titleEl = document.getElementById('surplusModalTitle');
+      if (titleEl) titleEl.innerText = `🎉 Pasar plata de ${fromName} a ${toName}`;
+      const subEl = document.getElementById('surplusModalSubtitle');
+      if (subEl) subEl.innerText = `Se pasará la plata disponible de ${fromName} para cada banco que estaba en el origen:`;
+
+      let totalSurplus = 0;
+      const htmlList = ACCOUNTS.map(a => {
+        const bal = getAccountBalance(a.id, fromMonth);
+        totalSurplus += bal;
+        return `
+          <div class="solid-elevated p-2.5 rounded-xl flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <span>${a.icon}</span>
+              <span class="font-bold">${a.name}</span>
+            </div>
+            <div class="font-bold" style="color:#10B981;">${formatMoney(bal)}</div>
+          </div>
+        `;
+      }).join('');
+
+      const listEl = document.getElementById('surplusModalAccountsList');
+      if (listEl) listEl.innerHTML = htmlList;
+      const totEl = document.getElementById('surplusModalTotalText');
+      if (totEl) totEl.innerText = formatMoney(totalSurplus);
+
+      const modalEl = document.getElementById('surplusTransferModal');
+      if (modalEl) modalEl.classList.remove('is-hidden');
+    }
+
+    function closeSurplusModal() {
+      const el = document.getElementById('surplusTransferModal');
+      if (el) el.classList.add('is-hidden');
+    }
+
+    function confirmSurplusTransfer() {
+      if (!pendingSurplusFromMonth || !pendingSurplusToMonth) return;
+
+      const fromMonth = pendingSurplusFromMonth;
+      const toMonth = pendingSurplusToMonth;
+      const fromName = MONTH_BASE_NAMES[fromMonth] || fromMonth;
+      const toName = MONTH_BASE_NAMES[toMonth] || toMonth;
+
+      ensureMonthBalances(toMonth);
+      const summaryParts = [];
+      ACCOUNTS.forEach(a => {
+        const balInOrigin = getAccountBalance(a.id, fromMonth);
+        balancesByMonth[toMonth][a.id] = balInOrigin;
+        summaryParts.push(`${a.name}: ${formatMoney(balInOrigin)}`);
       });
 
-      enqueueOutbox('transactions', 'INSERT', `Saldo a favor pasado a ${MONTH_LABELS[nextMonthKey]}`);
+      transferredPositiveMonths[fromMonth] = true;
+      enqueueOutbox('account_transfers', 'INSERT', `Plata de ${fromName} pasada a ${toName} para cada banco de origen (${summaryParts.join(' • ')})`);
+      saveStateToLocalStorage();
+      closeSurplusModal();
       renderAll();
+      showBackupFeedback(`✔ Plata de ${fromName} pasada a cada banco de origen en ${toName}`);
+    }
+
+    function transferPositiveSurplusToNextMonth() {
+      openSurplusTransferModal();
     }
 
     function onTxSearchChanged(val) {
@@ -1930,56 +2045,83 @@
       const totalFixedPaid = mBills.reduce((s, b) => s + (b.isPaid ? b.amount : b.paid), 0);
       const totalFixedPending = Math.max(0, totalFixed - totalFixedPaid);
 
+      // Total en Cuentas para el mes seleccionado (Personal Pay + Banco + Efectivo)
+      const totalMonthBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, selectedMonth), 0);
+      const realAvailableAfterPendingBills = Math.max(0, totalMonthBal - totalFixedPending);
       const available = totalIncome - totalFixed - totalDaily;
 
-      // 1. Hero Card
+      // 1. Hero Card: Consistencia 1:1 total con la sección de Cuentas
       document.getElementById('heroSubtitle').innerText =
-        `DISPONIBLE EN ${displayCurrency === 'ARS' ? 'PESOS (ARS)' : 'DÓLARES (USD)'} — ${monthLabel.toUpperCase()}`;
-      document.getElementById('heroBalance').innerText = formatMoney(available);
+        `SALDO EN CUENTAS — ${monthLabel.toUpperCase()}`;
+      document.getElementById('heroBalance').innerText = formatMoney(totalMonthBal);
       document.getElementById('heroIncome').innerText = formatMoney(totalIncome);
       document.getElementById('heroFixed').innerText = formatMoney(totalFixed);
       document.getElementById('heroDaily').innerText = formatMoney(totalDaily);
 
       // Calculadora de cobro por mes independiente
-      computeHeroPaydayAllowance(available);
+      computeHeroPaydayAllowance(realAvailableAfterPendingBills > 0 ? realAvailableAfterPendingBills : available);
 
       const heroCard = document.getElementById('heroCard');
       const heroStatusText = document.getElementById('heroStatusText');
-      if (available < 0) {
+      if (totalMonthBal <= 0 && available < 0) {
         heroCard.style.background = 'linear-gradient(135deg, #9F1239 0%, #4C0519 100%)';
-        heroStatusText.innerText = '⚠️ En este mes los gastos superaron los ingresos cargados';
+        heroStatusText.innerText = '⚠️ No tenés saldo registrado en tus cuentas para este mes';
       } else {
         heroCard.style.background = 'linear-gradient(135deg, #0D7A5F 0%, #064E3B 100%)';
-        heroStatusText.innerText = `Saldo libre en ${displayCurrency} descontando Gastos Fijos y Diarios`;
+        if (totalFixedPending > 0) {
+          heroStatusText.innerText = `Total en cuentas: ${formatMoney(totalMonthBal)} • Faltan pagar ${formatMoney(totalFixedPending)} en fijos • Te quedan ${formatMoney(realAvailableAfterPendingBills)} libres`;
+        } else {
+          heroStatusText.innerText = `Todos los gastos fijos del mes están al día • ${formatMoney(totalMonthBal)} 100% disponible`;
+        }
       }
 
-      // 2. Botón de Pasar Saldo a Favor al Mes Siguiente:
+      // 2. Botón de Pasar Saldo / Cuentas al Mes Siguiente (Día 1 o mes cerrado):
       const todayDate = new Date();
       const lastDayOfCurrentMonth = new Date(todayDate.getFullYear(), todayDate.getMonth() + 1, 0).getDate();
       const isLastDayOfMonth = (todayDate.getDate() === lastDayOfCurrentMonth);
+      const isFirstDayOfMonth = (todayDate.getDate() === 1);
       const isClosedPastMonth = (MONTH_ORDER.indexOf(selectedMonth) < MONTH_ORDER.indexOf(currentActiveMonth));
+      const idx = MONTH_ORDER.indexOf(selectedMonth);
 
       const surplusCard = document.getElementById('positiveSurplusTransferCard');
-      const idx = MONTH_ORDER.indexOf(selectedMonth);
-      if (available > 0 && idx >= 0 && idx < MONTH_ORDER.length - 1 && (isClosedPastMonth || isLastDayOfMonth)) {
-        const nextMonthName = MONTH_LABELS[MONTH_ORDER[idx + 1]];
+      let shouldShowSurplus = false;
+      let surplusSourceMonth = selectedMonth;
+      let surplusTargetMonth = (idx < MONTH_ORDER.length - 1) ? MONTH_ORDER[idx + 1] : null;
+
+      if (idx >= 0 && idx < MONTH_ORDER.length - 1 && totalMonthBal > 0 && (isClosedPastMonth || isLastDayOfMonth || isFirstDayOfMonth)) {
+        shouldShowSurplus = true;
+        surplusSourceMonth = selectedMonth;
+        surplusTargetMonth = MONTH_ORDER[idx + 1];
+      } else if (idx > 0) {
+        const prevMonthKey = MONTH_ORDER[idx - 1];
+        const prevBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, prevMonthKey), 0);
+        if (prevBal > 0 && (isFirstDayOfMonth || selectedMonth === currentActiveMonth || idx > MONTH_ORDER.indexOf(currentActiveMonth))) {
+          shouldShowSurplus = true;
+          surplusSourceMonth = prevMonthKey;
+          surplusTargetMonth = selectedMonth;
+        }
+      }
+
+      if (shouldShowSurplus && surplusCard && surplusTargetMonth) {
+        const srcName = MONTH_BASE_NAMES[surplusSourceMonth] || surplusSourceMonth;
+        const tgtName = MONTH_BASE_NAMES[surplusTargetMonth] || surplusTargetMonth;
+        const srcBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, surplusSourceMonth), 0);
+
         surplusCard.classList.remove('is-hidden');
-        document.getElementById('surplusTitle').innerText = `🎉 Saldo a favor: ${formatMoney(available)}`;
+        document.getElementById('surplusTitle').innerText = `🎉 Pasar plata de ${srcName} a ${tgtName}: ${formatMoney(srcBal)}`;
         const btn = document.getElementById('surplusBtn');
-        if (transferredPositiveMonths[selectedMonth]) {
-          document.getElementById('surplusSubtitle').innerText = `Ya pasaste este saldo a favor a ${nextMonthName}.`;
+        if (transferredPositiveMonths[surplusSourceMonth]) {
+          document.getElementById('surplusSubtitle').innerText = `Ya pasaste los saldos de ${srcName} a cada banco de origen en ${tgtName}.`;
           btn.innerText = '✔ Ya transferido';
           btn.style.opacity = '0.6';
+          btn.onclick = () => openSurplusTransferModal(surplusSourceMonth, surplusTargetMonth);
         } else {
-          document.getElementById('surplusSubtitle').innerText =
-            isClosedPastMonth
-              ? `Mes finalizado con saldo a favor: pasalo a ${nextMonthName}.`
-              : `Último día del mes: pasalo a ${nextMonthName} con 1 toque.`;
-          btn.innerText = `💸 Pasar a ${nextMonthName.split(' ')[0]}`;
+          document.getElementById('surplusSubtitle').innerText = `Pasar la plata para cada banco que estaba en el origen a ${tgtName}.`;
+          btn.innerText = `💸 Pasar a cada banco`;
           btn.style.opacity = '1';
+          btn.onclick = () => openSurplusTransferModal(surplusSourceMonth, surplusTargetMonth);
         }
-      } else {
-        // Durante los días normales del mes en curso, o si quedó en negativo / 0, NO se muestra
+      } else if (surplusCard) {
         surplusCard.classList.add('is-hidden');
       }
 
@@ -2187,7 +2329,6 @@
       const accountsSubtitleEl = document.getElementById('accountsMonthSubtitle');
       if (accountsSubtitleEl) accountsSubtitleEl.innerText = `Saldos configurados para ${monthName}.`;
       const accountsTotalEl = document.getElementById('accountsMonthTotal');
-      const totalMonthBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, selectedMonth), 0);
       if (accountsTotalEl) accountsTotalEl.innerText = `Total: ${formatMoney(totalMonthBal)}`;
 
       document.getElementById('accountsListContainer').innerHTML = ACCOUNTS.map(a => {
