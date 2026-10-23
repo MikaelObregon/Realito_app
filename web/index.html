@@ -1587,6 +1587,15 @@
       renderAll();
     }
 
+    function getMonthPositiveSurplus(mKey) {
+      const mTx = transactions.filter(t => t.monthKey === mKey);
+      const mBills = monthlyBills.filter(b => b.monthKey === mKey);
+      const inc = mTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+      const daily = mTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+      const fixed = mBills.reduce((s, b) => s + b.amount, 0);
+      return inc - fixed - daily;
+    }
+
     let pendingSurplusFromMonth = null;
     let pendingSurplusToMonth = null;
 
@@ -1619,24 +1628,23 @@
       const toName = MONTH_BASE_NAMES[toMonth] || toMonth;
 
       const titleEl = document.getElementById('surplusModalTitle');
-      if (titleEl) titleEl.innerText = `🎉 Pasar plata de ${fromName} a ${toName}`;
+      if (titleEl) titleEl.innerText = `🎉 Pasar sobrante de ${fromName} a ${toName}`;
       const subEl = document.getElementById('surplusModalSubtitle');
-      if (subEl) subEl.innerText = `Se pasará la plata disponible de ${fromName} para cada banco que estaba en el origen:`;
+      if (subEl) subEl.innerText = `Se sumará un ingreso de "Sobrante a favor de ${fromName}" el día 1 en ${toName}:`;
 
-      let totalSurplus = 0;
-      const htmlList = ACCOUNTS.map(a => {
-        const bal = getAccountBalance(a.id, fromMonth);
-        totalSurplus += bal;
-        return `
-          <div class="solid-elevated p-2.5 rounded-xl flex justify-between items-center">
-            <div class="flex items-center gap-2">
-              <span>${a.icon}</span>
-              <span class="font-bold">${a.name}</span>
+      const totalSurplus = Math.max(0, getMonthPositiveSurplus(fromMonth));
+      const htmlList = `
+        <div class="solid-elevated p-3 rounded-xl flex justify-between items-center">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🎉</span>
+            <div>
+              <div class="font-bold text-xs">Sobrante a favor de ${fromName}</div>
+              <div class="text-[11px]" style="color: var(--text-muted);">Categoría: Sobrante / Extra • Ingreso día 1</div>
             </div>
-            <div class="font-bold" style="color:#10B981;">${formatMoney(bal)}</div>
           </div>
-        `;
-      }).join('');
+          <div class="font-bold text-sm" style="color:#10B981;">+ ${formatMoney(totalSurplus)}</div>
+        </div>
+      `;
 
       const listEl = document.getElementById('surplusModalAccountsList');
       if (listEl) listEl.innerHTML = htmlList;
@@ -1662,15 +1670,14 @@
 
       ensureMonthBalances(toMonth);
       const summaryParts = [];
-      let totalPassed = 0;
       ACCOUNTS.forEach(a => {
         const balInOrigin = getAccountBalance(a.id, fromMonth);
         balancesByMonth[toMonth][a.id] = balInOrigin;
-        totalPassed += balInOrigin;
         summaryParts.push(`${a.name}: ${formatMoney(balInOrigin)}`);
       });
 
-      const existingSurplusTx = transactions.find(t => t.monthKey === toMonth && t.note && t.note.includes(`a favor de ${fromName}`));
+      const totalPassed = Math.max(0, getMonthPositiveSurplus(fromMonth));
+      const existingSurplusTx = transactions.find(t => t.monthKey === toMonth && t.note && (t.note.includes(`a favor de ${fromName}`) || t.note.includes('Sobrante a favor de')));
       if (!existingSurplusTx && totalPassed > 0) {
         const dayLabel = '1 ' + (MONTH_BASE_NAMES[toMonth] ? MONTH_BASE_NAMES[toMonth].slice(0, 3) : 'Día 1');
         transactions.unshift({
@@ -1681,17 +1688,17 @@
           categoryId: 'inc-extra',
           accountId: 'acc-bank',
           amount: totalPassed,
-          note: `Remanente / Saldo a favor de ${fromName}`
+          note: `Sobrante a favor de ${fromName}`
         });
         enqueueOutbox('transactions', 'INSERT', `Ingreso transferido de ${fromName} a ${toName}: $ ${totalPassed.toLocaleString('es-AR')}`);
       }
 
       transferredPositiveMonths[fromMonth] = true;
-      enqueueOutbox('account_transfers', 'INSERT', `Plata de ${fromName} pasada a ${toName} para cada banco de origen (${summaryParts.join(' • ')})`);
+      enqueueOutbox('account_transfers', 'INSERT', `Sobrante de ${fromName} pasado a ${toName}`);
       saveStateToLocalStorage();
       closeSurplusModal();
       renderAll();
-      showBackupFeedback(`✔ Plata de ${fromName} pasada a ${toName}`);
+      showBackupFeedback(`✔ Sobrante de ${fromName} pasado a ${toName}`);
     }
 
     function transferPositiveSurplusToNextMonth() {
@@ -2122,36 +2129,41 @@
         }
       }
 
-      // 2. Botón de Pasar Saldo / Cuentas al Mes Siguiente (Día 1 o mes cerrado):
+      // 2. Botón de Pasar Sobrante al Mes Siguiente (Solo en fin de mes o día 1 con saldo a favor):
       const todayDate = new Date();
       const lastDayOfCurrentMonth = new Date(todayDate.getFullYear(), todayDate.getMonth() + 1, 0).getDate();
       const isLastDayOfMonth = (todayDate.getDate() === lastDayOfCurrentMonth);
       const isFirstDayOfMonth = (todayDate.getDate() === 1);
-      const isClosedPastMonth = (MONTH_ORDER.indexOf(selectedMonth) < MONTH_ORDER.indexOf(currentActiveMonth));
       const idx = MONTH_ORDER.indexOf(selectedMonth);
+      const idxActive = MONTH_ORDER.indexOf(currentActiveMonth);
+      const isClosedPastMonth = (idx < idxActive);
 
       const surplusCard = document.getElementById('positiveSurplusTransferCard');
       let shouldShowSurplus = false;
       let surplusSourceMonth = selectedMonth;
       let surplusTargetMonth = (idx < MONTH_ORDER.length - 1) ? MONTH_ORDER[idx + 1] : null;
 
-      const surplusAmount = (available > 0) ? available : totalMonthBal;
-
-      if (idx >= 0 && idx < MONTH_ORDER.length - 1 && surplusAmount > 0 && (isClosedPastMonth || isLastDayOfMonth || isFirstDayOfMonth)) {
-        shouldShowSurplus = true;
-        surplusSourceMonth = selectedMonth;
-        surplusTargetMonth = MONTH_ORDER[idx + 1];
-      } else if (idx > 0) {
+      if (isClosedPastMonth && idx < MONTH_ORDER.length - 1) {
+        // Mes pasado cerrado (ej. Agosto): solo si tuvo sobrante positivo y NUNCA se transfirió
+        const srcSurplus = getMonthPositiveSurplus(selectedMonth);
+        if (srcSurplus > 0 && !transferredPositiveMonths[selectedMonth]) {
+          shouldShowSurplus = true;
+          surplusSourceMonth = selectedMonth;
+          surplusTargetMonth = MONTH_ORDER[idx + 1];
+        }
+      } else if (selectedMonth === currentActiveMonth && isLastDayOfMonth && idx < MONTH_ORDER.length - 1) {
+        // Último día del mes actual (ej. 31 de Octubre): habilitar pasar a Noviembre
+        const curSurplus = getMonthPositiveSurplus(selectedMonth);
+        if (curSurplus > 0 && !transferredPositiveMonths[selectedMonth]) {
+          shouldShowSurplus = true;
+          surplusSourceMonth = selectedMonth;
+          surplusTargetMonth = MONTH_ORDER[idx + 1];
+        }
+      } else if (selectedMonth === currentActiveMonth && isFirstDayOfMonth && idx > 0) {
+        // Día 1 del mes nuevo (ej. 1 de Noviembre): pasar sobrante de Octubre
         const prevMonthKey = MONTH_ORDER[idx - 1];
-        const prevTx = transactions.filter(t => t.monthKey === prevMonthKey);
-        const prevBills = monthlyBills.filter(b => b.monthKey === prevMonthKey);
-        const prevInc = prevTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-        const prevDaily = prevTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-        const prevFixed = prevBills.reduce((s, b) => s + b.amount, 0);
-        const prevAvail = prevInc - prevFixed - prevDaily;
-        const prevBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, prevMonthKey), 0);
-        const prevSurplus = (prevAvail > 0) ? prevAvail : prevBal;
-        if (prevSurplus > 0 && (isFirstDayOfMonth || selectedMonth === currentActiveMonth || idx > MONTH_ORDER.indexOf(currentActiveMonth))) {
+        const prevSurplus = getMonthPositiveSurplus(prevMonthKey);
+        if (prevSurplus > 0 && !transferredPositiveMonths[prevMonthKey]) {
           shouldShowSurplus = true;
           surplusSourceMonth = prevMonthKey;
           surplusTargetMonth = selectedMonth;
@@ -2161,24 +2173,15 @@
       if (shouldShowSurplus && surplusCard && surplusTargetMonth) {
         const srcName = MONTH_BASE_NAMES[surplusSourceMonth] || surplusSourceMonth;
         const tgtName = MONTH_BASE_NAMES[surplusTargetMonth] || surplusTargetMonth;
-        const srcBal = (surplusSourceMonth === selectedMonth)
-          ? surplusAmount
-          : ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, surplusSourceMonth), 0);
+        const srcBal = getMonthPositiveSurplus(surplusSourceMonth);
 
         surplusCard.classList.remove('is-hidden');
-        document.getElementById('surplusTitle').innerText = `🎉 Pasar plata de ${srcName} a ${tgtName}: ${formatMoney(srcBal)}`;
+        document.getElementById('surplusTitle').innerText = `🎉 Pasar sobrante de ${srcName} a ${tgtName}: ${formatMoney(srcBal)}`;
+        document.getElementById('surplusSubtitle').innerText = `Pasar saldo a favor de ${srcName} como ingreso al inicio de ${tgtName}.`;
         const btn = document.getElementById('surplusBtn');
-        if (transferredPositiveMonths[surplusSourceMonth]) {
-          document.getElementById('surplusSubtitle').innerText = `Ya pasaste el saldo a favor de ${srcName} a ${tgtName}.`;
-          btn.innerText = '✔ Ya transferido';
-          btn.style.opacity = '0.6';
-          btn.onclick = () => openSurplusTransferModal(surplusSourceMonth, surplusTargetMonth);
-        } else {
-          document.getElementById('surplusSubtitle').innerText = `Pasar saldo disponible de ${srcName} para iniciar ${tgtName}.`;
-          btn.innerText = `💸 Pasar al mes sig.`;
-          btn.style.opacity = '1';
-          btn.onclick = () => openSurplusTransferModal(surplusSourceMonth, surplusTargetMonth);
-        }
+        btn.innerText = `💸 Pasar al mes sig.`;
+        btn.style.opacity = '1';
+        btn.onclick = () => openSurplusTransferModal(surplusSourceMonth, surplusTargetMonth);
       } else if (surplusCard) {
         surplusCard.classList.add('is-hidden');
       }
