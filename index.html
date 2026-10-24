@@ -251,7 +251,7 @@
     </div>
 
     <!-- Selector de Mes (Rueda del Mouse + Arrastrar + Auto-centrado) -->
-    <div id="monthScrollBar" class="pb-2 flex gap-2 overflow-x-auto no-scrollbar shrink-0" style="scroll-behavior: smooth; cursor: grab; padding-left: max(16px, calc(50% - 75px)); padding-right: max(16px, calc(50% - 75px));">
+    <div id="monthScrollBar" class="pb-2 flex gap-2 overflow-x-auto no-scrollbar shrink-0" style="cursor: grab; padding-left: max(16px, calc(50% - 75px)); padding-right: max(16px, calc(50% - 75px));">
       <button onclick="selectMonth('2026-10')" id="m-2026-10" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap cursor-pointer shrink-0 flex items-center shadow-md" style="background:#0D7A5F;">
         <span>Octubre 2026</span>
         <span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold uppercase tracking-wider ml-1.5 bg-white/25 text-white">Actual</span>
@@ -643,21 +643,12 @@
           <div id="backupActionFeedback" class="text-[11px] font-bold mt-2 text-center is-hidden" style="color:#10B981;"></div>
         </div>
 
-        <!-- 6. Información de Versión y Actualización Forzada PWA -->
-        <div class="solid-card p-4 rounded-2xl text-center space-y-2.5">
-          <div class="flex items-center justify-center gap-2">
-            <span class="text-xs font-bold" style="color: var(--text-muted);">Realito PWA</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: rgba(16,185,129,0.18); color: #10B981;">v2.6 — Producción Oficial</span>
-          </div>
-          <div class="text-[11px] font-semibold" style="color: #6EE7B7;">
-            🌐 realitoapp-rho.vercel.app
-          </div>
-          <p class="text-[11px]" style="color: var(--text-muted);">
-            Tus datos se guardan seguros en el teléfono y se respaldan en Supabase Cloud.
-          </p>
-          <button type="button" id="forceRefreshBtn" onclick="forceAppRefresh()" class="w-full py-2.5 px-3 rounded-xl solid-elevated text-xs font-bold cursor-pointer flex items-center justify-center gap-2" style="color:#10B981; border: 1px solid rgba(16,185,129,0.3);">
+        <!-- 6. Commit y Actualización -->
+        <div class="pt-1 pb-2 flex items-center justify-center gap-3">
+          <span class="text-[10px] font-mono" style="color: var(--text-muted);">Commit: <strong id="appCommitHash" style="color: #10B981;">09a21ed</strong></span>
+          <button type="button" id="forceRefreshBtn" onclick="forceAppRefresh()" class="py-1 px-2.5 rounded-lg solid-elevated text-[10px] font-bold cursor-pointer flex items-center gap-1" style="color:#10B981; border: 1px solid rgba(16,185,129,0.25);">
             <span>🔄</span>
-            <span>Forzar Actualización y Limpiar Caché</span>
+            <span>Actualizar</span>
           </button>
         </div>
 
@@ -1866,11 +1857,15 @@
       const barWidth = bar.clientWidth;
       const btnLeft = btn.offsetLeft;
       const btnWidth = btn.offsetWidth;
-      const targetScrollLeft = btnLeft - (barWidth / 2) + (btnWidth / 2);
-      bar.scrollTo({
-        left: Math.max(0, targetScrollLeft),
-        behavior: smooth ? 'smooth' : 'auto'
-      });
+      const targetScrollLeft = Math.max(0, btnLeft - (barWidth / 2) + (btnWidth / 2));
+      if (!smooth) {
+        bar.scrollLeft = targetScrollLeft;
+      } else {
+        bar.scrollTo({
+          left: targetScrollLeft,
+          behavior: 'smooth'
+        });
+      }
     }
 
     function selectMonth(monthKey) {
@@ -2110,6 +2105,7 @@
     function renderAll() {
       updateLiveSystemClock();
       renderMonthBar();
+      centerMonthButton(selectedMonth, false);
       setTimeout(() => {
         centerMonthButton(selectedMonth, false);
       }, 50);
@@ -4095,6 +4091,8 @@
         }
         if (parsed.paydaysByMonth) paydaysByMonth = parsed.paydaysByMonth;
         currentActiveMonth = getSystemCurrentMonthKey();
+        selectedMonth = currentActiveMonth;
+        try { localStorage.setItem('realito_selected_month_v1', currentActiveMonth); } catch (_) {}
         if (parsed.dolarFechaActualizacion) dolarFechaActualizacion = parsed.dolarFechaActualizacion;
         if (!paydaysByMonth && nextPaydayDateStr) {
           paydaysByMonth = { [currentActiveMonth || '2026-10']: nextPaydayDateStr };
@@ -4102,10 +4100,6 @@
         if (parsed.transferredPositiveMonths) transferredPositiveMonths = parsed.transferredPositiveMonths;
         if (typeof parsed.isDarkObsidian === 'boolean' && parsed.isDarkObsidian !== isDarkObsidian) {
           toggleTheme();
-        }
-        const savedSelMonth = localStorage.getItem('realito_selected_month_v1') || parsed.selectedMonth;
-        if (savedSelMonth && MONTH_ORDER.includes(savedSelMonth)) {
-          selectedMonth = savedSelMonth;
         }
       } catch (_) {}
     }
@@ -4574,11 +4568,25 @@
       }, 250);
     }
 
+    async function loadLatestCommitHash() {
+      const el = document.getElementById('appCommitHash');
+      if (!el) return;
+      try {
+        const res = await fetch('https://api.github.com/repos/MikaelObregon/Realito_app/commits/main', { cache: 'no-store' });
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data && data.sha) {
+            el.innerText = data.sha.slice(0, 7);
+          }
+        }
+      } catch (_) {}
+    }
+
     async function forceAppRefresh() {
       const btn = document.getElementById('forceRefreshBtn');
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span>⏳</span><span>Actualizando y limpiando caché...</span>';
+        btn.innerHTML = '<span>⏳</span><span>...</span>';
       }
       try {
         if ('caches' in window) {
@@ -4589,16 +4597,18 @@
           const regs = await navigator.serviceWorker.getRegistrations();
           for (let r of regs) await r.unregister();
         }
-        // Limpiamos el timestamp local para que tras recargar baje la copia fresca de Supabase
         localStorage.removeItem('realito_last_saved_at_v1');
+        localStorage.removeItem('realito_selected_month_v1');
+        await fetch(window.location.pathname, { cache: 'reload' }).catch(() => {});
       } catch (e) {}
-      window.location.reload(true);
+      window.location.reload();
     }
 
     loadStateFromLocalStorage();
     loadSupabaseConfig();
     updateThemeColorMeta();
     renderAll();
+    loadLatestCommitHash();
     if (supabaseUrl && supabaseAnonKey) {
       pullFromSupabaseCloud(false);
     }
@@ -4628,7 +4638,7 @@
     // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=9').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=10').then((reg) => {
           reg.update().catch(() => {});
           setInterval(() => {
             reg.update().catch(() => {});

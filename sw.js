@@ -1,5 +1,5 @@
 // Service Worker para Realito PWA — Soporte Offline 100% y Auto-actualización Silenciosa
-const CACHE_NAME = 'realito-cache-v9';
+const CACHE_NAME = 'realito-cache-v10';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -58,45 +58,31 @@ self.addEventListener('fetch', (event) => {
   const url = event.request.url;
 
   // Supabase y APIs externas pasan directo a la red (con su propio fallback offline en la app)
-  if (url.includes('supabase.co') || url.includes('dolarapi.com')) {
+  if (url.includes('supabase.co') || url.includes('dolarapi.com') || url.includes('api.github.com')) {
     return;
   }
 
-  // 1. Navegación (HTML de la app al abrir en el teléfono o recargar sin internet)
+  // 1. Navegación (HTML de la app): Network-First para mostrar siempre el último commit de Vercel, con fallback offline a caché
   if (event.request.mode === 'navigate') {
     event.respondWith(
       (async () => {
         const cache = await caches.open(CACHE_NAME);
-        const cached = (await cache.match(event.request, { ignoreSearch: true }))
+        try {
+          const networkResponse = await fetch(event.request, { cache: 'no-store' });
+          if (networkResponse && networkResponse.status === 200) {
+            await cache.put(event.request, networkResponse.clone());
+            await cache.put('/index.html', networkResponse.clone());
+            await cache.put('./index.html', networkResponse.clone());
+            return networkResponse;
+          }
+        } catch (_) {}
+
+        return (await cache.match(event.request, { ignoreSearch: true }))
           || (await cache.match('/index.html'))
           || (await cache.match('./index.html'))
           || (await cache.match('index.html'))
           || (await cache.match('/'))
           || (await cache.match('./'));
-
-        // En segundo plano actualiza la caché si hay conexión a internet disponible
-        const fetchPromise = fetch(event.request)
-          .then(async (networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              await cache.put(event.request, networkResponse.clone());
-              await cache.put('/index.html', networkResponse.clone());
-              await cache.put('./index.html', networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => null);
-
-        if (cached) {
-          return cached;
-        }
-
-        const networkResponse = await fetchPromise;
-        if (networkResponse) return networkResponse;
-
-        return (await cache.match('/index.html'))
-          || (await cache.match('./index.html'))
-          || (await cache.match('./'))
-          || (await cache.match('/'));
       })()
     );
     return;
