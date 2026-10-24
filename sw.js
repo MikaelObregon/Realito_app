@@ -1,5 +1,5 @@
 // Service Worker para Realito PWA — Soporte Offline 100% y Auto-actualización Silenciosa
-const CACHE_NAME = 'realito-cache-v8';
+const CACHE_NAME = 'realito-cache-v9';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

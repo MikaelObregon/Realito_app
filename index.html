@@ -647,10 +647,13 @@
         <div class="solid-card p-4 rounded-2xl text-center space-y-2.5">
           <div class="flex items-center justify-center gap-2">
             <span class="text-xs font-bold" style="color: var(--text-muted);">Realito PWA</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: rgba(16,185,129,0.18); color: #10B981;">v2.6 • Build 2d6ca71</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: rgba(16,185,129,0.18); color: #10B981;">v2.6 — Producción Oficial</span>
+          </div>
+          <div class="text-[11px] font-semibold" style="color: #6EE7B7;">
+            🌐 realitoapp-rho.vercel.app
           </div>
           <p class="text-[11px]" style="color: var(--text-muted);">
-            Tus datos se guardan seguros en el teléfono (offline) y se respaldan en Supabase Cloud.
+            Tus datos se guardan seguros en el teléfono y se respaldan en Supabase Cloud.
           </p>
           <button type="button" id="forceRefreshBtn" onclick="forceAppRefresh()" class="w-full py-2.5 px-3 rounded-xl solid-elevated text-xs font-bold cursor-pointer flex items-center justify-center gap-2" style="color:#10B981; border: 1px solid rgba(16,185,129,0.3);">
             <span>🔄</span>
@@ -3982,49 +3985,16 @@
           INCOME_CATEGORIES = Array.from(incMap.values());
         }
 
-        // Fusión inteligente: preservar movimientos y gastos fijos cargados localmente sin pisarlos
-        const cloudBills = (parsed.monthlyBills || []).filter(b => !deletedBillIds.has(b.id));
-        const localBillsMap = new Map(monthlyBills.map(b => [b.id, b]));
-        const mergedBills = [];
-        for (const lb of monthlyBills) {
-          if (deletedBillIds.has(lb.id)) continue;
-          const cb = cloudBills.find(b => b.id === lb.id);
-          if (cb) {
-            mergedBills.push({
-              ...cb,
-              ...lb,
-              isPaid: Boolean(lb.isPaid || cb.isPaid),
-              paid: Math.max(Number(lb.paid) || 0, Number(cb.paid) || 0)
-            });
-          } else {
-            mergedBills.push(lb);
-          }
+        // Cuando la nube es autoritativa, tomamos los datos limpios directamente de Supabase
+        if (parsed.monthlyBills && Array.isArray(parsed.monthlyBills)) {
+          monthlyBills = parsed.monthlyBills;
         }
-        for (const cb of cloudBills) {
-          if (!localBillsMap.has(cb.id) && !deletedBillIds.has(cb.id)) {
-            mergedBills.push(cb);
-          }
+        if (parsed.transactions && Array.isArray(parsed.transactions)) {
+          transactions = parsed.transactions;
         }
-        monthlyBills = mergedBills;
-
-        const cloudTx = (parsed.transactions || []).filter(t => !deletedTxIds.has(t.id));
-        const localTxMap = new Map(transactions.map(t => [t.id, t]));
-        const mergedTx = [...transactions.filter(t => !deletedTxIds.has(t.id))];
-        for (const ct of cloudTx) {
-          if (!localTxMap.has(ct.id) && !deletedTxIds.has(ct.id)) {
-            mergedTx.push(ct);
-          }
-        }
-        transactions = mergedTx;
 
         if (parsed.accountTransfers) {
-          const cloudTr = parsed.accountTransfers || [];
-          const localTrMap = new Map(accountTransfers.map(tr => [tr.id, tr]));
-          for (const tr of cloudTr) {
-            if (!localTrMap.has(tr.id)) {
-              accountTransfers.push(tr);
-            }
-          }
+          accountTransfers = parsed.accountTransfers;
         }
         if (parsed.OFICIAL_SELL_RATE) OFICIAL_SELL_RATE = parsed.OFICIAL_SELL_RATE;
         if (parsed.nextPaydayDateStr) {
@@ -4040,6 +4010,33 @@
         if (typeof parsed.isDarkObsidian === 'boolean' && parsed.isDarkObsidian !== isDarkObsidian) {
           toggleTheme();
         }
+
+        // Guardamos en local el estado limpio bajado de la nube
+        const payload = {
+          ACCOUNTS,
+          balancesByMonth: balancesByMonth || {},
+          FIXED_BILL_CATEGORIES,
+          EXPENSE_CATEGORIES,
+          INCOME_CATEGORIES,
+          monthlyBills,
+          transactions,
+          accountTransfers,
+          OFICIAL_SELL_RATE,
+          nextPaydayDateStr,
+          paydaysByMonth,
+          currentActiveMonth,
+          selectedMonth,
+          dolarFechaActualizacion,
+          transferredPositiveMonths,
+          isDarkObsidian,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        localStorage.setItem('realito_last_saved_at_v1', cloudIso || new Date().toISOString());
+
+        renderAll();
+        updateSupabaseStatusBadge('☁️ Sincronizado', true);
+        if (showToast) showSupabaseFeedback('✔ ¡Datos actualizados desde Supabase!');
+        return true;
 
         // Consulta granular a tabla 'categorias' para asegurar que categorías personalizadas se preserven
         try {
@@ -4584,10 +4581,6 @@
         btn.innerHTML = '<span>⏳</span><span>Actualizando y limpiando caché...</span>';
       }
       try {
-        // Si hay conexión y Supabase, aseguramos guardar cualquier cambio local antes de recargar
-        if (navigator.onLine && supabaseUrl && supabaseAnonKey) {
-          await pushAllToSupabaseCloud();
-        }
         if ('caches' in window) {
           const keys = await caches.keys();
           await Promise.all(keys.map(k => caches.delete(k)));
@@ -4596,6 +4589,8 @@
           const regs = await navigator.serviceWorker.getRegistrations();
           for (let r of regs) await r.unregister();
         }
+        // Limpiamos el timestamp local para que tras recargar baje la copia fresca de Supabase
+        localStorage.removeItem('realito_last_saved_at_v1');
       } catch (e) {}
       window.location.reload(true);
     }
@@ -4633,7 +4628,7 @@
     // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=8').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=9').then((reg) => {
           reg.update().catch(() => {});
           setInterval(() => {
             reg.update().catch(() => {});
