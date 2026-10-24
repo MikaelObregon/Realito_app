@@ -69,9 +69,9 @@ Realito_app/
 │                   └── transactions_history_screen.dart
 │
 ├── test/                                      # Suite de Pruebas Unitarias, E2E y Regresión
-│   ├── run_all_tests.js                       # Ejecutor automatizado de las 8 suites (42 casos de prueba)
+│   ├── run_all_tests.js                       # Ejecutor automatizado de las 8 suites (43 casos de prueba)
 │   ├── verify_supabase_live.js                # Script de verificación y sincronización en vivo con Supabase
-│   ├── reporte_pruebas_e2e.html               # Reporte visual interactivo con el resultado de las 42 pruebas
+│   ├── reporte_pruebas_e2e.html               # Reporte visual interactivo con el resultado de las 43 pruebas
 │   ├── resultados_regresion.json              # Bitácora JSON de la última corrida de regresión
 │   ├── unit/                                  # Tests unitarios en Dart
 │   │   ├── money_formatter_test.dart          # Pruebas de formato ARS/USD y calculadora con '+'
@@ -84,7 +84,7 @@ Realito_app/
     ├── 01_estructura_del_proyecto.md          # Este documento: detalle carpeta por carpeta
     ├── 02_base_de_datos_supabase_espanol.md   # Esquema de 7 tablas en español y sincronización automática
     ├── 03_flujos_funcionales_y_ux.md          # Pantallas, fórmulas financieras, modales y reporte PDF
-    └── 04_pruebas_unitarias_y_regresion_e2e.md# Guía de ejecución de tests y regresión (42 casos)
+    └── 04_pruebas_unitarias_y_regresion_e2e.md# Guía de ejecución de tests y regresión (43 casos)
 ```
 
 ---
@@ -107,7 +107,7 @@ Contiene la arquitectura modular en **Flutter / Dart** dividida en dos grandes b
 
 ### 📁 `test/`
 Aloja toda la infraestructura de calidad y regresión del proyecto:
-- Permite validar en menos de 1 segundo los **42 casos de prueba** (unitarios y punta a punta con 100% de éxito), incluyendo consistencia matemática 1:1 y sanitización XSS.
+- Permite validar en menos de 1 segundo los **43 casos de prueba** (unitarios y punta a punta con 100% de éxito), incluyendo consistencia matemática 1:1, sanitización XSS y la tarjeta de Disponible en Mano (Opción 1).
 
 ### 📁 `docs/`
 Reúne la documentación técnica viva del proyecto, alineada con las decisiones de diseño y las últimas mejoras de UX.

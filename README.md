@@ -6,9 +6,8 @@
 
 ## ✨ Características Principales
 
-- **📊 Disponible Puro y Consistencia Matemática 1:1:**
-  - El saldo principal refleja con exactitud la fórmula:
-    $$\mathbf{Disponible} = \mathbf{Ingresos} - \mathbf{Gastos\ Fijos} - \mathbf{Gastos\ Diarios}$$
+- **📊 Disponible Puro y Consistencia Matemática 1:1 (Opción 1):**
+  - La tarjeta principal muestra en grande tu **Plata Real en Mano Hoy** ($\text{Ingresos} - \text{Fijos Pagados} - \text{Diarios}$) con el desglose exacto de fijos pendientes por vencer y tu **Plata Libre Real** protegida.
   - Coincidencia perfecta entre Inicio, el desglose diario y la pestaña de Reportes.
 - **💡 Margen Diario Automático hasta el Próximo Cobro:**
   - Divide tu disponible libre por los días que faltan hasta tu próximo sueldo (`💡 Podés gastar $ X / día · Quedan N días`).
@@ -26,6 +25,8 @@
   - Se registra automáticamente como un ingreso de `🎉 Sobrante a favor de [Mes Anterior]` en la categoría `inc-extra` y se auto-oculta de inmediato.
 - **📅 Navegación y Generación Dinámica de Meses:**
   - Barra superior auto-centrada en el mes actual con etiquetas `Actual` y `Próximo`. A medida que avanza el calendario, los meses nuevos se crean solos hacia el futuro.
+- **🔄 Control de Versión PWA y Actualización Forzada en 1 Toque:**
+  - En la pestaña de Ajustes se visualiza la versión (`v2.6`), build de commit y un botón `🔄 Forzar Actualización y Limpiar Caché` para refrescar el teléfono de inmediato tras un deploy sin perder datos.
 - **🛡️ Seguridad contra Inyección HTML (XSS):**
   - Función de sanitización [`escapeHtml()`](index.html) activa en todas las notas de gastos, títulos de servicios y categorías dinámicas.
 - **💵 Cotización del Dólar Oficial (Venta — Banco Nación):**
@@ -50,8 +51,8 @@ Realito_app/
 ├── lib/                                       # Arquitectura modular en Flutter / Dart
 │   ├── core/                                  # Base de datos local, formateadores, red, sync y temas
 │   └── features/                              # Módulos: dashboard, planning, reports, settings, transactions
-├── test/                                      # Suite de 42 pruebas (Unitarias + E2E + Supabase en vivo)
-│   ├── run_all_tests.js                       # Runner automatizado de regresión (42/42 tests — 100%)
+├── test/                                      # Suite de 43 pruebas (Unitarias + E2E + Supabase en vivo)
+│   ├── run_all_tests.js                       # Runner automatizado de regresión (43/43 tests — 100%)
 │   ├── verify_supabase_live.js                # Verificador de conexión y tablas en Supabase
 │   ├── reporte_pruebas_e2e.html               # Reporte visual HTML interactivo de las pruebas
 │   ├── resultados_regresion.json              # Resultados en formato JSON
@@ -61,7 +62,7 @@ Realito_app/
     ├── 01_estructura_del_proyecto.md          # Detalle carpeta por carpeta y archivo por archivo
     ├── 02_base_de_datos_supabase_espanol.md   # Documentación de las 7 tablas en español en Supabase
     ├── 03_flujos_funcionales_y_ux.md          # Fórmulas financieras, pantallas, modales y PDF
-    └── 04_pruebas_unitarias_y_regresion_e2e.md# Guía de pruebas unitarias, E2E y regresión (42 casos)
+    └── 04_pruebas_unitarias_y_regresion_e2e.md# Guía de pruebas unitarias, E2E y regresión (43 casos)
 ```
 
 ---

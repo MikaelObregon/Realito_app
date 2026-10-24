@@ -283,10 +283,10 @@
             </span>
           </div>
           <div class="text-3xl font-bold my-1" id="heroBalance">
-            $ 445.090
+            $ 725.442
           </div>
           <p class="text-xs mb-2.5" style="color: rgba(255,255,255,0.88);" id="heroStatusText">
-            Saldo libre en ARS descontando Gastos Fijos y Diarios
+            Faltan pagar $ 235.550 de fijos • Tu plata libre: $ 489.892
           </p>
 
           <!-- Recomendación #1: Cuánto puedo gastar por día según fecha de cobro -->
@@ -641,6 +641,21 @@
             </button>
           </div>
           <div id="backupActionFeedback" class="text-[11px] font-bold mt-2 text-center is-hidden" style="color:#10B981;"></div>
+        </div>
+
+        <!-- 6. Información de Versión y Actualización Forzada PWA -->
+        <div class="solid-card p-4 rounded-2xl text-center space-y-2.5">
+          <div class="flex items-center justify-center gap-2">
+            <span class="text-xs font-bold" style="color: var(--text-muted);">Realito PWA</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: rgba(16,185,129,0.18); color: #10B981;">v2.6 • Build b783014</span>
+          </div>
+          <p class="text-[11px]" style="color: var(--text-muted);">
+            Tus datos se guardan seguros en el teléfono (offline) y se respaldan en Supabase Cloud.
+          </p>
+          <button type="button" id="forceRefreshBtn" onclick="forceAppRefresh()" class="w-full py-2.5 px-3 rounded-xl solid-elevated text-xs font-bold cursor-pointer flex items-center justify-center gap-2" style="color:#10B981; border: 1px solid rgba(16,185,129,0.3);">
+            <span>🔄</span>
+            <span>Forzar Actualización y Limpiar Caché</span>
+          </button>
         </div>
 
       </div>
@@ -2113,11 +2128,13 @@
       const totalMonthBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, selectedMonth), 0);
       const realAvailableAfterPendingBills = Math.max(0, totalMonthBal - totalFixedPending);
       const available = totalIncome - totalFixed - totalDaily;
+      // Saldo en mano / en cuentas hoy según movimientos reales del mes (Opción 1)
+      const cashInHand = totalIncome - totalFixedPaid - totalDaily;
 
-      // 1. Hero Card: Presupuesto Ágil y Disponible Libre del Mes
+      // 1. Hero Card: Presupuesto Ágil y Disponible en Cuentas Hoy (Opción 1)
       document.getElementById('heroSubtitle').innerText =
         `DISPONIBLE EN ${displayCurrency} — ${monthLabel.toUpperCase()}`;
-      document.getElementById('heroBalance').innerText = formatMoney(available);
+      document.getElementById('heroBalance').innerText = formatMoney(cashInHand);
       document.getElementById('heroIncome').innerText = formatMoney(totalIncome);
       document.getElementById('heroFixed').innerText = formatMoney(totalFixed);
       document.getElementById('heroDaily').innerText = formatMoney(totalDaily);
@@ -2132,14 +2149,14 @@
         if (totalIncome === 0 && totalFixed > 0) {
           heroStatusText.innerText = `⚠️ Tenés ${formatMoney(totalFixed)} en gastos fijos previstos para este mes`;
         } else {
-          heroStatusText.innerText = `⚠️ Presupuesto excedido por ${formatMoney(Math.abs(available))} este mes`;
+          heroStatusText.innerText = `⚠️ Faltan pagar ${formatMoney(totalFixedPending)} de fijos • Presupuesto excedido por ${formatMoney(Math.abs(available))} este mes`;
         }
       } else {
         heroCard.style.background = 'linear-gradient(135deg, #0D7A5F 0%, #064E3B 100%)';
         if (totalFixedPending > 0) {
-          heroStatusText.innerText = `Faltan pagar ${formatMoney(totalFixedPending)} en fijos • Te quedan ${formatMoney(available)} libres en el mes`;
+          heroStatusText.innerText = `Faltan pagar ${formatMoney(totalFixedPending)} de fijos • Tu plata libre: ${formatMoney(available)}`;
         } else {
-          heroStatusText.innerText = `Todos los gastos fijos del mes están al día • ${formatMoney(available)} 100% disponible`;
+          heroStatusText.innerText = `Todos los gastos fijos del mes están al día • Tu plata libre: ${formatMoney(available)}`;
         }
       }
 
@@ -4555,6 +4572,11 @@
     }
 
     async function forceAppRefresh() {
+      const btn = document.getElementById('forceRefreshBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span><span>Actualizando y limpiando caché...</span>';
+      }
       try {
         // Si hay conexión y Supabase, aseguramos guardar cualquier cambio local antes de recargar
         if (navigator.onLine && supabaseUrl && supabaseAnonKey) {
@@ -4605,7 +4627,7 @@
     // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=6').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=7').then((reg) => {
           reg.update().catch(() => {});
           setInterval(() => {
             reg.update().catch(() => {});

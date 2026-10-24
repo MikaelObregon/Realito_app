@@ -1033,6 +1033,26 @@ runSuite(
         note: 'Previene XSS y fallos de renderizado ante caracteres &, <, >, ", \''
       };
     });
+
+    test('TC-43', 'Modelo B Hero Card: Plata en Mano Hoy (Cash in Hand) vs Margen Libre y Fijos Pendientes', 'E2E Hero Card Opción 1', () => {
+      const state = createFreshAppState();
+      const m = getMonthMetrics(state, '2026-10');
+      const cashInHand = m.income - m.fixedPaid - m.dailyExpense;
+      const freeAvailable = m.available;
+      const pendingBills = m.fixedPending;
+
+      assert.strictEqual(cashInHand, 902514, 'Plata en mano en fixture inicial Octubre debe ser $ 902.514');
+      assert.strictEqual(pendingBills, 412522, 'Fijos pendientes en fixture inicial Octubre deben ser $ 412.522');
+      assert.strictEqual(freeAvailable, 489992, 'Plata libre disponible real debe ser $ 489.992');
+      assert.strictEqual(cashInHand - pendingBills, freeAvailable, 'La diferencia entre plata en mano y fijos pendientes debe igualar exactamente la plata libre');
+
+      return {
+        input: 'Octubre 2026: Ingresos $ 2.467.474, Fijos pagados $ 1.306.333, Diarios $ 258.627, Fijos pendientes $ 412.522',
+        expected: 'Hero Balance muestra plata en mano, con fijos pendientes y saldo libre coherentes al 100%',
+        actual: `En mano: ${formatMoney(cashInHand)} | Fijos pendientes: ${formatMoney(pendingBills)} | Libre: ${formatMoney(freeAvailable)}`,
+        note: 'Garantiza claridad financiera absoluta en la pantalla principal (Opción 1)'
+      };
+    });
   }
 );
 

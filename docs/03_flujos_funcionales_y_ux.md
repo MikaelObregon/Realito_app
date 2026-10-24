@@ -18,17 +18,18 @@ La barra de navegación inferior organiza el uso diario en 4 accesos claros más
   - **Generación dinámica hacia el futuro:** A medida que avanza el calendario, los meses nuevos se crean y etiquetan automáticamente sin requerir intervención manual.
 * **Barra de Cotización Dólar Oficial:**
   - Muestra el precio de venta minorista del **Banco Nación** ($ 1.015 ARS). Permite alternar la visualización entre Pesos (`ARS`) y Dólares (`USD`).
-* **Tarjeta Principal del Presupuesto (Hero Card):**
-  - **Fórmula Matemática Pura:**
-    $$\mathbf{Disponible} = \mathbf{Ingresos} - \mathbf{Gastos\ Fijos} - \mathbf{Gastos\ Diarios}$$
-  - **Consistencia 1:1:** El monto grande coincide con exactitud con las 3 sub-tarjetas de la pantalla (`Ingresos`, `Gastos Fijos`, `Gastos Diarios`) y con la pestaña de **Reportes**.
-  - **Desglose de Fijos Pendientes:** Si aún restan abonar servicios o compromisos fijos, el texto indica con precisión:  
-    `Faltan pagar $ X en fijos • Te quedan $ Y libres en el mes`  
-    *(o `Todos los gastos fijos del mes están al día • $ Y 100% disponible`)*.
-  - **Alerta de Presupuesto Excedido:** Si un mes finaliza en déficit (como Septiembre), la tarjeta adopta un gradiente bordó/rojo de alerta informando el excedente.
+* **Tarjeta Principal del Presupuesto (Hero Card — Opción 1):**
+  - **Número Principal Destacado (Plata en Mano Hoy):**
+    $$\mathbf{Plata\ en\ Mano} = \mathbf{Ingresos} - \mathbf{Fijos\ Pagados} - \mathbf{Gastos\ Diarios}$$
+    Muestra la liquidez real actual que el usuario posee en sus billeteras y cuentas hoy.
+  - **Contexto Claro de Fijos y Margen Libre:** El subtítulo debajo del monto gigante desglosa:
+    `Faltan pagar $ X de fijos • Tu plata libre: $ Y`  
+    *(o si todo está al día: `Todos los gastos fijos al día • Tu plata libre: $ Y`)*.
+    $$\mathbf{Plata\ Libre} = \mathbf{Plata\ en\ Mano} - \mathbf{Fijos\ Pendientes} = \mathbf{Ingresos} - \mathbf{Total\ Fijos} - \mathbf{Diarios}$$
+  - **Alerta de Presupuesto Excedido:** Si un mes finaliza en déficit o los fijos pendientes superan la plata en mano, la tarjeta adopta un gradiente bordó/rojo de alerta informando el excedente exacto.
 * **Calculadora de Disponible Diario hasta el Próximo Cobro:**
   - Evalúa la fecha de cobro de sueldo configurada para el mes (por defecto el día 5):
-    $$\mathbf{Margen\ Diario} = \left\lfloor \frac{\mathbf{Disponible\ Libre}}{\mathbf{Días\ restantes\ hasta\ el\ próximo\ cobro}} \right\rfloor$$
+    $$\mathbf{Margen\ Diario} = \left\lfloor \frac{\mathbf{Plata\ Libre}}{\mathbf{Días\ restantes\ hasta\ el\ próximo\ cobro}} \right\rfloor$$
   - Informa con claridad: `💡 Podés gastar $ X / día · Quedan N días hasta tu próximo cobro (DD/MM)`.
 * **Traspaso de Sobrante Positivo a Fin de Mes:**
   - **Regla de Ocultación Inteligente:** A mitad de mes (ej. día 23), el cartel **permanece 100% oculto** para no generar fricción.
@@ -65,6 +66,7 @@ Reemplazó a la antigua pestaña de cuentas bancarias en la barra inferior, cent
 * **Administración de Categorías:** ABM independiente de Categorías Fijas, Diarias e Ingresos con selector de 28 emojis.
 * **Ajuste de Cotización Dólar Oficial:** Actualización desde Banco Nación o fijación manual.
 * **Fecha de Cobro Mensual:** Configuración del día de cobro para el cálculo de margen diario.
+* **Información de Versión y Actualización PWA:** Tarjeta informativa que visualiza la versión (`v2.6`), build de commit y estado de Supabase Cloud, con botón de 1 toque `🔄 Forzar Actualización y Limpiar Caché` para forzar la bajada inmediata de nuevas versiones en el teléfono sin perder datos.
 * **Respaldo Local / Nube:** Exportación e importación de copias de seguridad en formato JSON.
 
 ---
