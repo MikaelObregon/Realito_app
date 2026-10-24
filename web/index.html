@@ -647,7 +647,7 @@
         <div class="solid-card p-4 rounded-2xl text-center space-y-2.5">
           <div class="flex items-center justify-center gap-2">
             <span class="text-xs font-bold" style="color: var(--text-muted);">Realito PWA</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: rgba(16,185,129,0.18); color: #10B981;">v2.6 • Build b783014</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" style="background: rgba(16,185,129,0.18); color: #10B981;">v2.6 • Build 2d6ca71</span>
           </div>
           <p class="text-[11px]" style="color: var(--text-muted);">
             Tus datos se guardan seguros en el teléfono (offline) y se respaldan en Supabase Cloud.
@@ -1483,7 +1483,6 @@
       { id: 'b-oct-12', monthKey: '2026-10', title: 'Cholas', categoryId: 'fcat-family', amount: 20000, paid: 20000, dueDay: 12, isPaid: true, note: 'Calzado' },
       { id: 'b-oct-13', monthKey: '2026-10', title: 'Gemini y iCloud', categoryId: 'fcat-subs', amount: 13500, paid: 13500, dueDay: 15, isPaid: true, note: '8.500 + 5.000' },
       { id: 'b-oct-14', monthKey: '2026-10', title: 'Gas', categoryId: 'fcat-services', amount: 9923, paid: 0, dueDay: 19, isPaid: false, note: 'Servicio de gas' },
-      { id: 'bill-1792709351759', monthKey: '2026-10', title: 'Algo', categoryId: 'fcat-home', amount: 100, paid: 0, dueDay: 10, isPaid: false, note: '' },
 
       // SEPTIEMBRE 2026
       { id: 'b-sep-1', monthKey: '2026-09', title: 'Alquiler', categoryId: 'fcat-home', amount: 780000, paid: 300000, dueDay: 5, isPaid: false, note: 'Pago parcial 300.000' },
@@ -3404,16 +3403,25 @@
 
     function deleteCurrentBill() {
       if (!editingBillId) return;
-      const bill = monthlyBills.find(b => b.id === editingBillId);
-      monthlyBills = monthlyBills.filter(b => b.id !== editingBillId);
-      deletedBillIds.add(editingBillId);
+      const billIdToDelete = editingBillId;
+      const bill = monthlyBills.find(b => b.id === billIdToDelete);
+      monthlyBills = monthlyBills.filter(b => b.id !== billIdToDelete);
+      deletedBillIds.add(billIdToDelete);
       try { localStorage.setItem('realito_deleted_bills_v1', JSON.stringify([...deletedBillIds])); } catch (_) {}
       if (bill) {
         enqueueOutbox('monthly_bills', 'DELETE', `Eliminado: ${bill.title}`);
       }
+      // Borrado físico directo en Supabase si hay conexión
+      if (supabaseUrl && supabaseAnonKey && isOnline) {
+        fetch(`${supabaseUrl}/rest/v1/gastos_fijos?id=eq.${encodeURIComponent(billIdToDelete)}`, {
+          method: 'DELETE',
+          headers: supabaseHeaders()
+        }).catch(() => {});
+      }
       closeEditBillModal();
       saveStateToLocalStorage();
       renderAll();
+      pushAllToSupabaseCloud();
     }
 
     // ============================================================================
@@ -3569,7 +3577,8 @@
 
     function deleteEditedTx() {
       if (!editingTxId) return;
-      const tx = transactions.find(t => t.id === editingTxId);
+      const txIdToDelete = editingTxId;
+      const tx = transactions.find(t => t.id === txIdToDelete);
       if (!tx) return;
 
       const oldAcc = ACCOUNTS.find(a => a.id === tx.accountId);
@@ -3579,13 +3588,21 @@
         setAccountBalance(oldAcc.id, cur + delta, tx.monthKey);
       }
 
-      transactions = transactions.filter(t => t.id !== editingTxId);
-      deletedTxIds.add(editingTxId);
+      transactions = transactions.filter(t => t.id !== txIdToDelete);
+      deletedTxIds.add(txIdToDelete);
       try { localStorage.setItem('realito_deleted_tx_v1', JSON.stringify([...deletedTxIds])); } catch (_) {}
       enqueueOutbox('transactions', 'DELETE', `Eliminado: ${tx.note}`);
+      // Borrado físico directo en Supabase si hay conexión
+      if (supabaseUrl && supabaseAnonKey && isOnline) {
+        fetch(`${supabaseUrl}/rest/v1/movimientos?id=eq.${encodeURIComponent(txIdToDelete)}`, {
+          method: 'DELETE',
+          headers: supabaseHeaders()
+        }).catch(() => {});
+      }
       closeEditTxModal();
       saveStateToLocalStorage();
       renderAll();
+      pushAllToSupabaseCloud();
     }
 
     // ============================================================================
@@ -3657,6 +3674,8 @@
           isDarkObsidian,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        const nowIso = new Date().toISOString();
+        localStorage.setItem('realito_last_saved_at_v1', nowIso);
         if (selectedMonth) {
           localStorage.setItem('realito_selected_month_v1', selectedMonth);
         }
@@ -3910,6 +3929,21 @@
           if (showToast) showSupabaseFeedback('✔ La base estaba vacía: se subieron tus datos actuales a Supabase.');
           return true;
         }
+
+        const cloudIso = rows[0].actualizado_en;
+        const cloudTime = cloudIso ? new Date(cloudIso).getTime() : 0;
+        const localSavedIso = localStorage.getItem('realito_last_saved_at_v1');
+        const localTime = localSavedIso ? new Date(localSavedIso).getTime() : 0;
+
+        // Si el estado local tiene cambios más recientes que la nube (por ejemplo recién creaste o borraste algo),
+        // resguardamos subiendo local hacia la nube en lugar de dejar que una foto vieja de la nube lo pise:
+        if (localTime > cloudTime + 2000) {
+          await pushAllToSupabaseCloud();
+          updateSupabaseStatusBadge('☁️ Sincronizado', true);
+          if (showToast) showSupabaseFeedback('✔ Cambios locales recientes sincronizados con la nube.');
+          return true;
+        }
+
         const parsed = rows[0].datos_json;
         if (parsed.balancesByMonth) {
           balancesByMonth = balancesByMonth || {};
@@ -4007,18 +4041,13 @@
           toggleTheme();
         }
 
-        // Consulta granular a tablas 'categorias' y 'gastos_fijos' para asegurar que nada falte
+        // Consulta granular a tabla 'categorias' para asegurar que categorías personalizadas se preserven
         try {
-          const [catRes, gfRes] = await Promise.all([
-            fetch(`${supabaseUrl}/rest/v1/categorias?select=*`, {
-              headers: { 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
-            }),
-            fetch(`${supabaseUrl}/rest/v1/gastos_fijos?select=*`, {
-              headers: { 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
-            })
-          ]);
+          const catRes = await fetch(`${supabaseUrl}/rest/v1/categorias?select=*`, {
+            headers: { 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
+          });
 
-          if (catRes.ok) {
+          if (catRes && catRes.ok) {
             const dbCats = await catRes.json();
             if (Array.isArray(dbCats) && dbCats.length > 0) {
               const fixedMap = new Map(FIXED_BILL_CATEGORIES.map(c => [c.id, c]));
@@ -4033,29 +4062,6 @@
               FIXED_BILL_CATEGORIES = Array.from(fixedMap.values());
               EXPENSE_CATEGORIES = Array.from(expenseMap.values());
               INCOME_CATEGORIES = Array.from(incomeMap.values());
-            }
-          }
-
-          if (gfRes.ok) {
-            const dbGf = await gfRes.json();
-            if (Array.isArray(dbGf) && dbGf.length > 0) {
-              const existingBillsMap = new Map(monthlyBills.map(b => [b.id, b]));
-              dbGf.forEach(row => {
-                if (!deletedBillIds.has(row.id) && !existingBillsMap.has(row.id)) {
-                  existingBillsMap.set(row.id, {
-                    id: row.id,
-                    monthKey: row.mes_anio || '2026-10',
-                    title: row.titulo,
-                    categoryId: row.categoria_id,
-                    amount: Number(row.monto_total) || 0,
-                    paid: Number(row.monto_pagado) || 0,
-                    dueDay: Number(row.dia_vencimiento) || 10,
-                    isPaid: Boolean(row.esta_pagado),
-                    note: row.nota || ''
-                  });
-                }
-              });
-              monthlyBills = Array.from(existingBillsMap.values());
             }
           }
         } catch (_) {}
@@ -4627,7 +4633,7 @@
     // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=7').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=8').then((reg) => {
           reg.update().catch(() => {});
           setInterval(() => {
             reg.update().catch(() => {});
