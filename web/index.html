@@ -402,7 +402,7 @@
           <div class="flex justify-between items-center mb-2">
             <div>
               <span class="text-xs font-bold uppercase" style="color: var(--text-muted);" id="billsHeaderMonth">CHECKLIST — OCTUBRE 2026</span>
-              <h2 class="text-base font-bold" id="billsTotalText">Total Fijos: $ 1.662.855</h2>
+              <h2 class="text-base font-bold" id="billsTotalText">Total Gastos Fijos: $ 1.662.855</h2>
             </div>
             <button onclick="openEditBillModal(null)" class="px-3 py-2 rounded-xl text-white text-xs font-bold cursor-pointer" style="background:#0D7A5F;">
               + Nuevo Fijo
@@ -517,14 +517,7 @@
         </div>
       </div>
 
-      <!-- Contenedor Cuentas para retrocompatibilidad DOM silenciosa -->
-      <div id="tab-accounts" class="is-hidden" style="display:none !important;">
-        <div id="accountsMonthHeader"></div><div id="accountsMonthTotal"></div><div id="accountsMonthSubtitle"></div>
-        <div id="accountsListContainer"></div><select id="transferFromSelect"></select><select id="transferToSelect"></select>
-        <input id="transferAmountInput" /><input id="transferNoteInput" /><div id="accountTransfersHistoryList"></div><div id="transfersMonthHeader"></div>
-      </div>
-
-      <!-- ================= PESTAÑA 4: ⚙️ AJUSTES (TEMA, CATEGORÍAS Y CUENTAS) ================= -->
+      <!-- ================= PESTAÑA 4: ⚙️ AJUSTES (TEMA Y CATEGORÍAS) ================= -->
       <div id="tab-settings" class="space-y-3.5 pt-1 is-hidden">
 
         <!-- 0. Apariencia y Tema (Exclusivo en Configuración) -->
@@ -602,27 +595,7 @@
           <div id="newIncomeIconPickerGrid" class="grid grid-cols-7 gap-1.5 mt-2 p-2 rounded-xl solid-elevated is-hidden"></div>
         </div>
 
-        <!-- 4. Configurar Cuentas y Billeteras -->
-        <div class="solid-card p-4 rounded-2xl">
-          <h3 class="text-sm font-bold mb-1">🏦 Cuentas y Billeteras</h3>
-          <p class="text-xs mb-2.5" style="color: var(--text-muted);">
-            Administrá tus billeteras activas (Personal Pay, Banco, Efectivo, etc.) y elegí su icono.
-          </p>
-          <div id="settingsAccountsList" class="space-y-1.5 mb-3"></div>
-          <div class="flex gap-1.5 items-center">
-            <button type="button" onclick="toggleNewIconPicker('account')" id="newAccountIconBtn" title="Elegir icono"
-              class="px-2.5 py-2 rounded-xl solid-input text-sm font-bold flex items-center gap-1 cursor-pointer">
-              <span id="newAccountIconDisplay">💳</span>
-              <span class="text-[10px]" style="color: var(--text-muted);">▾</span>
-            </button>
-            <input id="newAccountIconInput" type="hidden" value="💳" />
-            <input id="newAccountNameInput" type="text" placeholder="Ej: Nombre de billetera o banco (Obligatorio)" class="flex-1 px-3 py-2 rounded-xl solid-input text-xs font-semibold" />
-            <button onclick="addCustomAccount()" class="px-3 py-2 rounded-xl text-xs font-bold text-white cursor-pointer" style="background:#0D7A5F;">+ Agregar</button>
-          </div>
-          <div id="newAccountIconPickerGrid" class="grid grid-cols-7 gap-1.5 mt-2 p-2 rounded-xl solid-elevated is-hidden"></div>
-        </div>
-
-        <!-- 5. Reporte del Mes -->
+        <!-- 4. Reporte del Mes -->
         <div class="solid-card p-4 rounded-2xl">
           <div class="flex justify-between items-center mb-1">
             <h3 class="text-sm font-bold">📄 Reporte Mensual</h3>
@@ -704,7 +677,7 @@
         </div>
 
         <!-- Visor de Monto y Suma Rápida (+) -->
-        <div class="solid-card rounded-2xl p-2.5 text-center mb-2.5">
+        <div id="quickDisplayCard" class="solid-card rounded-2xl p-2.5 text-center mb-2.5">
           <div class="text-xs font-semibold mb-0.5" style="color:#10B981;" id="quickFormulaPreview">
             Tocá "+" para sumar varios montos
           </div>
@@ -731,12 +704,6 @@
             </button>
           </div>
           <div id="quickMonthDayGrid" class="grid grid-cols-7 gap-1 mt-1.5 p-2 rounded-xl solid-elevated is-hidden"></div>
-        </div>
-
-        <!-- SELECTOR DE CUENTA (Oculto en Modelo B para carga ultra rápida sin fricción) -->
-        <div class="mb-2.5 is-hidden" style="display:none !important;">
-          <div class="text-xs font-bold mb-1" style="color: var(--text-muted);">2. Cuenta / Billetera:</div>
-          <div id="quickAccountPills" class="grid grid-cols-3 gap-1.5"></div>
         </div>
 
         <!-- SELECTOR DE CATEGORÍA (Propias de Gasto Diario o Propias de Ingreso) -->
@@ -1004,13 +971,7 @@
             <div id="editTxMonthDayGrid" class="grid grid-cols-7 gap-1 mt-1.5 p-2 rounded-xl solid-elevated is-hidden"></div>
           </div>
 
-          <!-- Fila 3: Cuenta / Billetera compacta (Oculto en Modelo B) -->
-          <div class="is-hidden" style="display:none !important;">
-            <label class="font-bold block mb-1" style="color: var(--text-muted);">Cuenta / Billetera:</label>
-            <div id="editTxAccountPills" class="grid grid-cols-3 gap-1.5"></div>
-          </div>
-
-          <!-- Fila 4: Categoría compacta -->
+          <!-- Fila 3: Categoría compacta -->
           <div>
             <label class="font-bold block mb-1" style="color: var(--text-muted);">Categoría:</label>
             <div id="editTxCategoryPills" class="grid grid-cols-3 gap-1.5"></div>
@@ -1023,38 +984,6 @@
           </button>
           <button type="button" onclick="saveEditedTx()" class="flex-1 py-2 rounded-xl font-bold text-xs cursor-pointer" style="background:#10B981; color:#052E16;">
             ✔ Guardar Cambios
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- MODAL 6: AJUSTAR SALDO REAL DE UNA CUENTA / BILLETERA                     -->
-    <!-- ========================================================================= -->
-    <div id="adjustBalanceModal" class="modal-backdrop is-hidden">
-      <div class="modal-sheet no-scrollbar">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="text-sm font-bold" id="adjustBalanceModalTitle">🏦 Ajustar Saldo Real</h3>
-          <button onclick="closeAdjustBalanceModal()" class="w-8 h-8 rounded-full solid-card flex items-center justify-center font-bold text-xs cursor-pointer">✕</button>
-        </div>
-
-        <div class="space-y-3 text-xs">
-          <p style="color: var(--text-muted);">
-            Ingresá el saldo real exacto que tenés hoy disponible en esta billetera o cuenta bancaria:
-          </p>
-          <div>
-            <label class="font-bold block mb-1" style="color: var(--text-muted);">Saldo actual en Pesos (ARS)</label>
-            <input id="adjustBalanceInput" type="number" placeholder="0"
-              class="w-full px-3 py-2.5 rounded-xl solid-input font-bold text-base" />
-          </div>
-        </div>
-
-        <div class="flex gap-2 mt-4">
-          <button type="button" onclick="closeAdjustBalanceModal()" class="px-4 py-2.5 rounded-xl solid-card font-bold text-xs cursor-pointer">
-            Cancelar
-          </button>
-          <button type="button" onclick="saveAdjustedBalance()" class="flex-1 py-2.5 rounded-xl font-bold text-xs cursor-pointer" style="background:#10B981; color:#052E16;">
-            ✔ Actualizar Saldo
           </button>
         </div>
       </div>
@@ -1074,9 +1003,9 @@
         </div>
         <div class="space-y-3 text-xs">
           <p style="color: var(--text-muted);" id="surplusModalSubtitle">
-            Se pasará la plata disponible de cada cuenta hacia el mes nuevo respetando cada banco de origen:
+            Se pasará el saldo disponible a favor hacia el mes siguiente como ingreso inicial:
           </p>
-          <div id="surplusModalAccountsList" class="space-y-2"></div>
+          <div id="surplusModalSummaryBox" class="space-y-2"></div>
           <div class="p-3 rounded-xl solid-card flex justify-between items-center font-bold">
             <span>Total a transferir:</span>
             <span style="color:#10B981;" id="surplusModalTotalText">$ 0</span>
@@ -1087,7 +1016,7 @@
             Cancelar
           </button>
           <button type="button" onclick="confirmSurplusTransfer()" class="flex-1 py-2.5 rounded-xl font-bold text-xs cursor-pointer" style="background:#10B981; color:#052E16;">
-            ✔ Confirmar para cada banco
+            ✔ Confirmar traspaso
           </button>
         </div>
       </div>
@@ -1357,67 +1286,6 @@
       { id: 'ob-1', table: 'monthly_bills', op: 'SYNCED', desc: 'Datos locales sincronizados en SQLite' }
     ];
 
-    let ACCOUNTS = [
-      { id: 'acc-pp', name: 'Personal Pay', icon: '📱', balance: 315400 },
-      { id: 'acc-bank', name: 'Banco', icon: '🏦', balance: 129690 },
-      { id: 'acc-cash', name: 'Efectivo', icon: '💵', balance: 48500 },
-    ];
-
-    // Saldos configurados independientemente por mes
-    let balancesByMonth = {
-      '2026-10': { 'acc-pp': 315400, 'acc-bank': 129690, 'acc-cash': 48500 },
-      '2026-09': { 'acc-pp': 200000, 'acc-bank': 150000, 'acc-cash': 30000 },
-      '2026-08': { 'acc-pp': 100000, 'acc-bank': 250000, 'acc-cash': 20000 }
-    };
-
-    function ensureMonthBalances(monthKey = selectedMonth) {
-      if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
-      if (!balancesByMonth) balancesByMonth = {};
-      if (!balancesByMonth[monthKey]) {
-        balancesByMonth[monthKey] = {};
-        ACCOUNTS.forEach(a => {
-          balancesByMonth[monthKey][a.id] = getAccountBalance(a.id, monthKey);
-        });
-      }
-      return balancesByMonth[monthKey];
-    }
-
-    function getAccountBalance(accId, monthKey = selectedMonth) {
-      if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
-      if (balancesByMonth && balancesByMonth[monthKey] && typeof balancesByMonth[monthKey][accId] === 'number') {
-        return balancesByMonth[monthKey][accId];
-      }
-      // Herencia inteligente para cada banco que estaba en el origen:
-      // Si el mes no tiene saldo explícito todavía, busca en el mes cronológicamente anterior
-      const idx = MONTH_ORDER.indexOf(monthKey);
-      if (idx > 0) {
-        for (let i = idx - 1; i >= 0; i--) {
-          const prevKey = MONTH_ORDER[i];
-          if (balancesByMonth && balancesByMonth[prevKey] && typeof balancesByMonth[prevKey][accId] === 'number') {
-            return balancesByMonth[prevKey][accId];
-          }
-        }
-      }
-      const acc = ACCOUNTS.find(a => a.id === accId);
-      return acc ? (Number(acc.balance) || 0) : 0;
-    }
-
-    function setAccountBalance(accId, newBalance, monthKey = selectedMonth) {
-      if (!monthKey) monthKey = selectedMonth || currentActiveMonth;
-      ensureMonthBalances(monthKey);
-      balancesByMonth[monthKey][accId] = Number(newBalance) || 0;
-      if (monthKey === currentActiveMonth) {
-        const acc = ACCOUNTS.find(a => a.id === accId);
-        if (acc) acc.balance = balancesByMonth[monthKey][accId];
-      }
-      saveStateToLocalStorage();
-    }
-
-    let accountTransfers = [
-      { id: 'tr-1', monthKey: '2026-10', fromId: 'acc-bank', toId: 'acc-pp', amount: 150000, note: 'Fondeo billetera diaria', dateLabel: 'Martes 13' },
-      { id: 'tr-2', monthKey: '2026-10', fromId: 'acc-bank', toId: 'acc-cash', amount: 40000, note: 'Retiro efectivo cajero', dateLabel: 'Jueves 8' },
-    ];
-
     // Categorías exclusivas de GASTOS FIJOS MENSUALES (separadas de Gastos Diarios)
     let FIXED_BILL_CATEGORIES = [
       { id: 'fcat-home', name: 'Alquiler / Vivienda', icon: '🏠', color: '#8B5CF6' },
@@ -1494,30 +1362,30 @@
 
     let transactions = [
       // OCTUBRE 2026
-      { id: 't-oct-inc1', monthKey: '2026-10', dayLabel: '1 Oct', type: 'income', categoryId: 'inc-sueldo', accountId: 'acc-bank', amount: 1767474, note: 'Sueldo Neto' },
-      { id: 't-oct-inc2', monthKey: '2026-10', dayLabel: 'Martes 13', type: 'income', categoryId: 'inc-adelanto', accountId: 'acc-bank', amount: 700000, note: 'Adelanto de sueldo' },
-      { id: 't-oct-1', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-super', accountId: 'acc-pp', amount: 9029, note: 'Fiambre' },
-      { id: 't-oct-2', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', accountId: 'acc-pp', amount: 4110, note: 'Denuncia de venta Captiva' },
-      { id: 't-oct-3', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', accountId: 'acc-pp', amount: 3900, note: 'DiDi' },
-      { id: 't-oct-4', monthKey: '2026-10', dayLabel: 'Miércoles 14', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 45000, note: 'Emilis (25.000 + 20.000)' },
-      { id: 't-oct-5', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 23000, note: 'Emilis (5.000 + 18.000)' },
-      { id: 't-oct-6', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-super', accountId: 'acc-cash', amount: 7400, note: 'Jamón y queso' },
-      { id: 't-oct-7', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-other', accountId: 'acc-pp', amount: 33000, note: 'Corte de pelo' },
-      { id: 't-oct-8', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 14000, note: 'Emilis' },
-      { id: 't-oct-9', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-food', accountId: 'acc-pp', amount: 9500, note: 'Mostaza' },
-      { id: 't-oct-10', monthKey: '2026-10', dayLabel: 'Viernes 9', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 20000, note: 'Emilis' },
-      { id: 't-oct-14', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', accountId: 'acc-bank', amount: 45100, note: 'Carne' },
-      { id: 't-oct-15', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', accountId: 'acc-cash', amount: 30788, note: 'Verduras' },
-      { id: 't-oct-16', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-food', accountId: 'acc-pp', amount: 13800, note: 'Burger (6.100 + 7.700)' },
+      { id: 't-oct-inc1', monthKey: '2026-10', dayLabel: '1 Oct', type: 'income', categoryId: 'inc-sueldo', amount: 1767474, note: 'Sueldo Neto' },
+      { id: 't-oct-inc2', monthKey: '2026-10', dayLabel: 'Martes 13', type: 'income', categoryId: 'inc-adelanto', amount: 700000, note: 'Adelanto de sueldo' },
+      { id: 't-oct-1', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-super', amount: 9029, note: 'Fiambre' },
+      { id: 't-oct-2', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', amount: 4110, note: 'Denuncia de venta Captiva' },
+      { id: 't-oct-3', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', amount: 3900, note: 'DiDi' },
+      { id: 't-oct-4', monthKey: '2026-10', dayLabel: 'Miércoles 14', type: 'expense', categoryId: 'cat-emilis', amount: 45000, note: 'Emilis (25.000 + 20.000)' },
+      { id: 't-oct-5', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-emilis', amount: 23000, note: 'Emilis (5.000 + 18.000)' },
+      { id: 't-oct-6', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-super', amount: 7400, note: 'Jamón y queso' },
+      { id: 't-oct-7', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-other', amount: 33000, note: 'Corte de pelo' },
+      { id: 't-oct-8', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-emilis', amount: 14000, note: 'Emilis' },
+      { id: 't-oct-9', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-food', amount: 9500, note: 'Mostaza' },
+      { id: 't-oct-10', monthKey: '2026-10', dayLabel: 'Viernes 9', type: 'expense', categoryId: 'cat-emilis', amount: 20000, note: 'Emilis' },
+      { id: 't-oct-14', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', amount: 45100, note: 'Carne' },
+      { id: 't-oct-15', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', amount: 30788, note: 'Verduras' },
+      { id: 't-oct-16', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-food', amount: 13800, note: 'Burger (6.100 + 7.700)' },
 
       // SEPTIEMBRE 2026 (Negativo)
-      { id: 't-sep-inc1', monthKey: '2026-09', dayLabel: '1 Sep', type: 'income', categoryId: 'inc-sueldo', accountId: 'acc-bank', amount: 1765593, note: 'Sueldo Septiembre' },
-      { id: 't-sep-1', monthKey: '2026-09', dayLabel: 'Miércoles 16', type: 'expense', categoryId: 'cat-other', accountId: 'acc-bank', amount: 310000, note: 'Pasaporte Papá' },
-      { id: 't-sep-2', monthKey: '2026-09', dayLabel: 'Sábado 5', type: 'expense', categoryId: 'cat-super', accountId: 'acc-bank', amount: 285000, note: 'Compras mayoristas' },
+      { id: 't-sep-inc1', monthKey: '2026-09', dayLabel: '1 Sep', type: 'income', categoryId: 'inc-sueldo', amount: 1765593, note: 'Sueldo Septiembre' },
+      { id: 't-sep-1', monthKey: '2026-09', dayLabel: 'Miércoles 16', type: 'expense', categoryId: 'cat-other', amount: 310000, note: 'Pasaporte Papá' },
+      { id: 't-sep-2', monthKey: '2026-09', dayLabel: 'Sábado 5', type: 'expense', categoryId: 'cat-super', amount: 285000, note: 'Compras mayoristas' },
 
       // AGOSTO 2026
-      { id: 't-aug-inc1', monthKey: '2026-08', dayLabel: '1 Ago', type: 'income', categoryId: 'inc-sueldo', accountId: 'acc-bank', amount: 2569000, note: 'Sueldo Agosto' },
-      { id: 't-aug-1', monthKey: '2026-08', dayLabel: 'Jueves 13', type: 'expense', categoryId: 'cat-auto', accountId: 'acc-bank', amount: 250000, note: 'Mecánico adicional' },
+      { id: 't-aug-inc1', monthKey: '2026-08', dayLabel: '1 Ago', type: 'income', categoryId: 'inc-sueldo', amount: 2569000, note: 'Sueldo Agosto' },
+      { id: 't-aug-1', monthKey: '2026-08', dayLabel: 'Jueves 13', type: 'expense', categoryId: 'cat-auto', amount: 250000, note: 'Mecánico adicional' },
     ];
 
     refreshMonthsCatalog();
@@ -1525,7 +1393,6 @@
     let quickExpression = '';
     let quickType = 'expense';
     let quickSelectedDay = 'Hoy';
-    let quickSelectedAccount = 'acc-pp';
     let quickSelectedCategory = 'cat-super';
 
     let editingBillId = null;
@@ -1664,7 +1531,7 @@
         </div>
       `;
 
-      const listEl = document.getElementById('surplusModalAccountsList');
+      const listEl = document.getElementById('surplusModalSummaryBox');
       if (listEl) listEl.innerHTML = htmlList;
       const totEl = document.getElementById('surplusModalTotalText');
       if (totEl) totEl.innerText = formatMoney(totalSurplus);
@@ -1686,14 +1553,6 @@
       const fromName = MONTH_BASE_NAMES[fromMonth] || fromMonth;
       const toName = MONTH_BASE_NAMES[toMonth] || toMonth;
 
-      ensureMonthBalances(toMonth);
-      const summaryParts = [];
-      ACCOUNTS.forEach(a => {
-        const balInOrigin = getAccountBalance(a.id, fromMonth);
-        balancesByMonth[toMonth][a.id] = balInOrigin;
-        summaryParts.push(`${a.name}: ${formatMoney(balInOrigin)}`);
-      });
-
       const totalPassed = Math.max(0, getMonthPositiveSurplus(fromMonth));
       const existingSurplusTx = transactions.find(t => t.monthKey === toMonth && t.note && (t.note.includes(`a favor de ${fromName}`) || t.note.includes('Sobrante a favor de')));
       if (!existingSurplusTx && totalPassed > 0) {
@@ -1704,7 +1563,6 @@
           dayLabel,
           type: 'income',
           categoryId: 'inc-extra',
-          accountId: 'acc-bank',
           amount: totalPassed,
           note: `Sobrante a favor de ${fromName}`
         });
@@ -1712,7 +1570,6 @@
       }
 
       transferredPositiveMonths[fromMonth] = true;
-      enqueueOutbox('account_transfers', 'INSERT', `Sobrante de ${fromName} pasado a ${toName}`);
       saveStateToLocalStorage();
       closeSurplusModal();
       renderAll();
@@ -1892,7 +1749,7 @@
       // Punto 8: Al cambiar a una nueva sección, empezar siempre arriba de todo
       if (main) main.scrollTop = 0;
 
-      ['dashboard', 'bills', 'reports', 'settings', 'accounts'].forEach(t => {
+      ['dashboard', 'bills', 'reports', 'settings'].forEach(t => {
         const panel = document.getElementById('tab-' + t);
         if (panel) {
           if (t === tab) {
@@ -2122,11 +1979,8 @@
       const totalFixedPaid = mBills.reduce((s, b) => s + (b.isPaid ? b.amount : b.paid), 0);
       const totalFixedPending = Math.max(0, totalFixed - totalFixedPaid);
 
-      // Total en Cuentas para el mes seleccionado (Personal Pay + Banco + Efectivo)
-      const totalMonthBal = ACCOUNTS.reduce((sum, a) => sum + getAccountBalance(a.id, selectedMonth), 0);
-      const realAvailableAfterPendingBills = Math.max(0, totalMonthBal - totalFixedPending);
       const available = totalIncome - totalFixed - totalDaily;
-      // Saldo en mano / en cuentas hoy según movimientos reales del mes (Opción 1)
+      // Saldo en mano hoy según movimientos reales del mes (Opción 1)
       const cashInHand = totalIncome - totalFixedPaid - totalDaily;
 
       // 1. Hero Card: Presupuesto Ágil y Disponible en Cuentas Hoy (Opción 1)
@@ -2256,8 +2110,7 @@
         if (txTypeFilter !== 'all' && tx.type !== txTypeFilter) return false;
         if (txSearchQuery.length > 0) {
           const cat = findCategory(tx.categoryId);
-          const acc = ACCOUNTS.find(a => a.id === tx.accountId) || ACCOUNTS[0];
-          const haystack = `${tx.note} ${cat.name} ${acc.name} ${tx.dayLabel}`.toLowerCase();
+          const haystack = `${tx.note} ${cat.name} ${tx.dayLabel}`.toLowerCase();
           return haystack.includes(txSearchQuery);
         }
         return true;
@@ -2300,7 +2153,6 @@
 
           const cardsHtml = items.map(tx => {
             const cat = findCategory(tx.categoryId);
-            const acc = ACCOUNTS.find(a => a.id === tx.accountId) || ACCOUNTS[0];
             const isInc = tx.type === 'income';
             return `
               <div onclick="openEditTxModal('${tx.id}')" class="solid-card p-3 rounded-2xl flex items-center justify-between cursor-pointer">
@@ -2315,7 +2167,7 @@
                         ? `<span class="px-1.5 py-0.5 rounded text-xs font-bold" style="background:rgba(16,185,129,0.2); color:#10B981;">INGRESO</span>`
                         : ''}
                     </div>
-                    <div class="text-xs" style="color: var(--text-muted);">${cat.name} • ${acc.name}</div>
+                    <div class="text-xs" style="color: var(--text-muted);">${escapeHtml(cat.name)}</div>
                   </div>
                 </div>
                 <div class="text-right flex items-center gap-2">
@@ -2342,7 +2194,7 @@
 
       // 6. Gastos Fijos Checklist
       document.getElementById('billsHeaderMonth').innerText = `CHECKLIST — ${monthLabel.toUpperCase()}`;
-      document.getElementById('billsTotalText').innerText = `Total Fijos: ${formatMoney(totalFixed)}`;
+      document.getElementById('billsTotalText').innerText = `Total Gastos Fijos: ${formatMoney(totalFixed)}`;
       document.getElementById('billsPaidSummary').innerText = `Pagado: ${formatMoney(totalFixedPaid)}`;
       document.getElementById('billsPendingSummary').innerText = `Falta pagar: ${formatMoney(totalFixedPending)}`;
       const progressPct = totalFixed > 0 ? Math.min(100, Math.round((totalFixedPaid / totalFixed) * 100)) : 0;
@@ -2412,76 +2264,6 @@
       const sourceBadgeEl = document.getElementById('dolarSourceBadge');
       if (sourceBadgeEl) sourceBadgeEl.innerText = dolarRateSource;
 
-      // 7. Cuentas, Transferencias entre Cuentas & Sync configuradas según el mes seleccionado
-      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
-      const accountsHeaderEl = document.getElementById('accountsMonthHeader');
-      if (accountsHeaderEl) accountsHeaderEl.innerText = `Mis Cuentas — ${monthName}`;
-      const accountsSubtitleEl = document.getElementById('accountsMonthSubtitle');
-      if (accountsSubtitleEl) accountsSubtitleEl.innerText = `Saldos configurados para ${monthName}.`;
-      const accountsTotalEl = document.getElementById('accountsMonthTotal');
-      if (accountsTotalEl) accountsTotalEl.innerText = `Total: ${formatMoney(totalMonthBal)}`;
-
-      document.getElementById('accountsListContainer').innerHTML = ACCOUNTS.map(a => {
-        const bal = getAccountBalance(a.id, selectedMonth);
-        return `
-        <div class="solid-elevated p-3 rounded-2xl flex justify-between items-center">
-          <div class="flex items-center gap-2.5">
-            <span class="text-lg">${a.icon}</span>
-            <div>
-              <div class="text-xs font-bold">${a.name}</div>
-              <div class="text-xs" style="color: var(--text-muted);">${monthName}</div>
-            </div>
-          </div>
-          <div class="text-right flex flex-col items-end gap-1">
-            <div class="text-sm font-bold" style="color:#10B981;">${formatMoney(bal)}</div>
-            <button type="button" onclick="openAdjustBalanceModal('${a.id}')" class="px-2.5 py-0.5 rounded-lg solid-card text-[11px] font-bold cursor-pointer" style="color:#10B981;">
-              Ajustar saldo
-            </button>
-          </div>
-        </div>
-      `;
-      }).join('');
-
-      const fromSelect = document.getElementById('transferFromSelect');
-      const toSelect = document.getElementById('transferToSelect');
-      if (fromSelect && toSelect && ACCOUNTS.length > 0) {
-        const prevFrom = fromSelect.value || (ACCOUNTS[1] ? ACCOUNTS[1].id : ACCOUNTS[0].id);
-        const prevTo = toSelect.value || ACCOUNTS[0].id;
-        const optionsHtml = ACCOUNTS.map(a => {
-          const bal = getAccountBalance(a.id, selectedMonth);
-          return `<option value="${a.id}">${a.icon} ${a.name} (${formatMoney(bal)})</option>`;
-        }).join('');
-        fromSelect.innerHTML = optionsHtml;
-        toSelect.innerHTML = optionsHtml;
-        fromSelect.value = ACCOUNTS.some(a => a.id === prevFrom) ? prevFrom : ACCOUNTS[0].id;
-        toSelect.value = ACCOUNTS.some(a => a.id === prevTo) ? prevTo : (ACCOUNTS[1] ? ACCOUNTS[1].id : ACCOUNTS[0].id);
-      }
-
-      const trListEl = document.getElementById('accountTransfersHistoryList');
-      const transfersHeaderEl = document.getElementById('transfersMonthHeader');
-      if (transfersHeaderEl) transfersHeaderEl.innerText = `Pases registrados en ${monthName}:`;
-
-      if (trListEl) {
-        const monthTransfers = accountTransfers.filter(tr => (tr.monthKey || '2026-10') === selectedMonth);
-        if (monthTransfers.length === 0) {
-          trListEl.innerHTML = `<div class="text-xs py-1" style="color: var(--text-muted);">Sin pases registrados en ${monthName}.</div>`;
-        } else {
-          trListEl.innerHTML = monthTransfers.map(tr => {
-            const fromAcc = ACCOUNTS.find(a => a.id === tr.fromId) || { icon: '🏦', name: 'Cuenta' };
-            const toAcc = ACCOUNTS.find(a => a.id === tr.toId) || { icon: '📱', name: 'Cuenta' };
-            return `
-              <div class="solid-elevated px-3 py-2 rounded-xl flex justify-between items-center">
-                <div>
-                  <div class="font-bold">${fromAcc.icon} ${fromAcc.name} ➔ ${toAcc.icon} ${toAcc.name}</div>
-                  <div class="text-[11px]" style="color: var(--text-muted);">${tr.dateLabel} • ${tr.note || 'Transferencia propia'}</div>
-                </div>
-                <div class="font-bold" style="color:#10B981;">${formatMoney(tr.amount)}</div>
-              </div>
-            `;
-          }).join('');
-        }
-      }
-
       const outboxEl = document.getElementById('outboxLogContainer');
       if (outboxEl) {
         outboxEl.innerHTML = outboxQueue.map(item => `
@@ -2497,42 +2279,6 @@
       renderSettingsTab();
       renderReportsTab();
       saveStateToLocalStorage();
-    }
-
-    function submitAccountTransfer() {
-      const fromId = document.getElementById('transferFromSelect').value;
-      const toId = document.getElementById('transferToSelect').value;
-      const amount = parseInt(document.getElementById('transferAmountInput').value, 10) || 0;
-      const note = document.getElementById('transferNoteInput').value.trim();
-
-      if (!fromId || !toId || fromId === toId || amount <= 0) return;
-
-      const fromAcc = ACCOUNTS.find(a => a.id === fromId);
-      const toAcc = ACCOUNTS.find(a => a.id === toId);
-      if (!fromAcc || !toAcc) return;
-
-      const curFromBal = getAccountBalance(fromId, selectedMonth);
-      const curToBal = getAccountBalance(toId, selectedMonth);
-
-      setAccountBalance(fromId, curFromBal - amount, selectedMonth);
-      setAccountBalance(toId, curToBal + amount, selectedMonth);
-
-      accountTransfers.unshift({
-        id: 'tr-' + Date.now(),
-        monthKey: selectedMonth,
-        fromId,
-        toId,
-        amount,
-        note: note || 'Transferencia entre mis cuentas',
-        dateLabel: formatDayLabelFromDate(new Date()),
-      });
-
-      document.getElementById('transferAmountInput').value = '';
-      document.getElementById('transferNoteInput').value = '';
-
-      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
-      enqueueOutbox('account_transfers', 'INSERT', `Pase en ${monthName}: ${fromAcc.name} ➔ ${toAcc.name} $ ${amount.toLocaleString('es-AR')}`);
-      renderAll();
     }
 
     function openDolarRateModal() {
@@ -2728,16 +2474,6 @@
           </div>
         </div>
       `).join('');
-
-      document.getElementById('settingsAccountsList').innerHTML = ACCOUNTS.map(a => `
-        <div class="solid-elevated px-3 py-2 rounded-xl flex justify-between items-center text-xs">
-          <span class="font-bold">${a.icon} ${escapeHtml(a.name)}</span>
-          <div class="flex items-center gap-3">
-            <button onclick="openEditItemModal('account', '${a.id}')" class="text-xs font-bold cursor-pointer" style="color:#10B981;">Editar</button>
-            <button onclick="removeAccount('${a.id}')" class="text-xs font-bold cursor-pointer" style="color:#FB7185;">Eliminar</button>
-          </div>
-        </div>
-      `).join('');
     }
 
     function openEditItemModal(kind, id) {
@@ -2755,9 +2491,6 @@
       } else if (kind === 'income') {
         target = INCOME_CATEGORIES.find(c => c.id === id);
         titleLabel = 'Modificar Categoría de Ingreso';
-      } else if (kind === 'account') {
-        target = ACCOUNTS.find(a => a.id === id);
-        titleLabel = 'Modificar Cuenta / Billetera';
       }
 
       if (!target) return;
@@ -2836,15 +2569,13 @@
         target = EXPENSE_CATEGORIES.find(c => c.id === editingSettingId);
       } else if (editingSettingKind === 'income') {
         target = INCOME_CATEGORIES.find(c => c.id === editingSettingId);
-      } else if (editingSettingKind === 'account') {
-        target = ACCOUNTS.find(a => a.id === editingSettingId);
       }
 
       if (target) {
         target.icon = newIcon;
         target.name = newName;
         enqueueOutbox(
-          editingSettingKind === 'account' ? 'accounts' : 'categories',
+          'categories',
           'UPDATE',
           `Actualizado: ${newIcon} ${newName}`
         );
@@ -2869,11 +2600,6 @@
         gridId: 'newIncomeIconPickerGrid',
         inputId: 'newIncomeCatIconInput',
         displayId: 'newIncomeCatIconDisplay',
-      },
-      account: {
-        gridId: 'newAccountIconPickerGrid',
-        inputId: 'newAccountIconInput',
-        displayId: 'newAccountIconDisplay',
       },
       inlineFixed: {
         gridId: 'inlineFixedIconPickerGrid',
@@ -2955,37 +2681,28 @@
     }
 
     function removeCategory(kind, id) {
+      let removed = false;
       if (kind === 'income' && INCOME_CATEGORIES.length > 1) {
         INCOME_CATEGORIES = INCOME_CATEGORIES.filter(c => c.id !== id);
+        removed = true;
       } else if (kind === 'fixed' && FIXED_BILL_CATEGORIES.length > 1) {
         FIXED_BILL_CATEGORIES = FIXED_BILL_CATEGORIES.filter(c => c.id !== id);
+        removed = true;
       } else if (kind === 'expense' && EXPENSE_CATEGORIES.length > 1) {
         EXPENSE_CATEGORIES = EXPENSE_CATEGORIES.filter(c => c.id !== id);
+        removed = true;
       }
-      renderAll();
-    }
-
-    function addCustomAccount() {
-      const inputEl = document.getElementById('newAccountNameInput');
-      const name = inputEl ? inputEl.value.trim() : '';
-      if (!name) {
-        highlightRequiredInput(inputEl, 'Ingresá el nombre de la billetera o cuenta');
-        return;
+      if (removed) {
+        if (supabaseUrl && supabaseAnonKey && isOnline) {
+          fetch(`${supabaseUrl}/rest/v1/categorias?id=eq.${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            headers: supabaseHeaders()
+          }).catch(() => {});
+        }
+        saveStateToLocalStorage();
+        renderAll();
+        pushAllToSupabaseCloud();
       }
-      const iconEl = document.getElementById('newAccountIconInput');
-      const icon = iconEl && iconEl.value.trim() ? iconEl.value.trim() : '💳';
-      ACCOUNTS.push({ id: 'acc-' + Date.now(), name, icon, balance: 0 });
-      document.getElementById('newAccountNameInput').value = '';
-      const grid = document.getElementById('newAccountIconPickerGrid');
-      if (grid) grid.classList.add('is-hidden');
-      enqueueOutbox('accounts', 'INSERT', `Nueva cuenta: ${icon} ${name}`);
-      renderAll();
-    }
-
-    function removeAccount(id) {
-      if (ACCOUNTS.length <= 1) return;
-      ACCOUNTS = ACCOUNTS.filter(a => a.id !== id);
-      renderAll();
     }
 
     function setBillFilter(filter) {
@@ -3037,7 +2754,6 @@
     function openQuickModal(type) {
       quickExpression = '';
       quickSelectedDay = 'Hoy';
-      quickSelectedAccount = ACCOUNTS[0].id;
       document.getElementById('quickNoteInput').value = '';
       const qGrid = document.getElementById('quickMonthDayGrid');
       if (qGrid) qGrid.classList.add('is-hidden');
@@ -3138,14 +2854,6 @@
     }
 
     function renderQuickSelectors() {
-      document.getElementById('quickAccountPills').innerHTML = ACCOUNTS.map(a => `
-        <button type="button" onclick="selectQuickAccount('${a.id}')"
-          class="selector-pill px-2.5 py-2 rounded-xl text-xs flex items-center gap-1.5 ${quickSelectedAccount === a.id ? 'active' : ''}">
-          <span>${a.icon}</span>
-          <span class="truncate">${a.name}</span>
-        </button>
-      `).join('');
-
       const activeCategoryList = (quickType === 'income') ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
       document.getElementById('quickCategoryPills').innerHTML = activeCategoryList.map(c => `
         <button type="button" onclick="selectQuickCategory('${c.id}')"
@@ -3154,11 +2862,6 @@
           <span class="truncate">${c.name}</span>
         </button>
       `).join('');
-    }
-
-    function selectQuickAccount(accId) {
-      quickSelectedAccount = accId;
-      renderQuickSelectors();
     }
 
     function selectQuickCategory(catId) {
@@ -3233,17 +2936,9 @@
         dayLabel: quickSelectedDay,
         type: quickType,
         categoryId: quickSelectedCategory,
-        accountId: quickSelectedAccount,
         amount: total,
         note: finalNote,
       });
-
-      const acc = ACCOUNTS.find(a => a.id === quickSelectedAccount);
-      if (acc) {
-        const delta = (quickType === 'income' ? total : -total);
-        const curBal = getAccountBalance(acc.id, selectedMonth);
-        setAccountBalance(acc.id, curBal + delta, selectedMonth);
-      }
 
       enqueueOutbox('transactions', 'INSERT', `${finalNote}: $ ${total.toLocaleString('es-AR')}`);
       closeQuickModal();
@@ -3427,7 +3122,6 @@
     // MODAL 5: EDITAR O ELIMINAR MOVIMIENTO DIARIO / INGRESO (COMPACTO)
     // ============================================================================
     let editingTxId = null;
-    let editingTxAccountId = null;
     let editingTxCategoryId = null;
     let editingTxType = 'expense';
 
@@ -3435,7 +3129,6 @@
       const tx = transactions.find(t => t.id === txId);
       if (!tx) return;
       editingTxId = tx.id;
-      editingTxAccountId = tx.accountId;
       editingTxCategoryId = tx.categoryId;
       editingTxType = tx.type;
 
@@ -3506,14 +3199,6 @@
     }
 
     function renderEditTxSelectors() {
-      document.getElementById('editTxAccountPills').innerHTML = ACCOUNTS.map(a => `
-        <button type="button" onclick="selectEditTxAccount('${a.id}')"
-          class="selector-pill px-2 py-1.5 rounded-xl text-xs flex items-center gap-1 min-w-0 ${editingTxAccountId === a.id ? 'active' : ''}">
-          <span>${a.icon}</span>
-          <span class="truncate">${a.name}</span>
-        </button>
-      `).join('');
-
       const activeList = (editingTxType === 'income') ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
       document.getElementById('editTxCategoryPills').innerHTML = activeList.map(c => `
         <button type="button" onclick="selectEditTxCategory('${c.id}')"
@@ -3522,11 +3207,6 @@
           <span class="truncate">${c.name}</span>
         </button>
       `).join('');
-    }
-
-    function selectEditTxAccount(accId) {
-      editingTxAccountId = accId;
-      renderEditTxSelectors();
     }
 
     function selectEditTxCategory(catId) {
@@ -3539,33 +3219,20 @@
       const tx = transactions.find(t => t.id === editingTxId);
       if (!tx) return;
 
-      const rawAmt = document.getElementById('editTxAmountInput').value.replace(/\./g, '').trim();
+      const amtInput = document.getElementById('editTxAmountInput');
+      const rawAmt = amtInput ? amtInput.value.replace(/\./g, '').trim() : '';
       const newAmount = evaluateQuickExpression(rawAmt);
-      if (newAmount <= 0) return;
+      if (newAmount <= 0) {
+        highlightRequiredInput(amtInput, 'Ingresá un monto mayor a $ 0');
+        return;
+      }
 
       const newDayLabel = document.getElementById('editTxDayInput').value.trim() || tx.dayLabel;
       const newNote = document.getElementById('editTxNoteInput').value.trim() || findCategory(editingTxCategoryId).name;
 
-      // Revertir efecto anterior en la billetera original
-      const oldAcc = ACCOUNTS.find(a => a.id === tx.accountId);
-      if (oldAcc) {
-        const delta = (tx.type === 'income' ? -tx.amount : tx.amount);
-        const cur = getAccountBalance(oldAcc.id, tx.monthKey);
-        setAccountBalance(oldAcc.id, cur + delta, tx.monthKey);
-      }
-
-      // Aplicar nuevo efecto en la billetera seleccionada
-      const newAcc = ACCOUNTS.find(a => a.id === editingTxAccountId);
-      if (newAcc) {
-        const delta = (tx.type === 'income' ? newAmount : -newAmount);
-        const cur = getAccountBalance(newAcc.id, tx.monthKey);
-        setAccountBalance(newAcc.id, cur + delta, tx.monthKey);
-      }
-
       tx.amount = newAmount;
       tx.dayLabel = newDayLabel;
       tx.note = newNote;
-      tx.accountId = editingTxAccountId;
       tx.categoryId = editingTxCategoryId;
 
       enqueueOutbox('transactions', 'UPDATE', `Editado: ${newNote} ($ ${newAmount.toLocaleString('es-AR')})`);
@@ -3579,13 +3246,6 @@
       const txIdToDelete = editingTxId;
       const tx = transactions.find(t => t.id === txIdToDelete);
       if (!tx) return;
-
-      const oldAcc = ACCOUNTS.find(a => a.id === tx.accountId);
-      if (oldAcc) {
-        const delta = (tx.type === 'income' ? -tx.amount : tx.amount);
-        const cur = getAccountBalance(oldAcc.id, tx.monthKey);
-        setAccountBalance(oldAcc.id, cur + delta, tx.monthKey);
-      }
 
       transactions = transactions.filter(t => t.id !== txIdToDelete);
       deletedTxIds.add(txIdToDelete);
@@ -3605,48 +3265,15 @@
     }
 
     // ============================================================================
-    // MODAL 6: AJUSTAR SALDO REAL DE UNA CUENTA / BILLETERA
-    // ============================================================================
-    let adjustingAccountId = null;
-
-    function openAdjustBalanceModal(accId) {
-      const acc = ACCOUNTS.find(a => a.id === accId);
-      if (!acc) return;
-      adjustingAccountId = acc.id;
-      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
-      document.getElementById('adjustBalanceModalTitle').innerText = `${acc.icon} Ajustar saldo de ${acc.name} — ${monthName}`;
-      document.getElementById('adjustBalanceInput').value = getAccountBalance(acc.id, selectedMonth);
-      document.getElementById('adjustBalanceModal').classList.remove('is-hidden');
-    }
-
-    function closeAdjustBalanceModal() {
-      document.getElementById('adjustBalanceModal').classList.add('is-hidden');
-    }
-
-    function saveAdjustedBalance() {
-      if (!adjustingAccountId) return;
-      const acc = ACCOUNTS.find(a => a.id === adjustingAccountId);
-      if (!acc) return;
-      const newBal = parseInt(document.getElementById('adjustBalanceInput').value, 10) || 0;
-      setAccountBalance(acc.id, newBal, selectedMonth);
-      const monthName = MONTH_BASE_NAMES[selectedMonth] || selectedMonth;
-      enqueueOutbox('accounts', 'UPDATE', `Saldo ${acc.name} (${monthName}) ajustado a $ ${newBal.toLocaleString('es-AR')}`);
-      closeAdjustBalanceModal();
-      renderAll();
-    }
-
-    // ============================================================================
-    // GUARDADO PERMANENTE (localStorage) + BACKUP EXPORTAR / IMPORTAR / LIMPIAR
+    // GUARDADO PERMANENTE (localStorage) + SINCRONIZACIÓN
     // ============================================================================
     const STORAGE_KEY = 'realito_app_state_v1';
     const INITIAL_SNAPSHOT = JSON.stringify({
-      ACCOUNTS,
       FIXED_BILL_CATEGORIES,
       EXPENSE_CATEGORIES,
       INCOME_CATEGORIES,
       monthlyBills,
       transactions,
-      accountTransfers,
       OFICIAL_SELL_RATE,
       nextPaydayDateStr,
       transferredPositiveMonths,
@@ -3655,14 +3282,11 @@
     function saveStateToLocalStorage() {
       try {
         const payload = {
-          ACCOUNTS,
-          balancesByMonth: balancesByMonth || {},
           FIXED_BILL_CATEGORIES,
           EXPENSE_CATEGORIES,
           INCOME_CATEGORIES,
           monthlyBills,
           transactions,
-          accountTransfers,
           OFICIAL_SELL_RATE,
           nextPaydayDateStr,
           paydaysByMonth,
@@ -3684,8 +3308,8 @@
 
     // ============================================================================
     // MOTOR DE SINCRONIZACIÓN CON SUPABASE (TABLAS 100% EN ESPAÑOL)
-    // Tablas: cuentas, categorias, gastos_fijos, movimientos,
-    //         transferencias_cuentas, configuracion_usuario, estado_sincronizado
+    // Tablas: categorias, gastos_fijos, movimientos,
+    //         configuracion_usuario, estado_sincronizado
     // ============================================================================
     const SUPABASE_CONFIG_KEY = 'realito_supabase_config_v1';
     const DEFAULT_SUPABASE_URL = 'https://zgbhnwpeiecrhcllswse.supabase.co';
@@ -3802,14 +3426,11 @@
 
         // 1. Tabla: estado_sincronizado (Respaldo instantáneo multi-dispositivo)
         const fullSnapshot = {
-          ACCOUNTS,
-          balancesByMonth: balancesByMonth || {},
           FIXED_BILL_CATEGORIES,
           EXPENSE_CATEGORIES,
           INCOME_CATEGORIES,
           monthlyBills,
           transactions,
-          accountTransfers,
           OFICIAL_SELL_RATE,
           nextPaydayDateStr,
           paydaysByMonth,
@@ -3825,17 +3446,7 @@
           actualizado_en: nowIso
         }]);
 
-        // 2. Tabla: cuentas
-        const cuentasRows = ACCOUNTS.map(a => ({
-          id: a.id,
-          nombre: a.name,
-          icono: a.icon,
-          saldo: Math.round(a.balance),
-          actualizado_en: nowIso
-        }));
-        await upsertTableInSpanish('cuentas', 'id', cuentasRows);
-
-        // 3. Tabla: categorias ('fijo', 'gasto_diario', 'ingreso')
+        // 2. Tabla: categorias ('fijo', 'gasto_diario', 'ingreso')
         const categoriasRows = [
           ...FIXED_BILL_CATEGORIES.map(c => ({ id: c.id, tipo: 'fijo', nombre: c.name, icono: c.icon, color: c.color || '#8B5CF6', actualizado_en: nowIso })),
           ...EXPENSE_CATEGORIES.map(c => ({ id: c.id, tipo: 'gasto_diario', nombre: c.name, icono: c.icon, color: c.color || '#F59E0B', actualizado_en: nowIso })),
@@ -3843,7 +3454,7 @@
         ];
         await upsertTableInSpanish('categorias', 'id', categoriasRows);
 
-        // 4. Tabla: gastos_fijos
+        // 3. Tabla: gastos_fijos
         const gastosFijosRows = monthlyBills.map(b => ({
           id: b.id,
           mes_anio: b.monthKey,
@@ -3858,33 +3469,21 @@
         }));
         await upsertTableInSpanish('gastos_fijos', 'id', gastosFijosRows);
 
-        // 5. Tabla: movimientos ('gasto', 'ingreso')
+        // 4. Tabla: movimientos ('gasto', 'ingreso')
         const movimientosRows = transactions.map(t => ({
           id: t.id,
           mes_anio: t.monthKey,
           etiqueta_dia: t.dayLabel,
           tipo: t.type === 'income' ? 'ingreso' : 'gasto',
           categoria_id: t.categoryId,
-          cuenta_id: t.accountId,
+          cuenta_id: '',
           monto: Math.round(t.amount),
           nota: t.note || '',
           actualizado_en: nowIso
         }));
         await upsertTableInSpanish('movimientos', 'id', movimientosRows);
 
-        // 6. Tabla: transferencias_cuentas
-        const transferenciasRows = accountTransfers.map(tr => ({
-          id: tr.id,
-          cuenta_origen_id: tr.fromId,
-          cuenta_destino_id: tr.toId,
-          monto: Math.round(tr.amount),
-          nota: tr.note || '',
-          etiqueta_fecha: tr.dateLabel || 'Hoy',
-          actualizado_en: nowIso
-        }));
-        await upsertTableInSpanish('transferencias_cuentas', 'id', transferenciasRows);
-
-        // 7. Tabla: configuracion_usuario
+        // 5. Tabla: configuracion_usuario
         await upsertTableInSpanish('configuracion_usuario', 'id', [{
           id: 'principal',
           cotizacion_dolar_oficial: OFICIAL_SELL_RATE,
@@ -3944,41 +3543,14 @@
         }
 
         const parsed = rows[0].datos_json;
-        if (parsed.balancesByMonth) {
-          balancesByMonth = balancesByMonth || {};
-          for (const mKey of Object.keys(parsed.balancesByMonth)) {
-            balancesByMonth[mKey] = {
-              ...(parsed.balancesByMonth[mKey] || {}),
-              ...(balancesByMonth[mKey] || {})
-            };
-          }
+        if (parsed.FIXED_BILL_CATEGORIES && Array.isArray(parsed.FIXED_BILL_CATEGORIES) && parsed.FIXED_BILL_CATEGORIES.length > 0) {
+          FIXED_BILL_CATEGORIES = parsed.FIXED_BILL_CATEGORIES;
         }
-        if (parsed.ACCOUNTS) {
-          const curAccMap = new Map(ACCOUNTS.map(a => [a.id, a]));
-          ACCOUNTS = parsed.ACCOUNTS.map(a => {
-            const existing = curAccMap.get(a.id);
-            return {
-              ...a,
-              balance: getAccountBalance(a.id, currentActiveMonth)
-            };
-          });
-          parsed.ACCOUNTS.forEach(a => curAccMap.delete(a.id));
-          curAccMap.forEach(a => ACCOUNTS.push(a));
+        if (parsed.EXPENSE_CATEGORIES && Array.isArray(parsed.EXPENSE_CATEGORIES) && parsed.EXPENSE_CATEGORIES.length > 0) {
+          EXPENSE_CATEGORIES = parsed.EXPENSE_CATEGORIES;
         }
-        if (parsed.FIXED_BILL_CATEGORIES) {
-          const fixedMap = new Map(FIXED_BILL_CATEGORIES.map(c => [c.id, c]));
-          parsed.FIXED_BILL_CATEGORIES.forEach(c => fixedMap.set(c.id, c));
-          FIXED_BILL_CATEGORIES = Array.from(fixedMap.values());
-        }
-        if (parsed.EXPENSE_CATEGORIES) {
-          const expMap = new Map(EXPENSE_CATEGORIES.map(c => [c.id, c]));
-          parsed.EXPENSE_CATEGORIES.forEach(c => expMap.set(c.id, c));
-          EXPENSE_CATEGORIES = Array.from(expMap.values());
-        }
-        if (parsed.INCOME_CATEGORIES) {
-          const incMap = new Map(INCOME_CATEGORIES.map(c => [c.id, c]));
-          parsed.INCOME_CATEGORIES.forEach(c => incMap.set(c.id, c));
-          INCOME_CATEGORIES = Array.from(incMap.values());
+        if (parsed.INCOME_CATEGORIES && Array.isArray(parsed.INCOME_CATEGORIES) && parsed.INCOME_CATEGORIES.length > 0) {
+          INCOME_CATEGORIES = parsed.INCOME_CATEGORIES;
         }
 
         // Cuando la nube es autoritativa, tomamos los datos limpios directamente de Supabase
@@ -3989,9 +3561,6 @@
           transactions = parsed.transactions;
         }
 
-        if (parsed.accountTransfers) {
-          accountTransfers = parsed.accountTransfers;
-        }
         if (parsed.OFICIAL_SELL_RATE) OFICIAL_SELL_RATE = parsed.OFICIAL_SELL_RATE;
         if (parsed.nextPaydayDateStr) {
           nextPaydayDateStr = parsed.nextPaydayDateStr;
@@ -4009,14 +3578,11 @@
 
         // Guardamos en local el estado limpio bajado de la nube
         const payload = {
-          ACCOUNTS,
-          balancesByMonth: balancesByMonth || {},
           FIXED_BILL_CATEGORIES,
           EXPENSE_CATEGORIES,
           INCOME_CATEGORIES,
           monthlyBills,
           transactions,
-          accountTransfers,
           OFICIAL_SELL_RATE,
           nextPaydayDateStr,
           paydaysByMonth,
@@ -4033,38 +3599,6 @@
         updateSupabaseStatusBadge('☁️ Sincronizado', true);
         if (showToast) showSupabaseFeedback('✔ ¡Datos actualizados desde Supabase!');
         return true;
-
-        // Consulta granular a tabla 'categorias' para asegurar que categorías personalizadas se preserven
-        try {
-          const catRes = await fetch(`${supabaseUrl}/rest/v1/categorias?select=*`, {
-            headers: { 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
-          });
-
-          if (catRes && catRes.ok) {
-            const dbCats = await catRes.json();
-            if (Array.isArray(dbCats) && dbCats.length > 0) {
-              const fixedMap = new Map(FIXED_BILL_CATEGORIES.map(c => [c.id, c]));
-              const expenseMap = new Map(EXPENSE_CATEGORIES.map(c => [c.id, c]));
-              const incomeMap = new Map(INCOME_CATEGORIES.map(c => [c.id, c]));
-              dbCats.forEach(c => {
-                const item = { id: c.id, name: c.nombre, icon: c.icono, color: c.color };
-                if (c.tipo === 'fijo') fixedMap.set(c.id, item);
-                else if (c.tipo === 'gasto_diario') expenseMap.set(c.id, item);
-                else if (c.tipo === 'ingreso') incomeMap.set(c.id, item);
-              });
-              FIXED_BILL_CATEGORIES = Array.from(fixedMap.values());
-              EXPENSE_CATEGORIES = Array.from(expenseMap.values());
-              INCOME_CATEGORIES = Array.from(incomeMap.values());
-            }
-          }
-        } catch (_) {}
-
-        saveStateToLocalStorage();
-        scheduleSupabaseCloudSync();
-        renderAll();
-        updateSupabaseStatusBadge('☁️ Sincronizado', true);
-        if (showToast) showSupabaseFeedback('✔ ¡Datos descargados y actualizados desde Supabase!');
-        return true;
       } catch (err) {
         updateSupabaseStatusBadge('⚠️ Sin conexión', false);
         if (showToast) showSupabaseFeedback(`⚠️ Error al traer datos de Supabase: ${err.message}`, true);
@@ -4077,14 +3611,11 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
-        if (parsed.ACCOUNTS) ACCOUNTS = parsed.ACCOUNTS;
-        if (parsed.balancesByMonth) balancesByMonth = parsed.balancesByMonth;
         if (parsed.FIXED_BILL_CATEGORIES) FIXED_BILL_CATEGORIES = parsed.FIXED_BILL_CATEGORIES;
         if (parsed.EXPENSE_CATEGORIES) EXPENSE_CATEGORIES = parsed.EXPENSE_CATEGORIES;
         if (parsed.INCOME_CATEGORIES) INCOME_CATEGORIES = parsed.INCOME_CATEGORIES;
         if (parsed.monthlyBills) monthlyBills = parsed.monthlyBills;
         if (parsed.transactions) transactions = parsed.transactions;
-        if (parsed.accountTransfers) accountTransfers = parsed.accountTransfers;
         if (parsed.OFICIAL_SELL_RATE) OFICIAL_SELL_RATE = parsed.OFICIAL_SELL_RATE;
         if (parsed.nextPaydayDateStr) {
           nextPaydayDateStr = parsed.nextPaydayDateStr;
@@ -4638,7 +4169,7 @@
     // Registro de Service Worker para soporte Offline 100% y Auto-actualización Silenciosa
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=10').then((reg) => {
+        navigator.serviceWorker.register('./sw.js?v=11').then((reg) => {
           reg.update().catch(() => {});
           setInterval(() => {
             reg.update().catch(() => {});

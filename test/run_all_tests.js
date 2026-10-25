@@ -26,11 +26,6 @@ function createFreshAppState() {
     txTypeFilter: 'all',
     txSearchQuery: '',
     transferredMonths: {},
-    accounts: [
-      { id: 'acc-pp', name: 'Personal Pay', icon: '📱', balance: 315400 },
-      { id: 'acc-bank', name: 'Banco', icon: '🏦', balance: 129690 },
-      { id: 'acc-cash', name: 'Efectivo', icon: '💵', balance: 48500 }
-    ],
     fixedCategories: [
       { id: 'fcat-home', name: 'Alquiler / Vivienda', icon: '🏠', color: '#8B5CF6' },
       { id: 'fcat-services', name: 'Servicios (Luz/Gas/Int)', icon: '💡', color: '#6366F1' },
@@ -92,36 +87,32 @@ function createFreshAppState() {
     transactions: {
       '2026-11': [],
       '2026-10': [
-        { id: 't-oct-inc1', monthKey: '2026-10', dayLabel: '1 Oct', type: 'income', categoryId: 'inc-sueldo', accountId: 'acc-bank', amount: 1767474, note: 'Sueldo Neto' },
-        { id: 't-oct-inc2', monthKey: '2026-10', dayLabel: 'Martes 13', type: 'income', categoryId: 'inc-adelanto', accountId: 'acc-bank', amount: 700000, note: 'Adelanto de sueldo' },
-        { id: 't-oct-1', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-super', accountId: 'acc-pp', amount: 9029, note: 'Fiambre' },
-        { id: 't-oct-2', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', accountId: 'acc-pp', amount: 4110, note: 'Denuncia de venta Captiva' },
-        { id: 't-oct-3', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', accountId: 'acc-pp', amount: 3900, note: 'DiDi' },
-        { id: 't-oct-4', monthKey: '2026-10', dayLabel: 'Miércoles 14', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 45000, note: 'Emilis (25.000 + 20.000)' },
-        { id: 't-oct-5', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 23000, note: 'Emilis (5.000 + 18.000)' },
-        { id: 't-oct-6', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-super', accountId: 'acc-cash', amount: 7400, note: 'Jamón y queso' },
-        { id: 't-oct-7', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-other', accountId: 'acc-pp', amount: 33000, note: 'Corte de pelo' },
-        { id: 't-oct-8', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 14000, note: 'Emilis' },
-        { id: 't-oct-9', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-food', accountId: 'acc-pp', amount: 9500, note: 'Mostaza' },
-        { id: 't-oct-10', monthKey: '2026-10', dayLabel: 'Viernes 9', type: 'expense', categoryId: 'cat-emilis', accountId: 'acc-pp', amount: 20000, note: 'Emilis' },
-        { id: 't-oct-14', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', accountId: 'acc-bank', amount: 45100, note: 'Carne' },
-        { id: 't-oct-15', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', accountId: 'acc-cash', amount: 30788, note: 'Verduras' },
-        { id: 't-oct-16', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-food', accountId: 'acc-pp', amount: 13800, note: 'Burger (6.100 + 7.700)' }
+        { id: 't-oct-inc1', monthKey: '2026-10', dayLabel: '1 Oct', type: 'income', categoryId: 'inc-sueldo', amount: 1767474, note: 'Sueldo Neto' },
+        { id: 't-oct-inc2', monthKey: '2026-10', dayLabel: 'Martes 13', type: 'income', categoryId: 'inc-adelanto', amount: 700000, note: 'Adelanto de sueldo' },
+        { id: 't-oct-1', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-super', amount: 9029, note: 'Fiambre' },
+        { id: 't-oct-2', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', amount: 4110, note: 'Denuncia de venta Captiva' },
+        { id: 't-oct-3', monthKey: '2026-10', dayLabel: 'Jueves 15', type: 'expense', categoryId: 'cat-auto', amount: 3900, note: 'DiDi' },
+        { id: 't-oct-4', monthKey: '2026-10', dayLabel: 'Miércoles 14', type: 'expense', categoryId: 'cat-emilis', amount: 45000, note: 'Emilis (25.000 + 20.000)' },
+        { id: 't-oct-5', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-emilis', amount: 23000, note: 'Emilis (5.000 + 18.000)' },
+        { id: 't-oct-6', monthKey: '2026-10', dayLabel: 'Lunes 12', type: 'expense', categoryId: 'cat-super', amount: 7400, note: 'Jamón y queso' },
+        { id: 't-oct-7', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-other', amount: 33000, note: 'Corte de pelo' },
+        { id: 't-oct-8', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-emilis', amount: 14000, note: 'Emilis' },
+        { id: 't-oct-9', monthKey: '2026-10', dayLabel: 'Sábado 10', type: 'expense', categoryId: 'cat-food', amount: 9500, note: 'Mostaza' },
+        { id: 't-oct-10', monthKey: '2026-10', dayLabel: 'Viernes 9', type: 'expense', categoryId: 'cat-emilis', amount: 20000, note: 'Emilis' },
+        { id: 't-oct-14', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', amount: 45100, note: 'Carne' },
+        { id: 't-oct-15', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-super', amount: 30788, note: 'Verduras' },
+        { id: 't-oct-16', monthKey: '2026-10', dayLabel: 'Martes 6', type: 'expense', categoryId: 'cat-food', amount: 13800, note: 'Burger (6.100 + 7.700)' }
       ],
       '2026-09': [
-        { id: 't-sep-inc1', monthKey: '2026-09', dayLabel: '1 Sep', type: 'income', categoryId: 'inc-sueldo', accountId: 'acc-bank', amount: 1765593, note: 'Sueldo Septiembre' },
-        { id: 't-sep-1', monthKey: '2026-09', dayLabel: 'Miércoles 16', type: 'expense', categoryId: 'cat-other', accountId: 'acc-bank', amount: 310000, note: 'Pasaporte Papá' },
-        { id: 't-sep-2', monthKey: '2026-09', dayLabel: 'Sábado 5', type: 'expense', categoryId: 'cat-super', accountId: 'acc-bank', amount: 285000, note: 'Compras mayoristas' }
+        { id: 't-sep-inc1', monthKey: '2026-09', dayLabel: '1 Sep', type: 'income', categoryId: 'inc-sueldo', amount: 1765593, note: 'Sueldo Septiembre' },
+        { id: 't-sep-1', monthKey: '2026-09', dayLabel: 'Miércoles 16', type: 'expense', categoryId: 'cat-other', amount: 310000, note: 'Pasaporte Papá' },
+        { id: 't-sep-2', monthKey: '2026-09', dayLabel: 'Sábado 5', type: 'expense', categoryId: 'cat-super', amount: 285000, note: 'Compras mayoristas' }
       ],
       '2026-08': [
-        { id: 't-aug-inc1', monthKey: '2026-08', dayLabel: '1 Ago', type: 'income', categoryId: 'inc-sueldo', accountId: 'acc-bank', amount: 2569000, note: 'Sueldo Agosto' },
-        { id: 't-aug-1', monthKey: '2026-08', dayLabel: 'Jueves 13', type: 'expense', categoryId: 'cat-auto', accountId: 'acc-bank', amount: 250000, note: 'Mecánico adicional' }
+        { id: 't-aug-inc1', monthKey: '2026-08', dayLabel: '1 Ago', type: 'income', categoryId: 'inc-sueldo', amount: 2569000, note: 'Sueldo Agosto' },
+        { id: 't-aug-1', monthKey: '2026-08', dayLabel: 'Jueves 13', type: 'expense', categoryId: 'cat-auto', amount: 250000, note: 'Mecánico adicional' }
       ]
-    },
-    transfers: [
-      { id: 'tr-1', fromId: 'acc-bank', toId: 'acc-pp', amount: 150000, note: 'Fondeo billetera diaria', dateLabel: 'Martes 13' },
-      { id: 'tr-2', fromId: 'acc-bank', toId: 'acc-cash', amount: 40000, note: 'Retiro efectivo cajero', dateLabel: 'Jueves 8' }
-    ]
+    }
   };
 }
 
@@ -422,7 +413,6 @@ runSuite(
         dayLabel: '1 Sep',
         type: 'income',
         categoryId: 'inc-extra',
-        accountId: 'acc-bank',
         amount: augAvail,
         note: 'Sobrante a favor de Agosto 2026'
       });
@@ -573,12 +563,12 @@ runSuite(
 // ============================================================================
 runSuite(
   'Suite 5: Movimientos Diarios e Ingresos (Alta, Edición, Eliminación, Fechas y Búsqueda)',
-  'Verifica los botones separados "🧾 Cargar Gasto" y "＋ Ingreso", fechas Hoy/Ayer/Calendario, edición con ajuste automático de billetera, eliminación y buscador.',
+  'Verifica la carga ágil sin cuentas ni billeteras ("🧾 Gasto" y "＋ Ingreso"), fechas Hoy/Ayer/Calendario, edición directa, eliminación y buscador.',
   ({ test }) => {
-    test('TC-23', 'Alta de Gasto Diario con suma rápida descuenta saldo de la cuenta seleccionada', 'E2E Flujo', () => {
+    test('TC-23', 'Alta de Gasto Diario con suma rápida descuenta del Disponible y de la Plata en Mano al instante', 'E2E Flujo', () => {
       const state = createFreshAppState();
-      const mpAcc = state.accounts.find(a => a.id === 'acc-pp');
-      const beforeBalance = mpAcc.balance; // $ 315.400
+      const before = getMonthMetrics(state, '2026-10');
+      const beforeCash = before.income - before.fixedPaid - before.dailyExpense; // $ 902.514
       const amount = parseSumExpression('4100+1890'); // $ 5.990
 
       state.transactions['2026-10'].unshift({
@@ -587,24 +577,24 @@ runSuite(
         dayLabel: 'Hoy (20/10)',
         type: 'expense',
         categoryId: 'cat-food',
-        accountId: 'acc-pp',
         amount,
         note: 'Pancho y gaseosa (4100 + 1890)'
       });
-      mpAcc.balance -= amount;
 
-      assert.strictEqual(mpAcc.balance, beforeBalance - 5990);
+      const after = getMonthMetrics(state, '2026-10');
+      const afterCash = after.income - after.fixedPaid - after.dailyExpense;
+      assert.strictEqual(after.available, before.available - 5990);
+      assert.strictEqual(afterCash, beforeCash - 5990);
       return {
-        input: 'Gasto $ 5.990 ("4100+1890") con Personal Pay',
-        expected: 'Saldo Personal Pay pasa de $ 315.400 a $ 309.410',
-        actual: `Saldo Personal Pay: ${formatMoney(mpAcc.balance)}`,
-        note: 'Impacta en Movimientos del Mes y en la billetera elegida'
+        input: 'Gasto $ 5.990 ("4100+1890") en Comida',
+        expected: 'Plata en mano baja a $ 896.524 y Plata libre baja a $ 484.002',
+        actual: `En mano: ${formatMoney(afterCash)} | Libre: ${formatMoney(after.available)}`,
+        note: 'Impacta directo en Movimientos y en la Hero Card sin pedir billetera'
       };
     });
 
-    test('TC-24', 'Alta de Ingreso (ej. Uber / DiDi) incrementa saldo de la cuenta y el Disponible del mes', 'E2E Flujo', () => {
+    test('TC-24', 'Alta de Ingreso (ej. Uber / DiDi) incrementa la Plata en Mano y el Disponible libre del mes', 'E2E Flujo', () => {
       const state = createFreshAppState();
-      const mpAcc = state.accounts.find(a => a.id === 'acc-pp');
       const beforeAvail = getMonthMetrics(state, '2026-10').available; // $ 489.992
 
       state.transactions['2026-10'].unshift({
@@ -613,68 +603,56 @@ runSuite(
         dayLabel: 'Hoy (20/10)',
         type: 'income',
         categoryId: 'inc-uber',
-        accountId: 'acc-pp',
         amount: 35000,
         note: 'Viajes Uber sábado'
       });
-      mpAcc.balance += 35000;
 
-      const afterAvail = getMonthMetrics(state, '2026-10').available;
-      assert.strictEqual(afterAvail, beforeAvail + 35000);
-      assert.strictEqual(mpAcc.balance, 315400 + 35000);
+      const after = getMonthMetrics(state, '2026-10');
+      const afterCash = after.income - after.fixedPaid - after.dailyExpense;
+      assert.strictEqual(after.available, beforeAvail + 35000);
+      assert.strictEqual(afterCash, 902514 + 35000);
       return {
-        input: 'Ingreso +$ 35.000 (Categoría: Uber / DiDi -> Personal Pay)',
-        expected: 'Disponible sube a $ 524.992 y Personal Pay a $ 350.400',
-        actual: `Disponible: ${formatMoney(afterAvail)} | Personal Pay: ${formatMoney(mpAcc.balance)}`,
-        note: 'Botón "＋ Ingreso" usa categorías exclusivas de ingreso'
+        input: 'Ingreso +$ 35.000 (Categoría: Uber / DiDi)',
+        expected: 'Disponible libre sube a $ 524.992 y Plata en mano a $ 937.514',
+        actual: `Disponible: ${formatMoney(after.available)} | En mano: ${formatMoney(afterCash)}`,
+        note: 'Usa categorías exclusivas de ingreso'
       };
     });
 
-    test('TC-25', 'Edición de un movimiento existente revierte el saldo en la cuenta anterior y aplica el nuevo', 'E2E Flujo Crítico', () => {
+    test('TC-25', 'Edición de un movimiento existente recalcula Gastos Diarios, Plata en Mano y Disponible', 'E2E Flujo Crítico', () => {
       const state = createFreshAppState();
-      const mpAcc = state.accounts.find(a => a.id === 'acc-pp');
-      const cashAcc = state.accounts.find(a => a.id === 'acc-cash');
-      const tx = state.transactions['2026-10'].find(t => t.id === 't-oct-1'); // Fiambre $ 9.029 en acc-pp
+      const tx = state.transactions['2026-10'].find(t => t.id === 't-oct-1'); // Fiambre $ 9.029
+      const availBefore = getMonthMetrics(state, '2026-10').available;
 
-      const mpBefore = mpAcc.balance;
-      const cashBefore = cashAcc.balance;
-
-      // 1. Revertir efecto anterior ($ 9.029 en Personal Pay)
-      mpAcc.balance += tx.amount;
-      // 2. Actualizar datos: ahora fue $ 10.500 pagado en Efectivo
+      // Actualizar monto de $ 9.029 a $ 10.500 (diferencia +$ 1.471 de gasto)
       tx.amount = 10500;
-      tx.accountId = 'acc-cash';
       tx.note = 'Fiambre y queso (Editado)';
-      // 3. Aplicar nuevo efecto en Efectivo
-      cashAcc.balance -= tx.amount;
 
-      assert.strictEqual(mpAcc.balance, mpBefore + 9029);
-      assert.strictEqual(cashAcc.balance, cashBefore - 10500);
+      const availAfter = getMonthMetrics(state, '2026-10').available;
+      assert.strictEqual(availAfter, availBefore - 1471);
       return {
-        input: 'Editar "Fiambre": de $ 9.029 (Personal Pay) a $ 10.500 (Efectivo)',
-        expected: 'Personal Pay recupera +$ 9.029 ($ 324.429) y Efectivo descuenta -$ 10.500 ($ 38.000)',
-        actual: `Personal Pay: ${formatMoney(mpAcc.balance)} | Efectivo: ${formatMoney(cashAcc.balance)}`,
-        note: 'Consistencia contable perfecta al editar monto o cuenta'
+        input: 'Editar "Fiambre": de $ 9.029 a $ 10.500',
+        expected: 'Disponible se ajusta exactamente en -$ 1.471 ($ 488.521)',
+        actual: `Disponible: ${formatMoney(availAfter)}`,
+        note: 'Consistencia contable inmediata al editar monto o categoría'
       };
     });
 
-    test('TC-26', 'Eliminación de un movimiento restaura el saldo en la cuenta y lo borra de la lista', 'E2E Flujo Crítico', () => {
+    test('TC-26', 'Eliminación de un movimiento restaura el Disponible del mes y lo borra de la lista', 'E2E Flujo Crítico', () => {
       const state = createFreshAppState();
-      const mpAcc = state.accounts.find(a => a.id === 'acc-pp');
-      const tx = state.transactions['2026-10'].find(t => t.id === 't-oct-3'); // DiDi $ 3.900 en acc-pp
-      const mpBefore = mpAcc.balance;
+      const tx = state.transactions['2026-10'].find(t => t.id === 't-oct-3'); // DiDi $ 3.900
+      const availBefore = getMonthMetrics(state, '2026-10').available;
       const countBefore = state.transactions['2026-10'].length;
 
-      // Revertir y eliminar
-      mpAcc.balance += tx.amount;
       state.transactions['2026-10'] = state.transactions['2026-10'].filter(t => t.id !== tx.id);
+      const availAfter = getMonthMetrics(state, '2026-10').available;
 
-      assert.strictEqual(mpAcc.balance, mpBefore + 3900);
+      assert.strictEqual(availAfter, availBefore + 3900);
       assert.strictEqual(state.transactions['2026-10'].length, countBefore - 1);
       return {
-        input: 'Eliminar gasto "DiDi" ($ 3.900 en Personal Pay)',
-        expected: 'Personal Pay recupera +$ 3.900 ($ 319.300) y lista pasa de 15 a 14 movimientos',
-        actual: `Personal Pay: ${formatMoney(mpAcc.balance)} | Movimientos: ${state.transactions['2026-10'].length}`,
+        input: 'Eliminar gasto "DiDi" ($ 3.900)',
+        expected: 'Disponible recupera +$ 3.900 ($ 493.892) y lista pasa de 15 a 14 movimientos',
+        actual: `Disponible: ${formatMoney(availAfter)} | Movimientos: ${state.transactions['2026-10'].length}`,
         note: 'Reversión automática al borrar movimiento'
       };
     });
@@ -702,79 +680,71 @@ runSuite(
 );
 
 // ============================================================================
-// SUITE 6: CUENTAS / BILLETERAS, AJUSTE DE SALDO Y TRANSFERENCIAS INTERNAS
+// SUITE 6: AUDITORÍA DE ARQUITECTURA (SIN CUENTAS/BILLETERAS, ETIQUETAS Y SYNC)
 // ============================================================================
 runSuite(
-  'Suite 6: Cuentas (Personal Pay, Banco, Efectivo), Ajuste Manual y Transferencias',
-  'Verifica el ajuste directo de saldo real ("✏️ Ajustar saldo") y las transferencias entre cuentas propias sin duplicar gastos ni ingresos.',
+  'Suite 6: Auditoría de Código Real (Eliminación Total de Cuentas/Billeteras, Etiquetas UI y Sync LWW)',
+  'Inspecciona directamente index.html, web/index.html y sw.js para garantizar que no existan restos de Cuentas/Billeteras, que Gastos Fijos tenga su etiqueta clara y que la sincronización sea limpia.',
   ({ test }) => {
-    test('TC-28', 'Ajuste manual de saldo real ("✏️ Ajustar saldo") actualiza la billetera al instante', 'E2E Flujo', () => {
-      const state = createFreshAppState();
-      const cash = state.accounts.find(a => a.id === 'acc-cash');
-      cash.balance = 62500;
-      assert.strictEqual(cash.balance, 62500);
+    test('TC-28', 'Ausencia total de Cuentas y Billeteras en HTML, Ajustes y Estado JS (index.html y web/index.html)', 'Auditoría Código Real', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const indexHtml = fs.readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
+      const webIndexHtml = fs.readFileSync(path.join(projectRoot, 'web', 'index.html'), 'utf8');
+
+      const forbiddenTokens = [
+        'Cuentas y Billeteras',
+        'settingsAccountsList',
+        'let ACCOUNTS',
+        'balancesByMonth',
+        'accountTransfers',
+        'openAdjustBalanceModal',
+        'submitAccountTransfer',
+        'addCustomAccount',
+        'removeAccount',
+        'transferencias_cuentas'
+      ];
+      const foundTokens = forbiddenTokens.filter(token => indexHtml.includes(token));
+      assert.strictEqual(foundTokens.length, 0, `Se encontraron referencias prohibidas a cuentas: ${foundTokens.join(', ')}`);
+      assert.strictEqual(indexHtml === webIndexHtml, true, 'index.html y web/index.html deben ser 100% idénticos');
+
       return {
-        input: 'Ajustar saldo de Efectivo a $ 62.500',
-        expected: '$ 62.500',
-        actual: formatMoney(cash.balance),
-        note: 'Permite cuadrar el saldo real de la billetera en cualquier momento'
+        input: 'Escaneo estático de 10 símbolos/secciones de Cuentas y Billeteras en index.html y web/index.html',
+        expected: '0 referencias a Cuentas/Billeteras + Paridad 100% entre index.html y web/index.html',
+        actual: `Referencias encontradas: ${foundTokens.length} | Paridad web/index.html: OK`,
+        note: 'Garantiza que Cuentas y Billeteras nunca vuelva a aparecer en Ajustes ni en la lógica'
       };
     });
 
-    test('TC-29', 'Transferencia entre cuentas propias (Banco -> Personal Pay) mueve el dinero sin alterar el Disponible del mes', 'E2E Flujo Crítico', () => {
-      const state = createFreshAppState();
-      const bank = state.accounts.find(a => a.id === 'acc-bank');
-      const mp = state.accounts.find(a => a.id === 'acc-pp');
-      const availBefore = getMonthMetrics(state, '2026-10').available;
-      const totalPatrimonyBefore = bank.balance + mp.balance;
+    test('TC-29', 'Etiqueta explícita "Total Gastos Fijos:" en la sección de Fijos (#billsTotalText y renderAll)', 'Auditoría UI', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const indexHtml = fs.readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
 
-      // Transferir $ 50.000 de Banco a Personal Pay
-      const transferAmount = 50000;
-      bank.balance -= transferAmount;
-      mp.balance += transferAmount;
-      state.transfers.unshift({
-        id: 'tr_new',
-        fromId: 'acc-bank',
-        toId: 'acc-pp',
-        amount: transferAmount,
-        note: 'Fondeo billetera virtual',
-        dateLabel: 'Hoy'
-      });
+      assert.strictEqual(indexHtml.includes('Total Gastos Fijos:'), true, 'Debe mostrar "Total Gastos Fijos:"');
+      assert.strictEqual(indexHtml.includes('Total Fijos:'), false, 'No debe quedar el texto ambiguo "Total Fijos:"');
 
-      const availAfter = getMonthMetrics(state, '2026-10').available;
-      const totalPatrimonyAfter = bank.balance + mp.balance;
-
-      assert.strictEqual(bank.balance, 129690 - 50000);
-      assert.strictEqual(mp.balance, 315400 + 50000);
-      assert.strictEqual(availAfter, availBefore);
-      assert.strictEqual(totalPatrimonyAfter, totalPatrimonyBefore);
       return {
-        input: 'Transferir $ 50.000 desde Banco hacia Personal Pay',
-        expected: 'Banco: $ 79.690 | Personal Pay: $ 365.400 | Disponible intacto: $ 489.992',
-        actual: `Banco: ${formatMoney(bank.balance)} | Personal Pay: ${formatMoney(mp.balance)} | Disponible: ${formatMoney(availAfter)}`,
-        note: 'No contamina los Gastos ni los Ingresos del mes'
+        input: 'Verificación de #billsTotalText en HTML inicial y en renderAll()',
+        expected: 'Usa "Total Gastos Fijos:" en todos los lugares de la pestaña Fijos',
+        actual: 'Texto "Total Gastos Fijos:" verificado en HTML y JS',
+        note: 'Claridad total en el encabezado de la pestaña Gastos Fijos'
       };
     });
 
-    test('TC-30', 'Alta, edición de nombre/ícono y eliminación segura de Cuentas en Ajustes', 'E2E Flujo', () => {
-      const state = createFreshAppState();
-      state.accounts.push({ id: 'acc-lemon', name: 'Lemon Cash', icon: '🍋', balance: 25000 });
-      assert.strictEqual(state.accounts.length, 4);
+    test('TC-30', 'Sincronización LWW sin resurrecciones, Inicio fijo en Mes Actual, Commit en Ajustes y SW Network-First', 'Auditoría Sync & PWA', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const indexHtml = fs.readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
+      const swJs = fs.readFileSync(path.join(projectRoot, 'sw.js'), 'utf8');
 
-      // Editar cuenta
-      const lemon = state.accounts.find(a => a.id === 'acc-lemon');
-      lemon.name = 'Lemon Card';
-      lemon.icon = '💳';
-      assert.strictEqual(lemon.name, 'Lemon Card');
+      assert.strictEqual(indexHtml.includes('id="appCommitHash"'), true, 'Ajustes debe mostrar solo el hash de commit en #appCommitHash');
+      assert.strictEqual(indexHtml.includes('loadLatestCommitHash()'), true, 'Debe consultar el commit actual al iniciar');
+      assert.strictEqual(indexHtml.includes('selectedMonth = currentActiveMonth;'), true, 'Al iniciar/actualizar debe ubicarse siempre en el mes actual');
+      assert.strictEqual(swJs.includes("fetch(event.request, { cache: 'no-store' })"), true, 'El Service Worker debe usar Network-First en navegación HTML');
 
-      // Eliminar cuenta
-      state.accounts = state.accounts.filter(a => a.id !== 'acc-lemon');
-      assert.strictEqual(state.accounts.length, 3);
       return {
-        input: 'Crear "Lemon Cash" 🍋 -> Editar a "Lemon Card" 💳 -> Eliminar',
-        expected: 'Vuelve a las 3 cuentas principales sin errores',
-        actual: `${state.accounts.length} cuentas activas`,
-        note: 'CRUD completo de cuentas en Ajustes'
+        input: 'Verificación de #appCommitHash, selectedMonth = currentActiveMonth y sw.js Network-First',
+        expected: 'Commit visible en Ajustes + Inicio en Mes Actual + SW Network-First activo',
+        actual: 'Todos los controles de actualización, mes activo y caché verificados',
+        note: 'Evita quedar atrapado en un commit viejo o saltar al primer mes cargado al actualizar'
       };
     });
   }
@@ -932,27 +902,27 @@ runSuite(
       };
     });
 
-    test('TC-39', 'Verificación de Esquema SQL en Español para Supabase (cuentas, categorias, gastos_fijos, movimientos)', 'E2E Base de Datos', () => {
+    test('TC-39', 'Verificación de Esquema SQL en Español para Supabase (5 tablas activas y baja de cuentas/transferencias)', 'E2E Base de Datos', () => {
       const projectRoot = path.resolve(__dirname, '..');
       const sqlPath = path.join(projectRoot, 'supabase', 'migrations', '0001_initial_schema.sql');
       const sqlContent = fs.readFileSync(sqlPath, 'utf8');
 
       const requiredTables = [
-        'public.cuentas',
         'public.categorias',
         'public.gastos_fijos',
         'public.movimientos',
-        'public.transferencias_cuentas',
         'public.configuracion_usuario',
         'public.estado_sincronizado'
       ];
       const allPresent = requiredTables.every(t => sqlContent.includes(t));
-      assert.strictEqual(allPresent, true);
+      const dropsOldAccounts = sqlContent.includes('DROP TABLE IF EXISTS public.cuentas')
+        && sqlContent.includes('DROP TABLE IF EXISTS public.transferencias_cuentas');
+      assert.strictEqual(allPresent && dropsOldAccounts, true);
       return {
         input: 'Inspección de 0001_initial_schema.sql',
-        expected: '7 tablas 100% en español creadas con políticas RLS',
-        actual: '7/7 tablas en español verificadas',
-        note: 'Tablas: cuentas, categorias, gastos_fijos, movimientos, transferencias_cuentas, configuracion_usuario, estado_sincronizado'
+        expected: '5 tablas activas en español + DROP de cuentas y transferencias_cuentas',
+        actual: '5/5 tablas verificadas y tablas de cuentas eliminadas',
+        note: 'Tablas activas: categorias, gastos_fijos, movimientos, configuracion_usuario, estado_sincronizado'
       };
     });
 
