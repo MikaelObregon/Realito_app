@@ -1041,9 +1041,28 @@ runSuite(
 
       return {
         input: 'Inspección de monthlyBills y copyBillsFromPreviousMonth() en index.html',
-        expected: '0 notas genéricas de plantilla, 0 fijos en Noviembre 2026, 7 notas reales intactas y note: "" al copiar fijos',
-        actual: '36 fijos limpios (Ago/Sep/Oct), 7 notas reales preservadas, Noviembre en 0 y copia sin notas viejas',
+        expected: '0 notas genéricas de plantilla, 0 fijos viejos en Noviembre 2026, notas reales intactas y note: "" al copiar fijos',
+        actual: 'Notas genéricas eliminadas, notas reales preservadas y copia de mes sin arrastrar notas viejas',
         note: 'Evita que aparezcan comentarios pre-cargados o se arrastren notas de meses anteriores'
+      };
+    });
+
+    test('TC-45', 'Limpieza automática de mensajes de validación obligatoria al usar teclado numérico, abrir/cerrar modales y temporizador', 'E2E Validación UI', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const htmlPath = path.join(projectRoot, 'index.html');
+      const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+      assert.ok(htmlContent.includes('function clearValidationErrors('), 'Debe existir la función clearValidationErrors');
+      assert.ok(/function pressKey\(key\)\s*\{\s*clearValidationErrors/.test(htmlContent), 'pressKey debe limpiar errores de validación en quickModal');
+      assert.ok(/function openQuickModal\(type\)\s*\{\s*clearValidationErrors/.test(htmlContent), 'openQuickModal debe limpiar errores previos');
+      assert.ok(/function openEditBillModal\(billId\)\s*\{\s*clearValidationErrors/.test(htmlContent), 'openEditBillModal debe limpiar errores previos');
+      assert.ok(htmlContent.includes('setTimeout(removeHandler, 3500)'), 'highlightRequiredInput debe auto-ocultar el mensaje tras 3.5s');
+
+      return {
+        input: 'Inspección de highlightRequiredInput(), clearValidationErrors(), pressKey() y apertura/cierre de modales',
+        expected: 'Los avisos de campo obligatorio desaparecen al tocar el teclado numérico, al abrir/cerrar modales o a los 3.5s',
+        actual: 'clearValidationErrors activo en pressKey, quickModal, editBillModal, editTxModal, editItemModal + auto-hide 3.5s',
+        note: 'Impide que el cartel "Ingresá un monto mayor a $ 0" quede fijo en pantalla'
       };
     });
   }
