@@ -738,6 +738,9 @@ runSuite(
       assert.strictEqual(indexHtml.includes('id="appCommitHash"'), true, 'Ajustes debe mostrar solo el hash de commit en #appCommitHash');
       assert.strictEqual(indexHtml.includes('loadLatestCommitHash()'), true, 'Debe consultar el commit actual al iniciar');
       assert.strictEqual(indexHtml.includes('selectedMonth = currentActiveMonth;'), true, 'Al iniciar/actualizar debe ubicarse siempre en el mes actual');
+      const renderAllClean = /renderSettingsTab\(\);\s*renderReportsTab\(\);\s*\}\s*function openDolarRateModal/.test(indexHtml);
+      assert.strictEqual(renderAllClean, true, 'renderAll() no debe llamar a saveStateToLocalStorage() al iniciar');
+      assert.strictEqual(indexHtml.includes('SYNC_FIX_VERSION'), true, 'Debe incluir migración limpia de caché para sincronización móvil');
       assert.strictEqual(swJs.includes("fetch(event.request, { cache: 'no-store' })"), true, 'El Service Worker debe usar Network-First en navegación HTML');
 
       return {
