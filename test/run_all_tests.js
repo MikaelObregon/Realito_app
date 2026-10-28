@@ -1026,6 +1026,26 @@ runSuite(
         note: 'Garantiza claridad financiera absoluta en la pantalla principal (Opción 1)'
       };
     });
+
+    test('TC-44', 'Limpieza de notas genéricas de plantilla, Noviembre 2026 en cero y copia de fijos sin arrastrar notas viejas', 'E2E Fijos y Notas', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const htmlPath = path.join(projectRoot, 'index.html');
+      const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+      assert.strictEqual(htmlContent.includes('Pagado mes completo'), false, 'No debe incluir notas genéricas de plantilla');
+      assert.strictEqual(htmlContent.includes('Cuota mensual colegio'), false, 'No debe incluir notas genéricas de plantilla');
+      assert.strictEqual(htmlContent.includes('b-nov-copy-'), false, 'Noviembre 2026 debe arrancar limpio sin fijos viejos');
+      assert.ok(htmlContent.includes('7.000 + 200.000 + 30.000 + 20.000'), 'Debe conservar la nota real de Luz Marina');
+      assert.ok(htmlContent.includes('15gasolina+10limpiador+15gasolina'), 'Debe conservar la nota real de Seguro Auto');
+      assert.ok(/dueDay:\s*b\.dueDay\s*\|\|\s*10,\s*isPaid:\s*false,\s*note:\s*''/.test(htmlContent), 'copyBillsFromPreviousMonth debe copiar con note: ""');
+
+      return {
+        input: 'Inspección de monthlyBills y copyBillsFromPreviousMonth() en index.html',
+        expected: '0 notas genéricas de plantilla, 0 fijos en Noviembre 2026, 7 notas reales intactas y note: "" al copiar fijos',
+        actual: '36 fijos limpios (Ago/Sep/Oct), 7 notas reales preservadas, Noviembre en 0 y copia sin notas viejas',
+        note: 'Evita que aparezcan comentarios pre-cargados o se arrastren notas de meses anteriores'
+      };
+    });
   }
 );
 
