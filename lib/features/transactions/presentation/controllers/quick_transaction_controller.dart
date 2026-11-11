@@ -794,6 +794,31 @@ class MonthlyBillsNotifier extends StateNotifier<List<MonthlyBillEntity>> {
     ];
   }
 
+  /// Mueve un gasto fijo hacia arriba (`direction = -1`) o hacia abajo (`direction = 1`)
+  /// dentro de su bloque (Pendientes o Pagados) del mismo mes.
+  void moveBillOrder(String billId, int direction) {
+    final targetIdx = state.indexWhere((b) => b.id == billId);
+    if (targetIdx == -1) return;
+    final target = state[targetIdx];
+    final sameGroup = state
+        .where((b) => b.monthKey == target.monthKey && b.isPaid == target.isPaid)
+        .toList();
+    final groupIdx = sameGroup.indexWhere((b) => b.id == billId);
+    if (groupIdx == -1) return;
+    final neighborIdx = groupIdx + direction;
+    if (neighborIdx < 0 || neighborIdx >= sameGroup.length) return;
+
+    final neighbor = sameGroup[neighborIdx];
+    final masterIdxB = state.indexWhere((b) => b.id == neighbor.id);
+    if (masterIdxB == -1) return;
+
+    final updated = [...state];
+    final temp = updated[targetIdx];
+    updated[targetIdx] = updated[masterIdxB];
+    updated[masterIdxB] = temp;
+    state = updated;
+  }
+
   /// Permite modificar absolutamente todos los datos de un Gasto Fijo existente.
   void updateBillFull({
     required String billId,

@@ -20,6 +20,8 @@ class PlanningScreen extends ConsumerWidget {
 
     final monthBills =
         allBills.where((b) => b.monthKey == selectedMonth.key).toList();
+    final pendingBills = monthBills.where((b) => !b.isPaid).toList();
+    final paidBills = monthBills.where((b) => b.isPaid).toList();
 
     int totalBillsMinor = 0;
     int paidBillsMinor = 0;
@@ -157,24 +159,109 @@ class PlanningScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 14),
 
-          // 2. Checklist de Gastos Fijos del Mes (Tocá cualquiera para modificar nombre, monto, fecha o nota)
-          for (final bill in monthBills)
-            _MonthlyBillCard(
-              bill: bill,
-              category: fixedCategories
-                  .where((c) => c.id == bill.categoryId)
-                  .firstOrNull,
-              onTogglePaid: () {
-                ref
-                    .read(monthlyBillsProvider.notifier)
-                    .toggleBillPaid(bill.id);
-              },
-              onEditBill: () => _showEditBillDialog(
-                context,
-                ref,
-                bill,
+          // 2. Checklist de Gastos Fijos del Mes: Pendientes arriba y Pagados abajo
+          if (pendingBills.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '⏳ Faltan pagar (${pendingBills.length})',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.warningLight,
+                    ),
+                  ),
+                  Text(
+                    'Falta: ${MoneyFormatter.formatMinor(pendingBillsMinor, currencyCode: 'ARS')}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ),
+            for (int i = 0; i < pendingBills.length; i++)
+              _MonthlyBillCard(
+                bill: pendingBills[i],
+                category: fixedCategories
+                    .where((c) => c.id == pendingBills[i].categoryId)
+                    .firstOrNull,
+                canMoveUp: i > 0,
+                canMoveDown: i < pendingBills.length - 1,
+                onMoveUp: () => ref
+                    .read(monthlyBillsProvider.notifier)
+                    .moveBillOrder(pendingBills[i].id, -1),
+                onMoveDown: () => ref
+                    .read(monthlyBillsProvider.notifier)
+                    .moveBillOrder(pendingBills[i].id, 1),
+                onTogglePaid: () {
+                  ref
+                      .read(monthlyBillsProvider.notifier)
+                      .toggleBillPaid(pendingBills[i].id);
+                },
+                onEditBill: () => _showEditBillDialog(
+                  context,
+                  ref,
+                  pendingBills[i],
+                ),
+              ),
+          ],
+
+          if (paidBills.isNotEmpty) ...[
+            if (pendingBills.isNotEmpty) const Divider(height: 24),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '✅ Ya pagados (${paidBills.length})',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.incomeLight,
+                    ),
+                  ),
+                  Text(
+                    'Total: ${MoneyFormatter.formatMinor(paidBills.fold<int>(0, (s, b) => s + b.amountMinor), currencyCode: 'ARS')}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            for (int i = 0; i < paidBills.length; i++)
+              _MonthlyBillCard(
+                bill: paidBills[i],
+                category: fixedCategories
+                    .where((c) => c.id == paidBills[i].categoryId)
+                    .firstOrNull,
+                canMoveUp: i > 0,
+                canMoveDown: i < paidBills.length - 1,
+                onMoveUp: () => ref
+                    .read(monthlyBillsProvider.notifier)
+                    .moveBillOrder(paidBills[i].id, -1),
+                onMoveDown: () => ref
+                    .read(monthlyBillsProvider.notifier)
+                    .moveBillOrder(paidBills[i].id, 1),
+                onTogglePaid: () {
+                  ref
+                      .read(monthlyBillsProvider.notifier)
+                      .toggleBillPaid(paidBills[i].id);
+                },
+                onEditBill: () => _showEditBillDialog(
+                  context,
+                  ref,
+                  paidBills[i],
+                ),
+              ),
+          ],
 
           const SizedBox(height: 24),
 
@@ -628,12 +715,20 @@ class _MonthlyBillCard extends StatelessWidget {
     required this.category,
     required this.onTogglePaid,
     required this.onEditBill,
+    this.canMoveUp = false,
+    this.canMoveDown = false,
+    this.onMoveUp,
+    this.onMoveDown,
   });
 
   final MonthlyBillEntity bill;
   final CategoryEntity? category;
   final VoidCallback onTogglePaid;
   final VoidCallback onEditBill;
+  final bool canMoveUp;
+  final bool canMoveDown;
+  final VoidCallback? onMoveUp;
+  final VoidCallback? onMoveDown;
 
   @override
   Widget build(BuildContext context) {
@@ -722,15 +817,27 @@ class _MonthlyBillCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Text(
-                          '✏️ Modificar nombre / monto / nota',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.primaryLight,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
+                         const Text(
+                           '✏️ Modificar nombre / monto / nota',
+                           style: TextStyle(
+                             fontSize: 11,
+                             color: AppColors.primaryLight,
+                             fontWeight: FontWeight.w700,
+                           ),
+                         ),
+                         IconButton(
+                           icon: const Icon(Icons.keyboard_arrow_up_rounded, size: 18),
+                           visualDensity: VisualDensity.compact,
+                           tooltip: 'Subir gasto',
+                           onPressed: canMoveUp ? onMoveUp : null,
+                         ),
+                         IconButton(
+                           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
+                           visualDensity: VisualDensity.compact,
+                           tooltip: 'Bajar gasto',
+                           onPressed: canMoveDown ? onMoveDown : null,
+                         ),
+                       ],
                     ),
                     if (bill.note.isNotEmpty) ...[
                       const SizedBox(height: 6),

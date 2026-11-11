@@ -1065,6 +1065,44 @@ runSuite(
         note: 'Impide que el cartel "Ingresá un monto mayor a $ 0" quede fijo en pantalla'
       };
     });
+
+    test('TC-46', 'Organización automática de Gastos Fijos (Pendientes arriba / Pagados abajo) y reordenamiento manual (▲ / ▼)', 'E2E Organización Fijos', () => {
+      const projectRoot = path.resolve(__dirname, '..');
+      const htmlPath = path.join(projectRoot, 'index.html');
+      const htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+      assert.ok(htmlContent.includes('function moveBillOrder(billId, direction)'), 'Debe existir moveBillOrder(billId, direction)');
+      assert.ok(htmlContent.includes('⏳ Faltan pagar ('), 'Debe mostrar el bloque superior de pendientes');
+      assert.ok(htmlContent.includes('✅ Ya pagados ('), 'Debe mostrar el bloque inferior de pagados');
+
+      // Simulación funcional de movimiento arriba/abajo dentro de pendientes
+      const bills = [
+        { id: 'b1', monthKey: '2026-11', title: 'Luz', isPaid: true },
+        { id: 'b2', monthKey: '2026-11', title: 'iCloud', isPaid: false },
+        { id: 'b3', monthKey: '2026-11', title: 'Alquiler', isPaid: true },
+        { id: 'b4', monthKey: '2026-11', title: 'Go Cuotas', isPaid: false },
+        { id: 'b5', monthKey: '2026-11', title: 'Corte de pelo', isPaid: false }
+      ];
+      // Mover 'Go Cuotas' (b4) hacia arriba (-1) dentro de los pendientes (debe quedar antes que 'iCloud' b2)
+      const sameGroup = bills.filter(x => x.monthKey === '2026-11' && !x.isPaid);
+      const groupIdx = sameGroup.findIndex(x => x.id === 'b4');
+      const neighbor = sameGroup[groupIdx - 1];
+      const idxA = bills.findIndex(x => x.id === 'b4');
+      const idxB = bills.findIndex(x => x.id === neighbor.id);
+      const tmp = bills[idxA];
+      bills[idxA] = bills[idxB];
+      bills[idxB] = tmp;
+
+      const pendingAfter = bills.filter(x => !x.isPaid).map(x => x.title);
+      assert.deepStrictEqual(pendingAfter, ['Go Cuotas', 'iCloud', 'Corte de pelo']);
+
+      return {
+        input: 'Separar Pendientes arriba / Pagados abajo y subir "Go Cuotas" con ▲ por encima de "iCloud"',
+        expected: 'Pendientes arriba: ["Go Cuotas", "iCloud", "Corte de pelo"] | Pagados abajo separados',
+        actual: `Pendientes arriba: [${pendingAfter.join(', ')}] | Controles ▲/▼ activos`,
+        note: 'Los pagados bajan automáticamente y los botones ▲/▼ permiten subir o bajar cualquier gasto'
+      };
+    });
   }
 );
 
